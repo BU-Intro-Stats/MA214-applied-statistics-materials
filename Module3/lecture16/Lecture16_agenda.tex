@@ -1,0 +1,53 @@
+% !TEX root =  Lecture16.tex
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Recap/Agenda
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Module 3: Regression Inference}
+    \begin{itemize}
+        \item \hl{Previously:} prediction intervals, extrapolation, and cross-validation for a \emph{numerical} response (Lecture 15).
+        \item \hl{This time:} the same questions for a \hl{binary} response: logistic regression inference. Module 3's last topic.
+          \begin{itemize}
+              \item tests and confidence intervals for the coefficients, read as \hl{odds ratios};
+              \item confidence intervals for a predicted \hl{probability};
+              \item diagnostics: log-odds linearity and binned residuals;
+              \item classification, the \hl{Brier score} and \hl{log-loss}, and cross-validation.
+          \end{itemize}
+        \item \hl{Reading:} IMS Chapter 26 (Logistic Regression).
+        \item \hl{Homework:} the assigned reading.
+    \end{itemize}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Learning objectives:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+    \frametitle{Lecture Objectives}
+    \goals{%
+    \begin{itemize}
+    \item read a logistic \texttt{glm()} coefficient table, test $H_0:\beta_j = 0$ with the $z$-statistic, and interpret each $\hat\beta_j$ as an \hl{odds ratio} $e^{\hat\beta_j}$;
+    \item build a confidence interval for a coefficient, an odds ratio, and a predicted \hl{probability}, transforming on the log-odds scale;
+    \item state and check the conditions for valid logistic inference (independence, log-odds linearity, sample size);
+    \item score probabilistic predictions with the \hl{Brier score} and \hl{log-loss}, and compare models by \hl{cross-validation}.
+    \end{itemize}}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+    \frametitle{Lecture Objectives}
+    \objectives{%
+    \begin{itemize}
+    \item \textbf{(M3, LO6)} Logistic Regression Inference
+    \end{itemize}}
+    \vspace{0.3em}
+    {\small Building on, and revisiting:}
+    \objectives{%
+    \begin{itemize}
+    \item \textbf{(M1, LO6)} Logistic Regression Models: the model itself, from Lecture 6
+    \item \textbf{(M3, LO5)} Prediction and Cross-Validation: the machinery of Lecture 15, now for a binary outcome
+    \end{itemize}}
+\end{frame}

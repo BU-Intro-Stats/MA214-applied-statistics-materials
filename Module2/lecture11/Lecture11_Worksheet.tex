@@ -1,0 +1,138 @@
+\documentclass{article}
+\usepackage[margin=1.15in]{geometry}
+\usepackage{xcolor}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{tabularx}
+\usepackage{listings}
+
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\rhead{Lecture 11}
+\lhead{MA 214: Applied Statistics (Spring 2026)}
+\renewcommand{\headrulewidth}{.4mm}
+
+\newcommand{\blankline}[1]{\underline{\hspace{#1}}}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  frame=single,
+  framerule=0.4pt,
+  breaklines=true,
+  showstringspaces=false
+}
+
+\begin{document}
+
+\noindent\textbf{Name:}\blankline{2.25in}\hfill\textbf{BUID:}\blankline{1.55in}
+
+\medskip
+
+\noindent\textbf{Name:}\blankline{2.25in}\hfill\textbf{BUID:}\blankline{1.55in}\newline
+
+\begin{center}
+ \Large In-Class Worksheet: Testing for Independence
+\end{center}
+
+\subsection*{Scenario}
+A campus survey asks 200 students their year (first-year / senior) and whether they prefer office hours \emph{online} or \emph{in person}:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lrr|r}
+\toprule
+& Online & In person & \textbf{Total} \\
+\midrule
+First-year & 30 & 50 & 80 \\
+Senior     & 66 & 54 & 120 \\
+\midrule
+\textbf{Total} & \textbf{96} & \textbf{104} & \textbf{200} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\newpage
+
+\subsection*{Part 1: What would independence predict?}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item State $H_0$ and $H_A$ in words. \\[3em]
+\item Overall, what fraction of the 200 students prefer online? \hfill \blankline{1.2in} \\[1em]
+\item Fill in all four expected counts. Show the arithmetic for at least one cell. \\[1em]
+\begin{center}
+\renewcommand{\arraystretch}{2.2}
+\begin{tabular}{lcc}
+\toprule
+Expected & Online & In person \\
+\midrule
+First-year & \blankline{1in} & \blankline{1in} \\
+Senior     & \blankline{1in} & \blankline{1in} \\
+\bottomrule
+\end{tabular}
+\end{center}
+\item Are the conditions for the $\chi^2$ model satisfied? Say which condition you are checking. \\[3em]
+\end{enumerate}
+
+\subsection*{Part 2: The statistic and its null distribution}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item Compute $X^2 = \sum (O-E)^2/E$ over the four cells. \hfill $X^2 = \blankline{1.2in}$ \\[2em]
+\item How many degrees of freedom? Show the formula --- and explain in one sentence \emph{why} it is not 4. \\[3.5em]
+\item A classmate shuffles the ``online / in person'' labels 10{,}000 times and finds that 213 of the shuffled tables gave an $X^2$ at least as large as yours. What is the randomization p-value? \hfill \blankline{1.2in} \\[1.5em]
+\item R reports \texttt{pchisq(x2, df, lower.tail = FALSE)} $= 0.0152$. The two roads do \emph{not} land on the same number this time. Does that change your conclusion? Why might the agreement be looser here than on the $3\times3$ table from lecture? \\[4.5em]
+\end{enumerate}
+
+\newpage
+
+\subsection*{Part 3: Find the bugs}
+A classmate tests the schoolchildren table (grade $\times$ goal, $478$ children, $3 \times 3$). Their code runs without an error message --- and is wrong in \textbf{three} separate ways.
+
+\begin{lstlisting}[language=R]
+O <- table(kids$grade, kids$goal)
+E <- outer(rowSums(O), colSums(O)) / sum(O)
+
+x2 <- sum((O - E)^2)                  # the statistic
+
+# null distribution by shuffling
+null <- replicate(10000,
+  sum((table(sample(kids$grade), sample(kids$goal)) - E)^2))
+
+2 * mean(null >= x2)                  # p-value
+\end{lstlisting}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item Bug 1 is in the \texttt{x2} line. What is missing, and why does it matter which cells are large? \\[3.5em]
+\item Bug 2: they shuffled \emph{both} columns. What null hypothesis does that actually impose, and why is shuffling one column enough? \\[4em]
+\item Bug 3 is on the last line. Why is the factor of 2 wrong here, when it was right for the two-sided $z$-test in Lecture 10? \\[3.5em]
+\end{enumerate}
+
+\subsection*{Part 4: Whether, and where}
+A large $X^2$ on a $4 \times 3$ table gives $p = 0.0003$. The standardized residuals are:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lrrr}
+\toprule
+& A & B & C \\
+\midrule
+Group 1 & $0.2$ & $-0.4$ & $0.3$ \\
+Group 2 & $-0.1$ & $0.5$ & $-0.3$ \\
+Group 3 & $\mathbf{4.1}$ & $-1.9$ & $-1.8$ \\
+Group 4 & $-0.3$ & $0.2$ & $0.1$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item Write the conclusion in one sentence --- and say where the dependence actually lives. \\[3.5em]
+\item Your collaborator writes: ``$p = 0.0003$, so all four groups differ.'' What is wrong with that sentence? \\[3.5em]
+\item Suppose instead \emph{every} residual had been between $-0.5$ and $0.5$, yet $p$ was still tiny. What would you suspect? (Think about what makes $X^2$ grow.) \\[3.5em]
+\end{enumerate}
+
+\end{document}

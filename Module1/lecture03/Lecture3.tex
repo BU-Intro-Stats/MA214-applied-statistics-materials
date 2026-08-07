@@ -1,0 +1,677 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Slide options
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Option 1: Slides with solutions
+
+\documentclass[slidestop,compress,mathserif]{beamer}
+\newcommand{\soln}[1]{\textit{#1}}
+\newcommand{\solnGr}[1]{#1}
+
+% Option 2: Handouts without solutions
+
+%\documentclass[11pt,containsverbatim,handout]{beamer}
+%\usepackage{pgfpages}
+%\pgfpagesuselayout{4 on 1}[letterpaper,landscape,border shrink=5mm]
+%\newcommand{\soln}[1]{ }
+%\newcommand{\solnGr}{ }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Style
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{../../common/lec_style.tex}
+\graphicspath{ {../../common/} }
+
+\AtBeginDocument{ %necessary to stop clash with autonum package
+\def\[#1\]{\begin{align*}#1\end{align*}}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Preamble
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title[Lecture 3]{Lecture 3: Linear regression models}
+\subtitle{Module 1: Modeling and Linear Regression
+}
+\author{Introduction to Modern Statistics, 2nd Edition}
+\institute{$\:$ \\ {Based on slides developed by Mine \c{C}etinkaya-Rundel of OpenIntro. \\
+The slides may be copied, edited, and/or shared via the CC BY-SA license. \\
+Some images may be included under fair use guidelines for educational purposes.}}
+\date{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Begin document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Title page
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\maketitleframe
+
+\include{Lecture3_agenda}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Lecture objectives
+\begin{frame}
+    \frametitle{Lecture Objectives}
+    \goals{%
+    \begin{itemize}
+    \item identify the explanatory and response variables and read a scatterplot;
+    \item write the simple linear regression model and interpret its slope and intercept;
+    \item compute residuals and explain the least-squares criterion;
+    \item connect least squares to maximum likelihood under a normal model.
+    \end{itemize}}
+    \objectives{%
+    \begin{itemize}
+    \item \textbf{LO 1.1:} Statistical Models and Maximum Likelihood
+    \item \textbf{LO 1.2:} Understanding and Applying Linear Regression Models
+    \end{itemize}}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Sections
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Relationships between two variables}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Explanatory and response variables}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Explanatory and response variables}
+
+\begin{itemize}
+\item The \hl{explanatory variable} is used to predict the \hl{response variable}: 
+\vspace{.5em}
+\begin{center}
+explanatory variable $\xrightarrow{might~predict}$ response variable
+\end{center}
+\vspace{.5em}
+
+\pause
+
+\item These labels track which variable predicts which. They do \hl{not} imply the relationship is causal.
+
+\pause
+
+\item \hl{Anti-causal} prediction is common too: predict a cause from its effects (e.g., a disease from symptoms).
+
+\end{itemize}
+
+\pause
+\keyidea{Modeling a response variable using one or more explanatory variables.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}
+\frametitle{Activity 1}
+
+\activity[-- response vs.\ explanatory]{\textbf{Worksheet Part 1:} for each scenario, identify the explanatory and response variables. 
+Determine if the relationship is \textbf{causal} or \textbf{anti-causal}: 
+\begin{enumerate}\setlength{\itemsep}{2pt}
+\item A biologist estimates the age of a tree from its trunk diameter.
+\item A farm trial asks how fertilizer amount affects crop yield.
+\item An email service flags spam using word frequencies in the message.
+
+\end{enumerate}}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Activity 1}
+\solnbox{%
+\begin{enumerate}
+\item diameter $\rightarrow$ age: \emph{anti-causal} (age drives diameter).
+\item fertilizer $\rightarrow$ yield: \emph{causal}.
+\item word frequencies $\rightarrow$ spam status: \emph{anti-causal}.
+\end{enumerate}}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Visualizing relationships}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{A running example}
+\examplehead{Unemployment and poverty}
+\textbf{Question.} How is the poverty rate related to the unemployment rate across US counties?
+\medskip
+
+\textbf{Data.} All \hl{3{,}139 US counties}: poverty rate (percent below the poverty line) and unemployment rate (percent of the labor force unemployed).
+\medskip
+
+\textbf{Model.} To be determined --- first we look at the data.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Scatterplots}
+\examplehead{Unemployment and poverty}
+\twocol{0.52}{0.48}
+{
+\keyidea[-- Describing a scatterplot]{\begin{itemize}
+\item \textbf{direction} (positive, negative, or none)
+\item \textbf{form} (linear or nonlinear)
+\item \textbf{strength} (weak, moderate, or strong)
+\item \textbf{unusual observations} (outliers or influential points).
+\end{itemize}}
+}
+{
+\begin{center}
+\includegraphics[width=\textwidth]{figures/unemployment-vs-poverty.png}
+\end{center}
+}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Activity: reading scatterplots}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Activity 2}
+
+\twocol{0.5}{0.5}
+{
+\activity[-- reading scatterplots]{%
+For each of the plots A--D, describe:
+\begin{itemize}\setlength{\itemsep}{2pt}
+\item direction,
+\item form,
+\item strength,
+\item unusual observations.
+\end{itemize}}
+}
+{
+\begin{center}
+\includegraphics[width=\textwidth]{figures/lecture3_scatter_panels.png}
+\end{center}
+}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Activity 2}
+
+\twocol{0.5}{0.5}
+{
+\solnbox{%
+\textbf{A:} positive, linear, strong.\\
+\textbf{B:} negative, linear, moderate, one clear outlier (top right).\\
+\textbf{C:} nonlinear (U-shaped), strong.\\
+\textbf{D:} no relationship.}
+
+\vspace{0.4em}
+When the form is linear, a straight line summarizes the trend. \hl{Next: write and fit that line.}
+}
+{
+\begin{center}
+\includegraphics[width=\textwidth]{figures/lecture3_scatter_panels.png}
+\end{center}
+}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Regression model
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Simple linear regression model}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{The model}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{A model for two variables}
+
+For the county data, we want more than a picture:
+\begin{itemize}
+\item a \textbf{prediction} of poverty at any unemployment rate,
+\item a description of the \textbf{scatter} around the trend.
+\end{itemize}
+A regression model provides both:
+
+\begin{center}
+\Large response = linear pattern + random error
+\end{center}
+\[
+Y_i = \beta_0 + \beta_1 x_i + \varepsilon_i.
+\]
+\begin{itemize}
+\item The line \(\beta_0 + \beta_1x_i\) describes the mean pattern.
+\item The error term \(\varepsilon_i\) describes variation around the line.
+\end{itemize}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{A model for two variables}
+        \begin{center}
+		\includegraphics[width=1\textwidth]{figures/lecture3_model_decomposition.png}
+		\end{center}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{The simple linear regression model}
+
+\formula{Simple linear regression model}{%
+\[
+Y_i = \beta_0 + \beta_1 x_i + \varepsilon_i
+\]
+\begin{itemize}
+\item \(Y_i\): response variable for observation \(i\)
+\item \(x_i\): explanatory variable value for observation \(i\)
+\item \(\beta_0\): intercept parameter
+\item \(\beta_1\): slope parameter
+\item \(\varepsilon_i\): random error for observation \(i\)
+\end{itemize}}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Mean response}
+
+If the random error has mean zero,
+\[
+E(\varepsilon_i)=0,
+\]
+then
+\[
+E(Y_i\mid x_i)=\beta_0+\beta_1x_i.
+\]
+\begin{itemize}
+\item \(E(Y_i\mid x_i)\) reads ``the average value of \(Y_i\) among observations with explanatory value \(x_i\)'': the \hl{mean response} at \(x_i\).
+\item Individual observations vary around this mean line.
+\item The fitted line estimates this population mean line.
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Model assumptions}
+
+The simple linear regression model is \(Y_i=\beta_0+\beta_1x_i+\varepsilon_i\).
+\formula{Model assumptions (LINE)}{%
+\begin{itemize}
+\item \textbf{L}inearity: the mean response is linear in \(x\).
+\item \textbf{I}ndependent observations.
+\item \textbf{N}ormal errors.
+\item \textbf{E}qual variance: the spread around the line is constant.
+\end{itemize}}
+The normal-error assumption is what connects least squares to maximum likelihood.
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Activity 3}
+\activity[-- model assumptions]{%
+\textbf{Worksheet Part 2:} for the model $Y_i=\beta_0+\beta_1x_i+\varepsilon_i$, match each LINE assumption to a short interpretation, in your own words.}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Population line and fitted line}
+
+The population regression line is
+\[
+E(Y\mid x)=\beta_0+\beta_1x.
+\]
+Since \(\beta_0\) and \(\beta_1\) are unknown, we estimate them from data.
+
+
+The fitted regression line is
+\[
+\widehat{y}
+=
+\widehat{\beta}_0+\widehat{\beta}_1x.
+\]
+\begin{itemize}
+\item \(\beta_0,\beta_1\): unknown parameters.
+\item \(\widehat{\beta}_0,\widehat{\beta}_1\): estimates from the data.
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Population line and fitted line}
+    \begin{center}
+		\includegraphics[width=1\textwidth]{figures/lecture3_population_vs_fitted.png}
+		\end{center}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Interpreting parameter estimates}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Interpreting slope and intercept}
+
+\twocol{0.5}{0.5}
+{
+\begin{itemize}
+\item \hl{Intercept:} When \(x=0\), \(y\) is predicted to equal the intercept.
+
+\vspace{0.8em}
+
+\item \hl{Slope:} For each one-unit increase in \(x\), \(y\) is predicted to increase or decrease by the slope, on average --- an association, not necessarily a causal effect.
+\end{itemize}
+}
+{
+\begin{center}
+\begin{tikzpicture}[scale=0.66]
+\draw[->] (0,0) -- (5,0) node[right] {$x$};
+\draw[->] (0,0) -- (0,4) node[above] {$y$};
+\draw[thick, oiB] (0.3,0.8) -- (4.5,3.3);
+\draw[dashed] (0,0.62) -- (0.3,0.8);
+\node[left] at (0,0.62) {intercept};
+\draw[<->, orange, thick] (2.0,1.82) -- (3.0,1.82);
+\draw[<->, orange, thick] (3.0,1.82) -- (3.0,2.42);
+\node[below] at (2.5,1.82) {$1$ unit};
+\node[right] at (3.0,2.1) {slope};
+\end{tikzpicture}
+\end{center}
+}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Interpreting parameter estimates: Slope}
+\examplehead{Unemployment and poverty}
+The fitted county model is
+\[
+\widehat{\mathrm{poverty}} = 6.15 + 2.13 \times \mathrm{unemployment}.
+\]
+\hl{Interpretation:} For each additional percentage point of unemployment, the predicted poverty rate \emph{increases} by \(2.13\) percentage points, on average.
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Interpreting parameter estimates: Intercept}
+\examplehead{Unemployment and poverty}
+
+The intercept \(\widehat{\beta}_0\) is the predicted response when \(x=0\).
+
+\twocol{0.5}{0.5}
+{
+Here \(\widehat{\beta}_0 = 6.15\).
+
+\hl{Interpretation:} a county with \(0\%\) unemployment is predicted to have a poverty rate of \(6.15\%\).
+
+\vspace{0.2em}
+\caution{Unemployment runs \(1.6\%\)--\(19\%\), so \(x=0\) is outside the data: the prediction is unreliable.}
+}
+{
+\begin{center}
+\includegraphics[width=0.85\textwidth]{figures/unemployment-vs-poverty-with-intercept.png}
+\end{center}
+}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Activity 4}
+\examplehead{Unemployment and poverty}
+\activity[-- apply the fitted line]{Use the fitted county model
+\[
+\widehat{\mathrm{poverty}} = 6.15 + 2.13 \times \mathrm{unemployment}.
+\]
+\begin{enumerate}
+\item What does the ``hat'' on \(\widehat{\mathrm{poverty}}\) mean?
+\item Predict the poverty rate for a county with a \(5\%\) unemployment rate.
+\item Does this fitted line prove that lowering unemployment \emph{causes} lower poverty? Explain.
+\end{enumerate}}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Activity 4}
+\examplehead{Unemployment and poverty}
+\begin{enumerate}
+\item \soln{The ``hat'' marks a predicted (fitted) value from the model, not an observed data point.}
+
+\pause
+
+\item Prediction:
+\[
+\widehat{\mathrm{poverty}} = 6.15 + 2.13(5) = 16.8.
+\]
+\soln{The predicted poverty rate is about \(16.8\%\).}
+
+\pause
+
+\item \soln{No. These are observational county data, so the line shows association, not causation --- other factors (local industry, education, cost of living) can drive both variables.}
+\end{enumerate}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Activity 5}
+\activity[-- interpret and use fitted lines]{%
+\textbf{Worksheet Parts 3--4:} two fitted models,
+\[
+\widehat{\text{rent}} = 800 + 2.5\times \text{size},
+\qquad
+\widehat{\text{score}} = 52 + 4.8\times \text{hours}.
+\]
+\begin{enumerate}
+\item Identify the response and explanatory variables.
+\item Interpret each slope and intercept in context.
+\item Predict rent at $700$ sq ft and the score after $6$ study hours.
+\end{enumerate}}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Residuals}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Residuals}
+\examplehead{Unemployment and poverty}
+\hl{Residuals} are the leftovers from the model fit: \(\text{Data} = \text{Fit} + \text{Residual}.\)
+
+\twocol{0.5}{0.5}
+{
+\formula{Residual}{The residual for observation \(i\) is \; \(e_i = y_i - \widehat{y}_i\).}
+\begin{itemize}
+\item \textbf{Positive}: point \emph{above} the line (Jefferson County, MS).
+\item \textbf{Negative}: point \emph{below} the line (Colusa County, CA).
+\end{itemize}
+}
+{
+\begin{center}
+\includegraphics[width=0.78\textwidth]{figures/unemployment-vs-poverty-residuals-labeled.png}
+\end{center}
+}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{From maximum likelihood to least squares}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Regression as a normal model}
+For regression, assume the errors are normal:
+\[
+Y_i=\beta_0+\beta_1x_i+\varepsilon_i,
+\qquad
+\varepsilon_i\sim N(0,\sigma^2) \\
+\Longleftrightarrow \qquad
+Y_i\mid x_i \sim N(\beta_0+\beta_1x_i,\sigma^2).
+\]
+\begin{itemize}
+\item The mean depends on \(x_i\); the variance \(\sigma^2\) describes spread around the line.
+\item The parameters are \(\beta_0\), \(\beta_1\), and \(\sigma^2\).
+\end{itemize}
+\textbf{Fitting a line is now an MLE problem: choose the parameters that make the observed data most likely.}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Regression likelihood}
+
+If
+\[
+Y_i\mid x_i \sim N(\beta_0+\beta_1x_i,\sigma^2),
+\]
+then the likelihood is
+\[
+L(\beta_0,\beta_1,\sigma^2)
+=
+\prod_{i=1}^{n}
+\frac{1}{\sqrt{2\pi\sigma^2}}
+\exp\left(
+-\frac{(y_i-\beta_0-\beta_1x_i)^2}{2\sigma^2}
+\right).
+\]
+The key term is the squared residual
+\[
+(y_i-\beta_0-\beta_1x_i)^2.
+\]
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Regression log-likelihood}
+
+Taking logs gives
+\[
+\ell(\beta_0,\beta_1,\sigma^2)
+=
+-\frac{n}{2}\log(2\pi)
+-\frac{n}{2}\log(\sigma^2)
+-\frac{1}{2\sigma^2}
+\sum_{i=1}^{n}
+(y_i-\beta_0-\beta_1x_i)^2.
+\]
+For fixed \(\sigma^2\), maximizing this log-likelihood over \(\beta_0\) and \(\beta_1\) is the same as minimizing
+\[
+\sum_{i=1}^{n}
+(y_i-\beta_0-\beta_1x_i)^2.
+\]
+So the most likely line is the one that minimizes this sum of squared residuals.
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Residual sum of squares}
+For any candidate line, the \hl{residual sum of squares} adds up the squared residuals:
+\[
+\operatorname{RSS}(\beta_0,\beta_1)=\sum_{i=1}^n (y_i-\beta_0-\beta_1x_i)^2.
+\]
+At the fitted line this equals \(\sum_{i=1}^n e_i^2\) --- the total squared vertical distance from the points to the line.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{The least squares estimates}
+The \hl{least squares estimates} are the candidate values that make the RSS smallest:
+\formula{Least squares estimates}{%
+\[
+(\widehat{\beta}_0,\widehat{\beta}_1)
+=
+\operatorname*{arg\,min}_{\beta_0,\beta_1}
+\sum_{i=1}^n
+(y_i-\beta_0-\beta_1x_i)^2.
+\]
+\(\operatorname*{arg\,min}\) returns the \emph{values} of \(\beta_0,\beta_1\) that make the RSS smallest.}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Least squares as maximum likelihood}
+
+The least squares estimates are
+\[
+(\widehat{\beta}_0,\widehat{\beta}_1)
+=
+\operatorname*{arg\,min}_{\beta_0,\beta_1}
+\sum_{i=1}^{n}
+(y_i-\beta_0-\beta_1x_i)^2.
+\]
+The maximum likelihood estimates are
+\[
+(\widehat{\beta}_0,\widehat{\beta}_1)
+=
+\operatorname*{arg\,max}_{\beta_0,\beta_1}
+\ell(\beta_0,\beta_1,\sigma^2).
+\]
+\keyidea[-- Least squares = maximum likelihood]{Under the normal error model, the least squares line is the maximum likelihood line.}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Activity 6}
+
+Compare two candidate lines for the data \((1,2),\ (2,4),\ (3,4)\):
+\[
+\text{Line A: } \hat y=1+x,
+\qquad
+\text{Line B: } \hat y=2+0.5x.
+\]
+\activity[-- which line is more likely?]{%
+\textbf{Worksheet Part 5:} answer the same questions for the data set given there.
+\begin{enumerate}
+\item Compute the residuals for each line.
+\item Compute the RSS for each line.
+\item Under the same normal error model, which line gives the larger likelihood? 
+\end{enumerate}}
+
+\end{frame}
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% End document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}

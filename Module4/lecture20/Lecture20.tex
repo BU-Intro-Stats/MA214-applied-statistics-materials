@@ -1,0 +1,447 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Slide options
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Option 1: Slides with solutions
+
+\documentclass[slidestop,compress,mathserif]{beamer}
+\usepackage{booktabs}
+\newcommand{\soln}[1]{\textit{#1}}
+\newcommand{\solnGr}[1]{#1}
+
+% Option 2: Handouts without solutions
+
+%\documentclass[11pt,containsverbatim,handout]{beamer}
+%\usepackage{booktabs}
+%\usepackage{pgfpages}
+%\pgfpagesuselayout{4 on 1}[letterpaper,landscape,border shrink=5mm]
+%\newcommand{\soln}[1]{ }
+%\newcommand{\solnGr}{ }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Style
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{../../common/lec_style.tex}
+\graphicspath{ {../../common/} {figures/} }
+
+% Preamble
+\title[Lecture 20]{Lecture 20: Posterior inference \& prediction}
+\subtitle{Module 4: Bayesian Statistics}
+\author{Jonathan H.~Huggins}
+\institute{}
+\date{}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Title page
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\maketitleframe
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Agenda
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\include{Lecture20_agenda}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{From a glimpse to a definition}
+
+Lecture 18 read an interval off the birthweight posterior and called it a \hl{credible interval}: an interval $\mu$ falls in with probability 0.95, given the data. It answered ``how likely is this claim?'' with a posterior probability rather than a $p$-value.
+
+\pause
+\medskip
+
+Both were used without a definition. This lecture supplies them, and adds model comparison, prediction, and a check on whether the model fits.
+
+\pause
+\medskip
+
+\keyidea{There is nothing new to compute. Once the posterior is in hand, every one of these is an area under it.}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Section: Point Estimates and Credible Intervals
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Point estimates and credible intervals}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Estimating the parameter}
+
+The posterior is a whole distribution, but often you must report \emph{one number}: its center, the \hl{posterior mean} (median, if skewed). Below, the observed rate is held at $x/n = 1/3$ as $n$ grows.
+
+\begin{center}
+\includegraphics[width=0.62\textwidth]{point_estimate.pdf}
+\end{center}
+
+\begin{itemize}
+    \item The \hl{MLE} $x/n$ ignores the prior; the \hl{posterior mean} is pulled from it toward the prior mean.
+    \item Drug: MLE $0.33$ vs.\ mean $0.25$. Whales: $4.43$ vs.\ $4.11$/day.
+\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Credible intervals}
+
+\formula{Credible interval}{Write $\theta$ for whatever parameter the posterior is over ($p$, $\mu$, $\lambda$, \ldots). A $95\%$ \hl{credible interval} $[a,b]$ satisfies $P(a \le \theta \le b \mid \text{data}) = 0.95$.}
+
+\pause
+\medskip
+
+\hl{Interpretation:} given the data we observed, there is a $95\%$ probability that $\theta$ lies in $[a,b]$. A direct statement about the parameter.
+
+\pause
+\medskip
+
+\dq{How is this different from a frequentist confidence interval?}
+
+\pause
+\medskip
+
+The confidence interval is a statement about the \emph{procedure}: ``if we repeated the study many times, $95\%$ of the intervals would cover $\theta$.'' The credible interval is the interpretation everyone \emph{wishes} a confidence interval had.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Reading it off the posterior}
+
+The simplest choice is the \hl{equal-tailed} interval: chop $2.5\%$ off each end of the posterior.
+\[
+a = \text{2.5th percentile}, \qquad b = \text{97.5th percentile of the posterior}.
+\]
+\pause
+\medskip
+
+You already have every tool you need to find those percentiles:
+\begin{itemize}
+    \item \hl{Conjugate} posterior: read them from the known distribution (\texttt{qbeta}, \texttt{qnorm}, \texttt{qgamma});
+    \item \hl{Grid} posterior: accumulate the grid weights until they pass $0.025$ and $0.975$ (Lecture 19);
+    \item \hl{MCMC} posterior: take the $2.5\%$ and $97.5\%$ \emph{quantiles of the draws} (Lecture 19).
+\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Two examples}
+
+\begin{center}
+\includegraphics[width=0.86\textwidth]{credible_interval.pdf}
+\end{center}
+
+\begin{itemize}
+    \item \hl{Drug trial} ($\text{Beta}(3,9)$): $95\%$ CI for $p$ is $[0.06,\; 0.52]$: wide, because $6$ patients is little data.
+    \item \hl{Birthweights} ($N(3090, 117^2)$): $95\%$ CI for the mean is $[2860,\; 3319]$\,g, the Lecture 18 value, now with a definition.
+\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Section: Hypothesis Testing
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Hypothesis testing}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Testing a hypothesis, Bayesian style}
+
+In Lecture 17, for a discrete event, we answered ``how likely is $H_0$ given the data?'' with the posterior probability itself: $p_{\text{Bayes}} = P(H_0 \mid \text{data})$, and $s_{\text{Bayes}} = -\log_2 p_{\text{Bayes}}$ ``bits of evidence against $H_0$.''
+
+\pause
+\medskip
+
+For a \emph{continuous} parameter, a hypothesis is a \hl{region}, and its probability is a \hl{posterior tail area}. Nothing new to invent.
+
+\pause
+\medskip
+
+\formula{Bayesian hypothesis test}{$p_{\text{Bayes}} = P(H_0 \mid \text{data})$ \; (a tail area of the posterior), \quad $s_{\text{Bayes}} = -\log_2 p_{\text{Bayes}}$.}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Two tests, read off the posterior}
+
+\begin{center}
+\includegraphics[width=0.8\textwidth]{hypothesis_region.pdf}
+\end{center}
+
+\begin{itemize}
+    \item \hl{Drug} ($H_0\!: p \le 0.15$): $p_{\text{Bayes}} = 0.22$, so $s_{\text{Bayes}} = 2.2$ bits: modest evidence against $H_0$.
+    \item \hl{Whales} ($H_0\!: \lambda \le 3$): $p_{\text{Bayes}} = 0.04$, so $s_{\text{Bayes}} = 4.7$ bits: strong evidence the rate is up.
+\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{No null distribution, no $p$-value}
+
+\caution{No null sampling distribution, and no ``assume $H_0$ and see how surprising the data are.'' The whole calculation was: how much posterior probability sits in the $H_0$ region. A larger $s_{\text{Bayes}}$ means more bits of evidence against $H_0$: $2$ bits is a coin landing heads twice, $4.7$ bits nearly five times in a row.}
+
+\pause
+\medskip
+
+It is all one idea: \hl{once you have the posterior, every question is an area under it.}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Section: Model Comparison
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Model comparison}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Comparing models, not just parameters}
+
+So far a hypothesis has been a claim about a parameter. But a hypothesis can be a \hl{whole model}. Bayes' rule works exactly the same way:
+\[
+P(\text{model} \mid \text{data}) \;\propto\; P(\text{model}) \times P(\text{data} \mid \text{model}).
+\]
+\pause
+\medskip
+
+\keyidea{$P(\text{data} \mid \text{model})$ is the probability the model assigned to the data we actually saw, \emph{before} seeing it, averaged over its prior. A prior that is too diffuse, or centered on the wrong values, gives the data a low probability.}
+
+\pause
+\medskip
+
+Combine with the prior over models and normalize.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Which whale model?}
+\examplehead{Whale sightings}
+
+Two rival stories for the same $7$ days ($31$ sightings), each equally likely to start:
+
+\smallskip
+
+{\footnotesize
+\renewcommand{\arraystretch}{1.2}
+\begin{center}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Model} & \textbf{Prior} & \textbf{Likelihood} & \textbf{Product} & \textbf{Posterior} \\
+\midrule
+A: baseline $\approx 3$/day & $0.50$ & $0.4596$ & $0.2298$ & $0.31$ \\
+B: surge $\approx 5$/day    & $0.50$ & $1.0000$ & $0.5000$ & $\mathbf{0.69}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+}
+
+\smallskip
+
+Multiply across, then divide by the total ($0.2298 + 0.5000 = 0.7298$). The data favor the surge model about $2$ to $1$, but do not \emph{prove} it. (Likelihoods rescaled so the larger reads $1.00$; the rescaling cancels when we normalize.)
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The data re-weight, they don't pick}
+\examplehead{Whale sightings}
+
+\begin{center}
+\includegraphics[width=0.55\textwidth]{model_comparison.pdf}
+\end{center}
+
+The data did not \emph{pick} a model, they \hl{re-weighted} both. Model B goes from an even bet to roughly a $2$-to-$1$ favorite, and A keeps a third of the probability. With only $7$ days, that is as far as the evidence goes.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Section: Posterior Prediction
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Posterior prediction}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Predicting a new observation: plug-in vs.\ averaging}
+\examplehead{Whale sightings}
+
+Given $y_1, \ldots, y_n \sim \text{Poisson}(\lambda)$, predict a new observation $\tilde{y}$.
+
+\pause
+\medskip
+
+\hl{Frequentist (plug-in):} estimate $\hat\lambda = \bar{y}$, then predict $\tilde{y} \sim \text{Poisson}(\hat\lambda)$, as if we knew $\lambda$ exactly.
+
+\pause
+\medskip
+
+\hl{Bayesian:} we are \emph{not} sure of $\lambda$, so \hl{average} the data model over the posterior:
+\formula{Posterior predictive}{$\displaystyle p(\tilde{y} \mid \text{data}) \;\approx\; \frac{1}{M}\sum_{m=1}^{M} p\!\left(\tilde{y} \mid \lambda^{(m)}\right), \qquad \lambda^{(m)} \sim \text{posterior}.$}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Sampling the posterior predictive}
+\examplehead{Whale sightings}
+
+\dq{How do we generate a draw from the posterior predictive?}
+
+\pause
+\medskip
+
+Two steps, using the posterior draws we already have (conjugate, grid, or MCMC):
+\begin{enumerate}
+    \item sample $\lambda^{(m)}$ from the posterior;
+    \item sample $\tilde{y}^{(m)} \sim \text{Poisson}\!\left(\lambda^{(m)}\right)$.
+\end{enumerate}
+
+\pause
+\medskip
+
+Each draw uses a \emph{different} $\lambda$, so the collection $\{\tilde{y}^{(1)}, \ldots, \tilde{y}^{(M)}\}$ carries \hl{both} sources of uncertainty: not knowing $\lambda$, and the randomness of a new count. Swap in any data model and this same recipe works.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Next day's whale sightings}
+\examplehead{Whale sightings}
+
+\begin{center}
+\includegraphics[width=0.56\textwidth]{posterior_predictive_whale.pdf}
+\end{center}
+
+\begin{itemize}
+    \item Predictive mean $4.1$ (plug-in: $4.4$); $95\%$ interval $[1, 9]$ sightings.
+    \item Averaging is \emph{wider in principle}, but $31$ sightings pin $\lambda$ down. The gap grows when data are scarce.
+\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Section: Predictive Checking
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Predictive checking}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Is the model any good?}
+
+Every result so far assumes the model is right. But the Poisson model could be wrong, so put it on trial.
+
+\pause
+\medskip
+
+\keyidea{\hl{Predictive check:} simulate many replicate datasets from the fitted model, compute a \hl{test statistic} on each, and see where the \emph{observed} value falls. If the real data look like a typical simulation, the model reproduces what matters. If the observed value sits far in the tail, the model is missing something.}
+
+\pause
+\medskip
+
+Same posterior-predictive machinery as prediction, but now we simulate whole \emph{datasets}, not a single new point.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Checking the whale model}
+\examplehead{Whale sightings}
+
+\vspace{1.4em}
+
+\twocol{0.5}{0.5}{
+Simulate $5000$ replicate weeks; the statistic is the \hl{busiest day's count} (observed $=7$). The \hl{predictive $p$-value} is the fraction at least as extreme: $P(T_{\text{rep}} \ge 7) = 0.57$, right in the bulk, so \hl{no reason to doubt} the Poisson fit.
+
+\medskip
+
+\hl{Careful:} not the $p_{\text{Bayes}}$ of a hypothesis test. There \emph{small} meant evidence against $H_0$; here the \hl{middle is good}.
+}{
+\includegraphics[width=\textwidth]{predictive_check.pdf}
+}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Section: Wrap-up
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Wrap-up}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Summary}
+
+Once you have the posterior, inference is just \emph{reading} it:
+{\small
+\begin{itemize}
+    \item \hl{Point estimate:} the posterior mean, shrunk from the MLE toward the prior.
+    \pause
+    \item \hl{Credible interval:} the central $95\%$ of the posterior, $P(a \le \theta \le b \mid \text{data}) = 0.95$.
+    \pause
+    \item \hl{Hypothesis test:} the posterior probability of the $H_0$ region, reported as $s_{\text{Bayes}} = -\log_2 p_{\text{Bayes}}$ bits.
+    \pause
+    \item \hl{Model comparison:} Bayes' rule over models rather than parameters.
+    \pause
+    \item \hl{Prediction:} average the data model over the posterior, carrying both kinds of uncertainty.
+    \pause
+    \item \hl{Predictive checking:} simulate replicate data and compare a test statistic to the observed one.
+\end{itemize}}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Frequentist $\longleftrightarrow$ Bayesian: a summary}
+
+Every task today had a frequentist counterpart you already know:
+
+{\footnotesize
+\renewcommand{\arraystretch}{1.25}
+\begin{center}
+\begin{tabular}{p{2.2cm} p{2.9cm} p{3.4cm}}
+\toprule
+\textbf{Task} & \textbf{Frequentist} & \textbf{Bayesian} \\
+\midrule
+Point estimate & MLE $\hat\theta$ & Posterior mean \\
+Interval & Confidence interval & Credible interval \\
+Hypothesis & $p$-value & $P(H_0 \mid \text{data})$ \\
+New observation & Prediction interval & Posterior predictive \\
+Computation & Formulas / bootstrap & Conjugate / grid / MCMC \\
+\bottomrule
+\end{tabular}
+\end{center}
+}
+
+\pause
+
+With plenty of data the two usually agree. The differences show up with \hl{small samples} or an \hl{informative prior}, which is exactly where the prior still matters.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Coming up next}
+
+\hl{We can now compute a posterior and read every kind of inference off it}, for one parameter or a handful.
+
+\vspace{0.4em}
+\begin{itemize}
+\item \hl{Lecture 21: Bayesian linear regression.} We put a whole \emph{regression} model into the Bayesian frame: a slope, an intercept, and noise, each with its own prior.
+\pause
+\item The new question is \hl{how to choose priors for the coefficients}: vague where we know nothing, informative where we do. Everything from today (credible intervals for the slope, prediction for a new case) then carries over unchanged.
+\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Activity Frame
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{In-class activity}
+
+You'll work in \textbf{pairs} (one analyst, one guide).
+
+\medskip
+\begin{itemize}
+\item Pick up the worksheet.
+\item Work through the problems together.
+\item \hl{Don't use Gen AI except for debugging}
+\item Your worksheet will be collected and graded.
+\end{itemize}
+
+\medskip
+\textbf{Recommendations:}
+\begin{itemize}
+\item Read each question carefully before starting the code.
+\item Discuss your answers with your partner before writing them down.
+\end{itemize}
+
+\end{frame}
+
+\end{document}

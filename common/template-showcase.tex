@@ -1,0 +1,150 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% MA213/214 slide-template showcase
+%
+% Exercises every callout box and the de-branded title slide so the
+% template can be eyeballed and regression-tested. Mirrors the real deck
+% preamble (Option 1 = instructor build with solutions; Option 2 = student
+% handout build with solutions hidden).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Option 1: Slides with solutions
+\documentclass[slidestop,compress,mathserif]{beamer}
+\newcommand{\soln}[1]{\textit{#1}}
+\newcommand{\solnGr}[1]{#1}
+
+% Option 2: Handouts without solutions
+%\documentclass[11pt,containsverbatim,handout]{beamer}
+%\newcommand{\soln}[1]{}
+%\newcommand{\solnGr}[1]{}
+
+\usepackage{booktabs}
+
+\input{lec_style.tex}
+
+\title[Template showcase]{Slide-template showcase}
+\subtitle{Calm \& Cool palette and content-type boxes}
+\renewcommand{\coursetag}{MA 214: Applied Statistics}
+\date{}
+
+\begin{document}
+
+\maketitleframe
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Chrome and inline emphasis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Frame title bar and inline highlights}
+
+This is normal body text. Use \hl{inline highlight} for the key term in a
+sentence, \alert{alerted text} for a metropolis alert, and \green{a green aside}
+or \orange{a terracotta aside} when needed.
+
+\bigskip
+
+\begin{itemize}
+  \item A first point with a \hl{highlighted phrase}.
+  \item A second point referencing a variable \texttt{poverty}.
+  \item A third point with math: $T = \hat\beta_1 / \mathrm{SE}(\hat\beta_1)$.
+\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Content-type boxes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Running example --- lightweight cue}
+\examplehead{Airbnb prices}
+
+We model nightly \hl{price} on the number of guests a listing
+\hl{accommodates}. The cue above marks every frame in this running example,
+so it can thread across many slides without a heavy box on each.
+\end{frame}
+
+\begin{frame}
+\frametitle{One-off worked example --- full box}
+
+\workedexample[Airbnb prices]{%
+Fit \texttt{lm(price \textasciitilde{} accommodates)}. The estimated slope is
+about \$48 per additional guest, and the intercept is \$22.}
+\end{frame}
+
+\begin{frame}
+\frametitle{Interactive activity and discussion}
+
+\activity[3.7]{In pairs, fit the model in R and report the slope and its
+standard error. One person drives RStudio; the other records the answer.}
+
+\dq{What would a slope of zero mean in this context?}
+\end{frame}
+
+\begin{frame}
+\frametitle{Discussion with a hidden solution}
+
+\dq{You test positive on a screening test. What is the probability you
+actually have the disease?}
+
+\pause
+
+\solnbox{Without the base rate you cannot say. With 1\% prevalence and a 95\%
+accurate test, the posterior probability is only about 16\%.}
+\end{frame}
+
+\begin{frame}
+\frametitle{Worksheet --- focused work time}
+
+\worksheet[15 min]{Open \texttt{anova\_donations.R} from Blackboard and complete
+Parts A--C. Work in pairs; we will reconvene to compare answers.}
+\end{frame}
+
+\begin{frame}
+\frametitle{Formulas and definitions}
+
+\formula{Residual}{The residual is the gap between observed and predicted:
+\[ e_i = y_i - \hat{y}_i. \]}
+
+\formula{%
+\[ R^2_{adj} = 1 - \pr{\frac{SS_{Error}}{SS_{Total}} \times \frac{n-1}{n-p-1}}. \]}
+\end{frame}
+
+\begin{frame}
+\frametitle{Caution and key idea}
+
+\caution{A small $p$-value does \hl{not} mean a large or important effect ---
+it only speaks to evidence against the null.}
+
+\keyidea{Simulation-based and model-based inference agree when the model
+conditions hold; when they do not, prefer the simulation-based answer.}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{R code and output}
+
+\begin{rblock}[fit the model]
+fit <- lm(price ~ accommodates, data = listings)
+summary(fit)$coefficients
+#>             Estimate Std. Error t value
+#> (Intercept)    22.13       6.40    3.46
+#> accommodates   47.85       2.11   22.68
+\end{rblock}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Legacy commands}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Practice question with multiple-choice solution}
+
+\pq{Which value is the best guess for the correlation shown at right?}
+\begin{enumerate}[(a)]
+\solnMult{0.55}
+\item $-0.7$
+\item $-0.1$
+\item $1.1$
+\end{enumerate}
+\end{frame}
+
+\end{document}

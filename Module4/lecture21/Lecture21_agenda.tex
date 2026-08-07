@@ -1,0 +1,54 @@
+% !TEX root =  Lecture21.tex
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Recap/Agenda
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Module 4: Bayesian Statistics}
+    \begin{itemize}
+        \item \hl{Previously:} how to \emph{read} a posterior: point estimates, credible intervals, hypothesis tests, model comparison, prediction, and predictive checks.
+        \item \hl{This time:} the \hl{regression model} enters the Bayesian frame, the last and biggest model of the course.
+          \begin{itemize}
+              \item the model: a slope, an intercept, and noise, each with \hl{its own prior};
+              \item \hl{choosing those priors}, and \hl{checking them before the data} by simulating lines from the prior alone;
+              \item then Lecture 20 applies unchanged: a \hl{credible interval} for the slope, a \hl{prediction} for a new penguin.
+          \end{itemize}
+        \item \hl{Reading:} Bayes Rules!\ Chapter 9.
+        \item \hl{Homework:}
+    \end{itemize}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Learning objectives:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+    \frametitle{Lecture Objectives}
+    \goals{%
+    \begin{itemize}
+    \item write down a \hl{Bayesian linear regression}: the same data model as OLS, plus a prior on each unknown;
+    \item choose a prior for each parameter and say whether it is \hl{vague}, \hl{weakly informative}, or \hl{informative}: and why that choice is defensible;
+    \item run a \hl{prior predictive check}: simulate regression lines from the prior alone and judge whether they are plausible;
+    \item read a \hl{credible interval for the slope} off the posterior, and say how the prior moved it relative to OLS;
+    \item predict a new case, distinguishing the \hl{line} $E[y \mid x]$ from a \hl{new observation}: the Bayesian answer to Lecture 15's CI-versus-PI.
+    \end{itemize}}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+    \frametitle{Lecture Objectives}
+    \objectives{%
+    \begin{itemize}
+    \item \textbf{(M4, LO6)} Bayesian Linear Regression
+    \end{itemize}}
+    \vspace{0.3em}
+    {\small Building on, and revisiting:}
+    \objectives{%
+    \begin{itemize}
+    \item \textbf{(M4, LO4)} Inference and Prediction: Lecture 20's credible intervals and posterior prediction, now applied to a regression
+    \item \textbf{(M4, LO5)} Markov chain Monte Carlo: Lecture 19's sampler, used here to fit three parameters at once
+    \item \textbf{(M3)} Regression inference: the OLS fit, bootstrap, and prediction intervals we are about to reinterpret
+    \end{itemize}}
+\end{frame}

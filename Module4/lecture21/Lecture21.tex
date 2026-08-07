@@ -1,0 +1,363 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Slide options
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Option 1: Slides with solutions
+
+\documentclass[slidestop,compress,mathserif]{beamer}
+\usepackage{booktabs}
+\newcommand{\soln}[1]{\textit{#1}}
+\newcommand{\solnGr}[1]{#1}
+
+% Option 2: Handouts without solutions
+
+%\documentclass[11pt,containsverbatim,handout]{beamer}
+%\usepackage{booktabs}
+%\usepackage{pgfpages}
+%\pgfpagesuselayout{4 on 1}[letterpaper,landscape,border shrink=5mm]
+%\newcommand{\soln}[1]{ }
+%\newcommand{\solnGr}{ }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Style
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{../../common/lec_style.tex}
+\graphicspath{ {../../common/} {figures/} }
+
+% Preamble
+\title[Lecture 21]{Lecture 21: Bayesian linear regression}
+\subtitle{Module 4: Bayesian Statistics}
+\author{Jonathan H.~Huggins}
+\institute{}
+\date{}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Title page
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\maketitleframe
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Agenda
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\include{Lecture21_agenda}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Section: The Bayesian Regression Model
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The Bayesian regression model}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The penguins, from Module 3}
+
+\twocol{0.45}{0.55}{
+$n = 40$ penguins. Predict \textbf{body mass} (g) from \textbf{flipper length} (mm). The ordinary least squares fit:
+
+\medskip
+\begin{itemize}
+    \item Fitted slope $\hat\beta_1 = 50.4$ g/mm, SE $= 4.10$
+    \item $95\%$ CI: $[42.4,\; 58.5]$
+    \item $R^2 = 0.80$, $s_e = 388$ g
+\end{itemize}
+}{
+\includegraphics[width=\textwidth]{penguins_scatter.pdf}
+}
+
+That interval is $16$ g/mm wide: a lot of uncertainty from only $40$ birds.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Can we do better with prior knowledge?}
+
+An ornithologist points out: \emph{``I've studied many penguin species. The flipper--mass relationship is typically around $40$ g/mm, give or take.''}
+
+\pause
+\bigskip
+
+\hl{The Bayesian offer:} use that knowledge alongside the data rather than discarding it.
+
+\pause
+\bigskip
+
+\dq{Why not just collect more data?} Sometimes you can't: rare species, expensive measurement, limited access. A prior is worth some number of observations, exactly as in Lecture 18.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The model: same line, now with priors}
+
+\hl{Data model.} The regression from Module 3:
+\[
+y_i = \beta_0 + \beta_1 x_i + \varepsilon_i, \qquad \varepsilon_i \stackrel{iid}{\sim} N(0, \sigma^2)
+\]
+\pause
+\medskip
+
+\formula{What makes it Bayesian}{Every unknown gets a \hl{prior}: $\beta_0 \sim N(\mu_0, \tau_0^2)$, \; $\beta_1 \sim N(\mu_1, \tau_1^2)$, \; $\log(\sigma) \sim N(\mu_\sigma, \tau_\sigma^2)$. Bayes' rule then does what it always does: posterior $\propto$ priors $\times$ likelihood.}
+
+\pause
+\medskip
+
+Three unknowns instead of one, and no conjugate shortcut, so we fit it with \hl{MCMC} as in Lecture 19.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Section: Priors for the Parameters
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Priors for the parameters}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Choosing a prior for each parameter}
+
+\keyidea{A prior should say what you actually believe, no more and no less. \hl{Vague} where the parameter is meaningless; \hl{informative} where you do know something; \hl{weakly informative} to rule out impossible values without claiming precision you do not have.}
+
+\pause
+\medskip
+
+\begin{itemize}
+    \item $\beta_0 \sim N(0,\; 5000^2)$: \hl{vague}. Mass at a $0$\,mm flipper is meaningless, so say almost nothing.
+    \pause
+    \item $\beta_1 \sim N(40,\; 5^2)$: \hl{informative}. The ornithologist's claim, written down.
+    \pause
+    \item $\log(\sigma) \sim N(\log 400,\; 0.5^2)$: \hl{weakly informative}. Masses scatter by hundreds of grams: not by $5$, and not by $50{,}000$.
+\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Check the prior \emph{before} the data}
+
+Lecture 20 checked a model \emph{after} fitting. A prior can be checked \hl{before}: simulate lines from it alone.
+
+\begin{center}
+\includegraphics[width=0.56\textwidth]{prior_predictive_lines.pdf}
+\end{center}
+
+\vspace{-0.5em}
+\caution{At $200$\,mm this prior gives a $95\%$ range of $[-1994,\; 17994]$\,g, against real penguins of $3050$--$6050$. Its lower end is a \hl{negative} weight: vague, not thoughtful. This is the check that catches a prior that is not harmless.}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Now bring in the data}
+
+\begin{center}
+\includegraphics[width=0.62\textwidth]{prior_beta1.pdf}
+\end{center}
+
+\vspace{-0.3em}
+The prior is centered at $40$ g/mm and the OLS estimate is $50.4$, about two prior standard deviations apart. \dq{Which one wins?}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Section: Posterior Inference for the Slope
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Posterior inference for the slope}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Fitting it with MCMC}
+
+Lecture 19's sampler, now walking in \emph{three} dimensions.
+
+\begin{center}
+\includegraphics[width=0.72\textwidth]{trace_plots.pdf}
+\end{center}
+
+\vspace{-0.5em}
+Fuzzy caterpillars after burn-in, and $\widehat{R} = 1.004$ everywhere, inside Lecture 19's $\widehat{R} < 1.01$ rule.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The posterior is a compromise}
+
+\begin{center}
+\includegraphics[width=0.72\textwidth]{beta1_prior_post.pdf}
+\end{center}
+
+The posterior for $\beta_1$ lands \textbf{between} the prior (centered at $40$) and the data (centered at $50.4$): the same weighted-average behavior as Lecture 18's conjugate models, though this time with no formula to write it down. With $n = 40$, neither side wins outright.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{A credible interval for the slope}
+
+{\footnotesize
+\renewcommand{\arraystretch}{1.25}
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+& \textbf{Estimate} & \textbf{95\% interval} \\
+\midrule
+Frequentist (OLS) & $50.4$ & $[42.4,\; 58.5]$ \quad (width $16.1$) \\
+Bayesian          & $45.7$ & $[39.2,\; 51.7]$ \quad (width $12.5$) \\
+\bottomrule
+\end{tabular}
+\end{center}
+}
+
+\medskip
+
+Read straight off the draws, exactly as in Lecture 20: the $2.5$th and $97.5$th percentiles of the $\beta_1$ samples. The prior \hl{shifts} the estimate toward $40$ and \hl{narrows} the interval by nearly a quarter, acting like extra data.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Was the prior worth it?}
+
+\begin{center}
+\includegraphics[width=0.78\textwidth]{freq_vs_bayes.pdf}
+\end{center}
+
+\dq{Is the narrower interval a good thing?} Only if the ornithologist was right. A confident prior gives precision at the risk of being confidently wrong. That is the trade, and it should be made on purpose.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Bootstrap vs.\ posterior}
+
+\begin{center}
+\includegraphics[width=0.68\textwidth]{boot_vs_posterior.pdf}
+\end{center}
+
+\vspace{-0.3em}
+Both are distributions over $\beta_1$, but they answer \emph{different questions}.
+\begin{itemize}
+    \item \hl{Bootstrap} (Lecture 13): ``if I resampled, where would $\hat\beta_1$ land?'': the spread of an \emph{estimator}.
+    \item \hl{Posterior:} ``given the data I have, where is $\beta_1$?'': uncertainty about the \emph{parameter}.
+\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{From a diffuse prior to a tight posterior}
+
+\begin{center}
+\includegraphics[width=0.52\textwidth]{posterior_lines.pdf}
+\end{center}
+
+\vspace{-0.3em}
+Each blue line is one posterior draw of $(\beta_0, \beta_1)$. The spread \emph{is} the parameter uncertainty. Compare with the prior's lines: $40$ penguins turned a prior that reached below zero into a tight bundle.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Section: Prediction for a New Penguin
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Prediction for a new penguin}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Two questions, two answers}
+
+A new penguin has $\tilde{x} = 200$\,mm. Apply Lecture 20's recipe to each posterior draw $(\beta_0^{(m)}, \beta_1^{(m)}, \sigma^{(m)})$:
+
+\pause
+\medskip
+
+\formula{Two questions, two calculations}{\hl{Where is the line?} $\bar{y}^{(m)} = \beta_0^{(m)} + \beta_1^{(m)} \tilde{x}$: estimation uncertainty only.\\[0.3em]
+\hl{Where will the penguin land?} $\tilde{y}^{(m)} \sim N\!\left(\bar{y}^{(m)},\; (\sigma^{(m)})^2\right)$: adds observation noise.}
+
+\pause
+\medskip
+
+\keyidea{The Bayesian answer to Lecture 15's \hl{CI for the mean response vs.\ prediction interval}, now just collections of draws.}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The line vs.\ the penguin}
+
+\begin{center}
+\includegraphics[width=0.68\textwidth]{posterior_predictive.pdf}
+\end{center}
+
+\vspace{-0.2em}
+\begin{itemize}
+    \item \hl{The line} $E[y \mid x]$: $4289$ g, $95\%$ CI $[4162,\; 4418]$, only $256$ g wide.
+    \item \hl{A new penguin}: $4289$ g, $95\%$ PI $[3491,\; 5091]$: $1601$ g wide, six times wider, because individual penguins vary.
+\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Bayesian vs.\ frequentist prediction}
+
+\begin{center}
+\includegraphics[width=0.54\textwidth]{pred_comparison.pdf}
+\end{center}
+
+\vspace{-0.4em}
+\begin{itemize}
+    \item The intervals nearly \hl{coincide}: $\sigma$ dominates both.
+    \item Why so close? The prior moves the slope \emph{down} and the intercept \emph{up}; at $200$\,mm the shifts cancel ($4289$ vs.\ $4266$\,g).
+    \item \hl{With enough data the two frameworks agree}: a prior shows up in the parameters long before it shows up in a prediction.
+\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Section: Wrap-up
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Wrap-up}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Summary}
+
+\begin{itemize}
+    \item A \hl{Bayesian regression} is the OLS data model plus \hl{a prior on every unknown}: slope, intercept, and noise.
+    \pause
+    \item \hl{Choosing priors} is the new work: vague where the parameter is meaningless, informative where you do know something.
+    \pause
+    \item A \hl{prior predictive check} (simulate lines from the prior alone) shows what the prior implies, before any data are used.
+    \pause
+    \item Everything else carries over: \hl{MCMC} fits it, a \hl{credible interval} reads the slope, the \hl{posterior predictive} predicts a new penguin.
+    \pause
+    \item The prior \hl{shifts and narrows}, worth it exactly when the prior is trustworthy.
+\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Coming up next}
+
+\hl{That completes the course.} You can describe data, fit a regression, test a hypothesis, and, since Module 4, do all of it while stating honestly what you believed beforehand.
+
+\vspace{0.4em}
+\begin{itemize}
+\item \hl{Bring your questions.} This is the moment to close gaps rather than discover them.
+\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Activity Frame
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{In-class activity}
+
+You'll work in \textbf{pairs} (one analyst, one guide).
+
+\medskip
+\begin{itemize}
+\item Pick up the worksheet.
+\item Work through the problems together.
+\item \hl{Don't use Gen AI except for debugging}
+\item Your worksheet will be collected and graded.
+\end{itemize}
+
+\medskip
+\textbf{Recommendations:}
+\begin{itemize}
+\item Read each question carefully before starting the code.
+\item Discuss your answers with your partner before writing them down.
+\end{itemize}
+
+\end{frame}
+
+\end{document}

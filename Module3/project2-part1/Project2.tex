@@ -1,0 +1,194 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath, amssymb}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{array}
+\geometry{margin=1in}
+
+%--------------------
+\begin{document}
+
+\begin{center}
+\textbf{\Large Project 2 \\ How Reliable Is Linear Regression Inference?} \\
+\end{center}
+
+
+\section*{Overview}
+
+Classical linear regression inference --- confidence intervals and hypothesis tests for slopes --- rests on a set of assumptions about the error distribution: normality, constant variance, and independence. In practice, real data rarely satisfy all of these cleanly. This project investigates those questions:
+\begin{itemize}
+    \item How badly do classical 95\% confidence intervals for regression slopes fail when assumptions are violated?
+    \item How p-value can be used in the bootstrap when assumptions are violated?
+    \item Does the bootstrap provide a reliable remedy?
+\end{itemize}
+You will answer these questions in two ways. In Part I, you will use simulation --- where the true parameter $\beta_1 = 2$ is known --- to directly measure how often each CI method works under a specific type of violation. In Part II, you will apply both methods to a real dataset and use your simulation results to assess how much trust to place in each approach. \\
+
+\noindent\textbf{Each group will choose two of four simulation studies for Part I (Studies A--D).} \\
+
+\noindent\textbf{Your group will submit a written report (8--12 pages, excluding code appendix) and a complete, reproducible R script.}
+
+
+\section*{Suggested Outline for the Report}
+\begin{itemize}
+    \item Introduction
+    \begin{enumerate}
+        \item Motivation
+        \item Which two simulation studies your group chose, and why those violations are interesting
+        \item Overview of the two CI methods being compared (classical OLS vs.\ bootstrap)
+        \item Overview of the two p-value methods being compared (classical $t$-test vs.\ bootstrap)
+        \item Brief preview of findings
+    \end{enumerate}
+
+    \item Methods
+    \begin{enumerate}
+        \item Base data-generating model and simulation design
+        \item Description of your two chosen studies and their scenarios
+        \item Definition of empirical coverage probability, average CI width, and bias
+        \item Definition of the bootstrap p-value for testing $H_0\colon \beta_1 = 0$ (null-centered percentile method)
+        \item Description of the real dataset chosen for Part II
+    \end{enumerate}
+
+    \item Part I: Simulation Study Results
+    \begin{enumerate}
+        \item Empirical coverage probabilities (table: 4 scenarios $\times$ 2 sample sizes $\times$ 2 CI methods, for each study)
+        \item Average CI widths
+        \item Bias of $\hat{\beta}_1$ across scenarios
+        \item Empirical rejection rates for $H_0\colon \beta_1 = 0$: classical $t$-test p-value vs.\ bootstrap p-value (table: same structure as coverage table)
+        \item Histograms of the sampling distribution of $\hat{\beta}_1$ (one per scenario)
+        \item Scenario-by-scenario interpretation: what drives the pattern you observe?
+        \item Comparison across your two studies: which violation is more damaging? Does the bootstrap help differently?
+    \end{enumerate}
+
+    \item Part II: Real Data Analysis
+    \begin{enumerate}
+        \item Exploratory data analysis and motivation for chosen predictor
+        \item OLS model output, classical 95\% CI, and classical p-value for the slope
+        \item Bootstrap 95\% CI, bootstrap p-value for $H_0\colon \beta_1 = 0$, and bootstrap distribution plot
+        \item Residual diagnostics (residual plot and Q-Q plot)
+        \item Comparison of the two CIs and the two p-values: do they agree? Are assumptions likely violated?
+        \item Connection to Part I: which of your studied scenarios does this most resemble, and what does that imply about how much to trust the classical CI and p-value?
+    \end{enumerate}
+
+    % \item Part III: Reflection
+    % \begin{enumerate}
+    %     \item When does the bootstrap help (or not help) for your chosen violation types?
+    %     \item Does larger sample size solve the problems your studies identified?
+    %     \item What would you recommend to a researcher who suspects these violations in their data?
+    % \end{enumerate}
+
+    \item Conclusion
+    \begin{enumerate}
+        \item Summary of key findings from simulation and real data
+        \item Practical guidance specific to your chosen violation types
+        \item Suggestions for future work
+    \end{enumerate}
+\end{itemize}
+
+
+\section*{Part I: Simulation Study}
+
+\subsection*{Base Setting}
+
+\textbf{Base data-generating model:}
+\[
+Y_i = \beta_0 + \beta_1 X_i + \epsilon_i, \quad \beta_0 = 1,\quad \beta_1 = 2,\quad X_i \sim N(0,1)
+\]
+The only thing that varies across groups is the distribution of $\epsilon_i$.
+
+\begin{itemize}
+    \item \textbf{Sample sizes:} different $n$ for each scenario, e.g., $n = 30, 100, 200$
+    \item \textbf{Replications:} $500$ or $1{,}000$ simulated datasets per scenario (bootstrap sample size $B = 1{,}000$)
+    \item \textbf{CI methods:} Classical 95\% CI and bootstrap 95\% percentile CI
+    \item \textbf{P-value methods:} Classical $t$-test p-value and bootstrap p-value for $H_0\colon \beta_1 = 0$, computed by centering the bootstrap distribution of $\hat{\beta}_1^*$ at zero and finding the proportion of resamples satisfying $|\hat{\beta}_1^* - \bar{\hat{\beta}}_1^*| \geq |\hat{\beta}_1|$ (two-sided)
+\end{itemize}
+
+\subsection*{For Each Cell, Report:}
+\begin{itemize}
+    \item Empirical coverage probability (nominal target: 0.95) for both CI methods
+    \item Average CI width for both methods
+    \item Bias: $\overline{\hat{\beta}}_1 - 2$
+    \item Empirical rejection rate for $H_0\colon\beta_1 = 0$ using both the classical and bootstrap p-values 
+    \item Histogram of the sampling distribution of $\hat{\beta}_1$
+\end{itemize}
+
+%--------------------------------------------------
+\subsection*{Study A --- Non-normality of Errors}
+
+\textbf{Violation:} The classical CI assumes normally distributed errors. This study investigates how skewness in the error distribution affects coverage, from mild to severe. All errors are mean-centered so $E(\epsilon_i) = 0$ and the model remains correctly specified.
+
+%--------------------------------------------------
+\subsection*{Study B --- Heteroskedasticity}
+
+\textbf{Violation:} OLS assumes $\mathrm{Var}(\epsilon_i) = \sigma^2$ (constant variance). This study investigates what happens when variance grows with $|X_i|$.
+
+%--------------------------------------------------
+\subsection*{Study C --- Heavy-Tailed Errors}
+
+\textbf{Violation:} Fat-tailed errors increase the frequency of extreme residuals and inflate the true variability of $\hat{\beta}_1$ beyond what the classical SE estimates. Tail weight is controlled by the degrees of freedom $\nu$ of a $t$-distribution; smaller $\nu$ means heavier tails.
+
+%--------------------------------------------------
+\subsection*{Study D --- Model Misspecification}
+
+\textbf{Violation:} The fitted model is linear ($\hat{Y} = \hat{\beta}_0 + \hat{\beta}_1 X$), but the true relationship contains a quadratic component. Unlike Studies A--C, this is a \emph{model misspecification} violation rather than a distributional one. It introduces \emph{bias} in $\hat{\beta}_1$ in addition to coverage problems, because the linear slope absorbs part of the curvature.
+
+
+\section*{Part II: Real Data Analysis}
+
+Choose \textbf{one} dataset from the suggested sources below, or propose your own. Your dataset must have a continuous response variable and at least one continuous predictor with a plausible linear relationship. In your discussion, connect the assumption violations you detected in the data to the specific violation types your group investigated in Part I.
+
+\subsection*{Required Steps}
+\begin{enumerate}
+    \item Perform brief EDA and motivate your choice of primary predictor.
+    \item Fit OLS and report the classical 95\% CI and classical p-value for the slope.
+    \item Compute the bootstrap 95\% CI ($B = 1{,}000$, percentile method).
+    \item Compute the bootstrap p-value for $H_0\colon \beta_1 = 0$ ($B = 1{,}000$, null-centered percentile method). Report and interpret it alongside the classical p-value.
+    \item Plot the bootstrap distribution of $\hat{\beta}_1$ and describe its shape.
+    \item Check model assumptions using a residual plot and a Q-Q plot.
+    \item Discuss: do the two CIs agree? Do the classical and bootstrap p-values agree? Are assumptions likely violated? Which of your Part I scenarios does this most resemble?
+    \item Based on your simulation results, how much do you trust the classical CI and p-value here?
+\end{enumerate}
+
+
+\section*{Project Requirements}
+\begin{itemize}
+    \item Source of data (Part II) must be cited
+    \item Complete R code must be included as an appendix (\texttt{.R} or \texttt{.Rmd})
+    \item \texttt{set.seed()} must be used for all simulations to ensure reproducibility
+    \item References should be provided at the end of the report
+\end{itemize}
+
+
+\section*{Possible Datasets for Part II}
+\begin{itemize}
+    \item \textbf{Boston Housing} --- median home value vs.\ socioeconomic predictors (\texttt{MASS} R package)
+    \item \textbf{Auto MPG} --- fuel efficiency vs.\ vehicle characteristics (\href{https://archive.ics.uci.edu/}{UCI ML Repository})
+    \item \textbf{Gapminder} --- life expectancy vs.\ GDP per capita (\texttt{gapminder} R package)
+    \item \href{https://www.openintro.org/data/}{OpenIntro Datasets}
+    \item \href{https://www.kaggle.com/datasets}{Kaggle Datasets}
+    \item \href{https://data.gov/}{US Government Open Data}
+\end{itemize}
+
+
+\section*{Deliverables}
+\begin{itemize}
+    \item Deliverable 1: Project Outline due on \textbf{Tuesday Mar 17 at 10:00 PM}
+    \item Deliverable 2: Progress Report (Draft slides + R code + dataset) due on \textbf{Monday March 30 at 10:00 PM}
+    \item Deliverable 3: Final Written Report (PDF) + R script + dataset due on \textbf{Tuesday Apr 7 at 10:00 PM}
+\end{itemize}
+
+
+\section*{Important Dates (Tentative)}
+\begin{itemize}
+    \item \textbf{Wednesday March 4 Lab:} Project 2 logistics --- study selection, dataset selection, and simulation design
+    \item \textbf{Tuesday Mar 17 at 10:00 PM:} Deliverable 1 --- Project Outline due
+    \item \textbf{Wednesday March 18 Lab:} Project 2 work lab --- Part I simulation
+    \item \textbf{Wednesday March 25 Lab:} Project 2 work lab --- Part II real data analysis
+    \item \textbf{Monday March 30 at 10:00 PM:} Deliverable 2 --- Progress Report due
+    \item \textbf{Wednesday April 1 Lab:} Project 2 work lab --- reflection and report finalisation
+    \item \textbf{Tuesday Apr 7 at 10:00 PM:} Deliverable 3 --- Final Report + R script due
+    \item \textbf{Wednesday Apr 29:} Resubmission deadline (for groups receiving R or N)
+\end{itemize}
+
+
+\end{document}

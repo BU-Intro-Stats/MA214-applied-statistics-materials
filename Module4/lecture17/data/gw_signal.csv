@@ -1,0 +1,5 @@
+"source","description","prior","lik_long","lik_em"
+"BBH","Binary black hole merger",0.5,0.2,0.01
+"BNS","Binary neutron star merger",0.15,0.9,0.8
+"NSBH","Neutron star--black hole",0.1,0.5,0.2
+"Noise","Detector glitch",0.25,0.35,0.02

@@ -1,0 +1,147 @@
+\documentclass{article}
+\usepackage[margin=1.15in]{geometry}
+\usepackage{xcolor}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{tabularx}
+
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\rhead{Lecture 6}
+\lhead{MA 214: Applied Statistics (Spring 2026)}
+\renewcommand{\headrulewidth}{.4mm}
+
+\newcommand{\blankline}[1]{\underline{\hspace{#1}}}
+
+\begin{document}
+
+\noindent\textbf{Name:}\blankline{2.25in}\hfill\textbf{BUID:}\blankline{1.55in}\newline
+
+\begin{center}
+ \Large In-Class Worksheet: Logistic Regression
+\end{center}
+
+\subsection*{Scenario}
+Logistic regression is used when the response variable is binary. Instead of modeling the raw 0/1 outcome with a line, we model the probability of success using odds, log odds, and maximum likelihood.
+
+\medskip
+\noindent\textbf{Goals:} \textbf{(1)} identify binary responses and success coding, \textbf{(2)} convert between probabilities, odds, and log odds, \textbf{(3)} interpret logistic regression coefficients using odds ratios, \textbf{(4)} understand classification thresholds and unbalanced data.
+
+\subsection*{Part 1: Binary Response and Success Coding}
+For each question, define a binary response variable $Y$ and choose what value will count as success ($Y=1$).
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabularx}{\textwidth}{p{5.2cm}p{3.2cm}p{3.2cm}X}
+\toprule
+\textbf{Question} & \textbf{$Y=0$} & \textbf{$Y=1$} & \textbf{What is $p=P(Y=1)$?} \\
+\midrule
+Did a passenger survive? & & & \\[1.8em]
+Is an email spam? & & & \\[1.8em]
+Did a borrower default? & & & \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item Why is ordinary linear regression often a poor fit for a 0/1 response? \\[3.5em]
+\end{enumerate}
+
+\subsection*{Part 2: Probability, Odds, and Log Odds}
+For an event with probability $p$,
+\[
+\text{odds}=\frac{p}{1-p}, \qquad \text{log odds}=\log\left(\frac{p}{1-p}\right).
+\]
+Complete the missing values.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.6}
+\begin{tabular}{ccc}
+\toprule
+\boldmath$p$ & \textbf{odds} & \textbf{log odds} \\
+\midrule
+0.50 & & \\[1.8em]
+0.80 & & \\[1.8em]
+0.25 & & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item If the odds of survival are 3, is survival more likely or less likely than death? Explain briefly. \\[3em]
+\end{enumerate}
+
+\subsection*{Part 3: Interpreting a Logistic Regression Model}
+For the Donner Party example, code $Y=1$ if a person survived. Using Male as the reference level, a fitted logistic model is
+\[
+\log\left(\frac{p}{1-p}\right) = 1.633 - 0.078(\text{Age}) + 1.597(\text{Female}),
+\]
+where $p$ is the probability of survival.
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item What is the reference group for sex? \\[2em]
+\item Convert the age coefficient into an odds ratio.
+\[
+e^{-0.078}=\blankline{2in}
+\]
+Interpret it in context. \\[3.5em]
+\item Convert the female coefficient into an odds ratio.
+\[
+e^{1.597}=\blankline{2in}
+\]
+Interpret it in context. \\[3.5em]
+\item For a 25-year-old male, compute the linear predictor $\eta$.
+\[
+\eta = 1.633 - 0.078(25) + 1.597(0)=\blankline{2in}
+\]
+\item Convert this $\eta$ to a probability using $p=e^\eta/(1+e^\eta)$.
+\[
+p = \blankline{2.5in}
+\]
+\end{enumerate}
+
+\subsection*{Part 4: Likelihood and Classification}
+For one binary observation, the Bernoulli likelihood contribution is
+\[
+P(Y_i=y_i)=p_i^{y_i}(1-p_i)^{1-y_i}.
+\]
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item If $y_i=1$, what is the likelihood contribution? \hfill \blankline{1.5in}
+\item If $y_i=0$, what is the likelihood contribution? \hfill \blankline{1.5in}
+\item A logistic model gives a probability $\hat p$, not automatically a class label. If we use threshold 0.50, fill in the rule:
+\[
+\hat p \ge 0.50 \Rightarrow \hat Y = \blankline{.7in}, \qquad \hat p < 0.50 \Rightarrow \hat Y = \blankline{.7in}.
+\]
+\end{enumerate}
+
+\subsection*{Part 5: Misleading Accuracy}
+Out of 1000 emails, 950 are not spam and 50 are spam. A classifier predicts every email is not spam.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{lcc}
+\toprule
+ & \textbf{Actual not spam} & \textbf{Actual spam} \\
+\midrule
+Predicted not spam & 950 & 50 \\
+Predicted spam & 0 & 0 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item Compute the accuracy.
+\[
+\text{accuracy}=\blankline{2.5in}
+\]
+\item What is the problem with this classifier? \\[3.5em]
+\item In one sentence, explain why a threshold other than 0.50 might be reasonable. \\[3.5em]
+\end{enumerate}
+
+\end{document}

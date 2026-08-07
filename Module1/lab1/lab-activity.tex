@@ -1,0 +1,188 @@
+\documentclass{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{xcolor}
+\usepackage{parskip}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{listings}
+
+\definecolor{codegray}{gray}{0.97}
+\definecolor{huddleblue}{RGB}{214,234,255}
+\definecolor{predictionyellow}{RGB}{255,242,200}
+\definecolor{debatepink}{RGB}{255,225,225}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  frame=single,
+  framerule=0.4pt,
+  backgroundcolor=\color{codegray},
+  breaklines=true,
+  showstringspaces=false,
+  keepspaces=true
+}
+
+\newcommand{\coursenumber}{MA 214}
+\newcommand{\nameblank}{\rule{1.75in}{0.4pt}}
+\newcommand{\idblank}{\rule{1.55in}{0.4pt}}
+\newcommand{\shortblank}{\rule{1.6in}{0.4pt}}
+\newcommand{\longblank}{\rule{0.93\linewidth}{0.4pt}}
+\newcommand{\responsebox}[2]{\noindent\fbox{\begin{minipage}{0.95\linewidth}\textbf{#1} #2\vspace{0.55in}\end{minipage}}}
+\newcommand{\linedbox}[1]{\noindent\fbox{\begin{minipage}{0.95\linewidth}#1\vspace{0.18in}\par\longblank\par\vspace{0.18in}\longblank\par\vspace{0.18in}\longblank\end{minipage}}}
+\newcommand{\callout}[3]{\noindent\colorbox{#1}{\makebox[\dimexpr0.95\linewidth-2\fboxsep\relax][l]{\textbf{#2}}}\par\noindent\fbox{\begin{minipage}{0.93\linewidth}#3\end{minipage}}}
+
+\begin{document}
+
+\begin{center}
+  {\LARGE \coursenumber{} Week 1: Lab 1}\\
+  {\large Working with R and Data}
+\end{center}
+
+\begin{enumerate}[label=\arabic*.,leftmargin=*,itemsep=.7em]
+  \item \textbf{Your name:} \nameblank \hfill \textbf{BU ID:} \idblank
+  \item \textbf{Partner's name:} \nameblank \hfill \textbf{BU ID:} \idblank
+\end{enumerate}
+
+\textbf{Big idea:} Data analysis starts with understanding what each row and column represents before calculating summaries or making plots.
+\textbf{Do not use GenAI tools for this lab.} The point is to practice your own analysis work, coding skills, and statistical reasoning.
+
+\textbf{Files used:} \texttt{flights.csv} and \texttt{lab-starter.R}
+
+\textbf{Skills practiced:} \texttt{read.csv()}, \texttt{glimpse()}, \texttt{count()}, \texttt{summarize()}, and basic \texttt{ggplot()} graphics.
+
+\textbf{Your mission:} Use the flights data to practice importing, inspecting, summarizing, and visualizing data in a reproducible R script.
+
+\section*{Icebreaker}
+
+Before opening R: introduce yourself to your partner and answer the warm-up question below.
+
+\responsebox{Warm-up response:}{What is one everyday data set you have seen recently, and what would one row represent in that data set?}
+
+\section*{Getting Started}
+
+Open \texttt{lab-starter.R}. Make sure \texttt{flights.csv} is in the same folder as your script. Do not use \texttt{setwd()} in the file you submit.
+
+\begin{lstlisting}
+library(dplyr)
+library(ggplot2)
+library(readr)
+
+flights <- read.csv("flights.csv")
+
+head(flights)
+str(flights)
+\end{lstlisting}
+
+\callout{huddleblue}{HUDDLE UP}{Before calculating anything, what do you think one row represents? Which variables seem useful for describing where flights went and how long they took?}
+
+\newpage
+
+\section*{Question 1. Explore the Flights Data}
+
+Start by getting oriented. Record what you learn about the size, columns, and variable types in the data.
+
+\begin{lstlisting}
+dim(flights)
+names(flights)
+str(flights)
+\end{lstlisting}
+
+\begin{center}
+\renewcommand{\arraystretch}{2.3}
+\begin{tabular}{|p{0.24\linewidth}|p{0.27\linewidth}|p{0.36\linewidth}|}
+\hline
+\textbf{Variable or data set} & \textbf{Type or role} & \textbf{What it means} \\
+\hline
+\texttt{origin} & & \\
+\hline
+\texttt{dest} & & \\
+\hline
+\texttt{air\_time} & & \\
+\hline
+\end{tabular}
+\end{center}
+
+\linedbox{\textbf{Write 2-3 sentences describing what you learned from the first look at the data.}}
+
+\section*{Question 2. Make a Prediction}
+
+Before summarizing, predict which NYC airport had the most flights in this data set: JFK, LGA, or EWR.
+
+\callout{predictionyellow}{PREDICTION TIME}{Before running the code, predict the busiest origin airport. Be specific enough that the data can support or challenge your answer.}
+
+\begin{lstlisting}
+airport_counts <- flights %>%
+  count(origin)
+
+airport_counts
+\end{lstlisting}
+
+\newpage
+
+\linedbox{\textbf{What did your team predict? What evidence did you check first?}}
+
+\section*{Question 3. Compute Summaries}
+
+Use counts and grouped summaries to answer concrete questions about destinations and air time.
+
+\begin{lstlisting}
+state_counts <- flights %>%
+  count(dest)
+
+air_time_by_month <- flights %>%
+  group_by(month) %>%
+  summarize(
+    mean_air_time = mean(air_time, na.rm = TRUE),
+    n_flights = n()
+  )
+\end{lstlisting}
+
+\callout{huddleblue}{HUDDLE UP}{Does each summary answer the question directly, or do you need another comparison, plot, or table?}
+
+\callout{huddleblue}{CLAIM, EVIDENCE, CONTEXT}{%
+The main pattern is \shortblank.\\[.6em]
+My evidence is \shortblank.\\[.6em]
+This matters because \shortblank.
+}
+
+\section*{Question 4. Interpret in Context}
+
+Connect your R output to a plain-language statement about the flights data.
+
+\begin{center}
+\renewcommand{\arraystretch}{2.25}
+\begin{tabular}{|p{0.42\linewidth}|p{0.50\linewidth}|}
+\hline
+\textbf{Question} & \textbf{Your answer} \\
+\hline
+What comparison did you make? & \\
+\hline
+What result is strongest? & \\
+\hline
+What limitation or caution should readers know? & \\
+\hline
+\end{tabular}
+\end{center}
+
+\newpage
+
+\callout{debatepink}{DEBATE CORNER}{If you and your partner disagree about the interpretation, write both arguments first. Then decide what claim the evidence actually supports.}
+
+\section*{Question 5. Close the Lab}
+
+Submit your completed \texttt{lab-starter.R}. Your script should run from top to bottom and include the requested objects and plots.
+
+\linedbox{\textbf{Final response:} state one claim about the flights data, cite one piece of evidence, and explain the context.}
+
+\section*{Optional Challenge}
+
+Make one plot that compares \texttt{air\_time} across months or origin airports. Save it using \texttt{ggsave()}.
+
+\begin{lstlisting}
+# Optional challenge starter code.
+ggplot(flights, aes(x = factor(month), y = air_time)) +
+  geom_boxplot()
+\end{lstlisting}
+
+\end{document}

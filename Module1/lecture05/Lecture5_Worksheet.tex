@@ -1,0 +1,135 @@
+\documentclass{article}
+\usepackage[margin=1.15in]{geometry}
+\usepackage{xcolor}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{tabularx}
+
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\rhead{Lecture 5}
+\lhead{MA 214: Applied Statistics (Spring 2026)}
+\renewcommand{\headrulewidth}{.4mm}
+
+\newcommand{\blankline}[1]{\underline{\hspace{#1}}}
+
+\begin{document}
+
+\noindent\textbf{Name:}\blankline{2.25in}\hfill\textbf{BUID:}\blankline{1.55in}\newline
+
+\begin{center}
+ \Large In-Class Worksheet: Multiple Regression
+\end{center}
+
+\subsection*{Scenario}
+Multiple regression models a numerical response using more than one predictor. The key new phrase is \textbf{holding the other predictors fixed}. Today we practice coefficient interpretation, indicator variables, and comparing models using adjusted $R^2$.
+
+\medskip
+\noindent\textbf{Goals:} \textbf{(1)} read software output and identify reference levels, \textbf{(2)} interpret multiple regression coefficients conditionally, \textbf{(3)} compute predictions from a model with an indicator variable, \textbf{(4)} compare models using $R^2$ and adjusted $R^2$.
+
+\subsection*{Part 1: Reading Software Output}
+Interest rates on loans are modeled using \texttt{income\_ver}, a categorical variable with three levels: \texttt{not}, \texttt{source\_only}, and \texttt{verified}. Software reports:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lrrrr}
+\toprule
+ & \textbf{Estimate} & \textbf{Std. Error} & \textbf{t value} & \textbf{Pr($>|t|$)} \\
+\midrule
+(Intercept) & 11.0995 & 0.0809 & 137.18 & $<$0.0001 \\
+\texttt{income\_ver : source\_only} & 1.4160 & 0.1107 & 12.79 & $<$0.0001 \\
+\texttt{income\_ver : verified} & 3.2543 & 0.1297 & 25.09 & $<$0.0001 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item The variable has three levels, but only two appear in the table. Why? \\[3em]
+\item Which level is the reference level? How can you tell? \\[3em]
+\item What is the predicted interest rate for a borrower whose income is \texttt{verified}?
+\[
+\blankline{3.2in}
+\]
+\item Which level has the \emph{lowest} predicted interest rate? Explain. \\[3em]
+\end{enumerate}
+
+\subsection*{Part 2: Coefficients While Holding Other Variables Fixed}
+A data set contains book weights, volumes, and cover types. Define
+\[
+\text{paperback}=\begin{cases}
+1, & \text{paperback book},\\
+0, & \text{hardcover book}.
+\end{cases}
+\]
+A fitted model is
+\[
+\widehat{\text{weight}} = 197.96 + 0.72(\text{volume}) - 184.05(\text{paperback}),
+\]
+where weight is measured in grams and volume is measured in cm$^3$.
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item What is the response variable? What are the predictors? \\[3em]
+\item What is the reference level for cover type? \\[2.5em]
+\item Interpret the coefficient 0.72 in context. Make sure to include ``holding fixed'' language. \\[4em]
+\item Interpret the coefficient $-184.05$ in context. \\[4em]
+\item Is the intercept practically meaningful here? Explain briefly. \\[3em]
+\end{enumerate}
+
+\subsection*{Part 3: Same Model, Two Lines}
+Using the same fitted model,
+\[
+\widehat{\text{weight}} = 197.96 + 0.72(\text{volume}) - 184.05(\text{paperback}),
+\]
+complete the two equations below.
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item For hardcover books, $\text{paperback}=0$:
+\[
+\widehat{\text{weight}} = \blankline{4in}
+\]
+\item For paperback books, $\text{paperback}=1$:
+\[
+\widehat{\text{weight}} = \blankline{4in}
+\]
+\item Predict the weight of a hardcover book with volume 900 cm$^3$.
+\[
+\blankline{3.2in}
+\]
+\item Predict the weight of a paperback book with volume 900 cm$^3$.
+\[
+\blankline{3.2in}
+\]
+\end{enumerate}
+
+\subsection*{Part 4: Comparing Models}
+Three models are fit to predict apartment rent.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{clcc}
+\toprule
+\textbf{Model} & \textbf{Predictors} & \boldmath$R^2$ & \textbf{Adjusted }\boldmath$R^2$ \\
+\midrule
+A & size & 0.61 & 0.60 \\
+B & size + bedrooms & 0.64 & 0.62 \\
+C & size + bedrooms + random ID code & 0.65 & 0.60 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item Which model has the largest $R^2$? \\[2em]
+\item Which model has the largest adjusted $R^2$? \\[2em]
+\item Which model would you prefer for interpretation? Why? \\[4em]
+\item Why is adjusted $R^2$ useful when comparing models with different numbers of predictors? \\[4em]
+\end{enumerate}
+
+\subsection*{Wrap-Up}
+Complete the sentence: In multiple regression, each coefficient is interpreted as a predicted change in the response \blankline{3.3in}. \\[3em]
+
+\end{document}

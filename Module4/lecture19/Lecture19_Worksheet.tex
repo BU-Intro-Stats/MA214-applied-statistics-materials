@@ -1,0 +1,235 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage[margin=1.15in]{geometry}
+\usepackage{xcolor}
+\usepackage{parskip}
+\usepackage{float}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath}
+
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\rhead{Lecture 19}
+\lhead{MA 214: Applied Statistics (Spring 2026)}
+\renewcommand{\headrulewidth}{.4mm}
+
+\newcommand{\blankline}[1]{\underline{\hspace{#1}}}
+
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  frame=single,
+  framerule=0.4pt,
+  breaklines=true,
+  showstringspaces=false,
+  keywordstyle=\color{blue!60!black},
+  commentstyle=\color{green!40!black},
+  stringstyle=\color{orange!60!black}
+}
+
+\begin{document}
+
+\noindent\textbf{Name:}\blankline{2.25in}\hfill\textbf{BUID:}\blankline{1.55in}
+
+\medskip
+
+\noindent\textbf{Name:}\blankline{2.25in}\hfill\textbf{BUID:}\blankline{1.55in}\newline
+
+\begin{center}
+ \Large In-Class Worksheet: MCMC and Diagnostics
+\end{center}
+
+\subsection*{Scenario}
+We return to the systolic blood pressure (SBP) data from Lecture 18's activity ($n = 20$ patients, $\bar{x} = 126$ mmHg). There we estimated the mean $\mu$ with a Normal--Normal conjugate model, \emph{assuming} the SD was known ($\sigma = 15$). Today we drop that assumption and estimate $\mu$ and $\sigma$ \textbf{jointly}, with independent priors that are \emph{not} conjugate:
+\[
+\mu \sim N(120,\; 10^2), \qquad \log(\sigma) \sim N(\log 10,\; 0.5^2).
+\]
+Two unknowns and no conjugacy $\Rightarrow$ no closed-form posterior $\Rightarrow$ we need the computational tools from today.
+
+\medskip
+\noindent\textbf{Goals:}
+\textbf{(1)} see how grid approximation works (and struggles) in 2D,
+\textbf{(2)} read trace plots and understand burn-in,
+\textbf{(3)} identify good and bad MCMC chains,
+\textbf{(4)} use $\widehat{R}$ to diagnose convergence.
+
+\medskip
+\noindent\textbf{Files.} Download \texttt{lecture19\_activity.R} from Blackboard. Its \texttt{Setup} section loads the SBP data and defines three functions you will call: \texttt{log\_posterior}, \texttt{run\_mcmc} (a Metropolis--Hastings sampler), and \texttt{compute\_rhat}. In practice you would use a probabilistic programming system like Stan or PyMC; this is a zero-install stand-in so we can focus on \emph{interpreting} the output.
+
+\subsection*{Setup}
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.5em]
+	\item \textbf{Determine roles.} You will work in PAIRS. One person is the \textbf{analyst} (runs the code), the other the \textbf{guide} (reads the questions and fills out the worksheet).
+	\item \textbf{Open RStudio.} Open \texttt{lecture19\_activity.R} and run the \texttt{Setup} section.
+\end{enumerate}
+
+\subsection*{Part 1: Grid Approximation in 2D}
+Grid approximation evaluates the posterior on a $K \times K$ grid of $(\mu, \sigma)$ values. You'll see how the resolution $K$ affects the approximation, then record reference summaries from a fine grid.
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.6em]
+	\item \textbf{Contour plot.} Run \textbf{1A}, which plots the joint posterior on a $101 \times 101$ grid. The result is a \textbf{contour plot}: a bird's-eye view of a 3D surface (posterior density over $\mu$ and $\sigma$). Each contour connects points of equal density, like elevation lines on a map; the innermost contour marks the posterior peak.
+
+	Over what range of $\mu$ does most of the posterior mass lie? What about $\sigma$? \\[3em]
+
+	\newpage
+	\item \textbf{Grid convergence.} Run \textbf{1B}, which computes the posterior mean of $\mu$ and $\sigma$ at seven grid sizes ($K = 5, 7, 11, 15, 21, 51, 101$). At what $K$ do the estimates stabilise? Does one parameter need a finer grid than the other --- and if so, why? \\[5em]
+
+	\item \textbf{Reference summaries.} Run \textbf{1C} with $K = 201$. Record the posterior mean and SD for each parameter:
+
+	\vspace{0.3em}
+	\begin{center}
+	\renewcommand{\arraystretch}{1.4}
+	\begin{tabular}{>{\bfseries}p{3cm}cc}
+	\toprule
+	\textbf{Parameter} & \textbf{Posterior mean} & \textbf{Posterior SD} \\
+	\midrule
+	$\mu$ & \blankline{4cm} & \blankline{4cm} \\
+	$\sigma$ & \blankline{4cm} & \blankline{4cm} \\
+	\bottomrule
+	\end{tabular}
+	\end{center}
+	\vspace{0.5em}
+
+	With 2 parameters, a $K = 21$ grid needs $21^2 = 441$ points. How many would you need for 10 parameters? For 20? This is the \textbf{curse of dimensionality} --- and the reason we turn to MCMC. \\[3em]
+\end{enumerate}
+
+\subsection*{Part 2: Running MCMC and Burn-in}
+A \textbf{trace plot} shows the sampled values of a parameter (y-axis) across iterations (x-axis). When the chain starts far from the region of high posterior probability, the early iterations drift toward it before settling. That initial transient is the \textbf{burn-in}; those draws don't represent the posterior, so we discard them before computing summaries.
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.6em]
+	\item \textbf{Trace plots from a bad start.} Run \textbf{2A}, which draws $M = 2{,}000$ samples starting from $(\mu_0, \sigma_0) = (140, 25)$ --- far from the high-density region. Examine both trace plots. Where is the burn-in? Roughly how many iterations until the chain reaches the high-density region? \\[4em]
+
+	\item \textbf{Effect of burn-in.} Run \textbf{2B}, which computes the posterior mean of $\mu$ and $\sigma$ after discarding different amounts of burn-in (none, 200, 500, 1000). How do the estimates change as you discard more? Where do they stabilise? \\[4em]
+
+	\item \textbf{MCMC vs.\ grid.} Run \textbf{2C}, which compares MCMC summaries (dropping the first 500 draws) to the grid reference from Part~1. Record:
+
+	\vspace{0.3em}
+	\begin{center}
+	\renewcommand{\arraystretch}{1.4}
+	\begin{tabular}{>{\bfseries}p{2.5cm}cccc}
+	\toprule
+	& \multicolumn{2}{c}{\textbf{MCMC ($M = 2{,}000$)}} & \multicolumn{2}{c}{\textbf{Grid (Part 1)}} \\
+	\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+	\textbf{Parameter} & Mean & SD & Mean & SD \\
+	\midrule
+	$\mu$ & \blankline{2.2cm} & \blankline{2.2cm} & \blankline{2.2cm} & \blankline{2.2cm} \\
+	$\sigma$ & \blankline{2.2cm} & \blankline{2.2cm} & \blankline{2.2cm} & \blankline{2.2cm} \\
+	\bottomrule
+	\end{tabular}
+	\end{center}
+	\vspace{0.5em}
+
+	How well do the MCMC estimates match the grid? Why might they differ? \\[3em]
+
+	\item \textbf{Running longer.} Run \textbf{2D}, which re-runs the sampler with $M = 10{,}000$ iterations. Record the new summaries (same burn-in):
+
+	\vspace{0.3em}
+	\begin{center}
+	\renewcommand{\arraystretch}{1.4}
+	\begin{tabular}{>{\bfseries}p{2.5cm}cccc}
+	\toprule
+	& \multicolumn{2}{c}{\textbf{MCMC ($M = 10{,}000$)}} & \multicolumn{2}{c}{\textbf{Grid (Part 1)}} \\
+	\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+	\textbf{Parameter} & Mean & SD & Mean & SD \\
+	\midrule
+	$\mu$ & \blankline{2.2cm} & \blankline{2.2cm} & \blankline{2.2cm} & \blankline{2.2cm} \\
+	$\sigma$ & \blankline{2.2cm} & \blankline{2.2cm} & \blankline{2.2cm} & \blankline{2.2cm} \\
+	\bottomrule
+	\end{tabular}
+	\end{center}
+	\vspace{0.5em}
+
+	Did the longer chain improve the match? Why does chain length matter even after burn-in? (Hint: think about ESS and MCSE.) \\[3em]
+\end{enumerate}
+
+\subsection*{Part 3: Good Chains and Bad Chains}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.6em]
+	\item \textbf{Step-size comparison.} Run \textbf{3A}, which runs the sampler with three proposal step sizes. For each, record the acceptance rate and describe the $\mu$ trace plot:
+
+	\vspace{0.3em}
+	\begin{center}
+	\renewcommand{\arraystretch}{1.6}
+	\begin{tabular}{>{\bfseries}p{4cm}cp{6.5cm}}
+	\toprule
+	\textbf{Step size} & \textbf{Acc.\ rate} & \textbf{Describe the trace plot} \\
+	\midrule
+	$0.05$ [too small] & \blankline{1.6cm} & \\[2.5em]
+	$1.5$ [good] & \blankline{1.6cm} & \\[2.5em]
+	$15$ [too large] & \blankline{1.6cm} & \\[2.5em]
+	\bottomrule
+	\end{tabular}
+	\end{center}
+
+	\item In your own words, why does the proposal step size matter --- and what goes wrong at each extreme? \\[4em]
+\end{enumerate}
+
+\subsection*{Part 4: Multiple Chains and $\widehat{R}$}
+One way to check convergence is to run \emph{multiple chains} from different starting values. If they all converge to the same distribution, we gain confidence the sampler works. $\widehat{R}$ formalises this: it compares variation \emph{within} each chain to variation \emph{between} chains. Converged $\Rightarrow \widehat{R}\approx 1$; $\widehat{R} > 1.01$ is a concern, and $> 1.1$ signals badly unreliable estimates.
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.6em]
+	\item \textbf{Good chains.} Run \textbf{4A}: 4 chains from different starts, good step size. Do the overlaid traces converge to the same region?
+
+	\medskip
+	\begin{center}
+	\renewcommand{\arraystretch}{1.4}
+	\begin{tabular}{>{\bfseries}p{3cm}c}
+	\toprule
+	\textbf{Parameter} & $\widehat{R}$ \\
+	\midrule
+	$\mu$ & \blankline{4cm} \\
+	$\sigma$ & \blankline{4cm} \\
+	\bottomrule
+	\end{tabular}
+	\end{center}
+	\vspace{0.7em}
+
+	\item \textbf{Bad chains.} Run \textbf{4B}: 4 chains from different starts, but a too-small step size. Examine the traces.
+
+	\medskip
+	\begin{center}
+	\renewcommand{\arraystretch}{1.4}
+	\begin{tabular}{>{\bfseries}p{3cm}c}
+	\toprule
+	\textbf{Parameter} & $\widehat{R}$ \\
+	\midrule
+	$\mu$ & \blankline{4cm} \\
+	$\sigma$ & \blankline{4cm} \\
+	\bottomrule
+	\end{tabular}
+	\end{center}
+	\vspace{0.7em}
+
+	\item Compare the two sets of $\widehat{R}$. What went wrong with the bad chains, and how does $\widehat{R}$ detect it? \\[5em]
+\end{enumerate}
+
+\newpage
+
+\subsection*{Part 5: Wrap-Up}
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.6em]
+	\item Suppose all four chains start at the \emph{same} value $(\mu_0, \sigma_0) = (126, 15)$ with a too-small step size. Would $\widehat{R}$ be close to 1, or large? Would the chains actually be reliable? Explain --- and say what this reveals about what $\widehat{R}$ can and cannot catch. \\[5em]
+
+	\item \textbf{Comparing to Lecture 18.} Last time you estimated $\mu$ for this same SBP data with the Normal--Normal conjugate model, \emph{assuming} $\sigma = 15$ was known. Today's MCMC estimates $\mu$ and $\sigma$ jointly. Fill in today's result from your Part~2D run:
+
+	\medskip
+	\begin{center}
+	\renewcommand{\arraystretch}{1.6}
+	\begin{tabular}{>{\bfseries}p{6cm}cc}
+	\toprule
+	\textbf{Model} & \textbf{Post.\ mean of $\mu$} & \textbf{Post.\ SD of $\mu$} \\
+	\midrule
+	Lec 18: $\sigma = 15$ assumed known & $125.39$ & $3.18$ \\
+	Lec 19: joint $(\mu, \sigma)$ via MCMC & \blankline{3cm} & \blankline{3cm} \\
+	\bottomrule
+	\end{tabular}
+	\end{center}
+	\vspace{0.5em}
+
+	The Lecture 18 model \emph{assumed} it knew $\sigma$ exactly. Today's model admits it does not. Which of the two gives a more honest assessment of the uncertainty in $\mu$, and why? (Think about what pretending to know $\sigma$ leaves out.) \\[5em]
+\end{enumerate}
+
+\end{document}

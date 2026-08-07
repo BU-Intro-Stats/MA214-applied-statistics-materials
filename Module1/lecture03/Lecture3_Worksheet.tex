@@ -1,0 +1,134 @@
+\documentclass{article}
+\usepackage[margin=1.15in]{geometry}
+\usepackage{xcolor}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{tabularx}
+\usepackage{graphicx}
+
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\rhead{Lecture 3}
+\lhead{MA 214: Applied Statistics}
+\renewcommand{\headrulewidth}{.4mm}
+
+\newcommand{\blankline}[1]{\underline{\hspace{#1}}}
+
+\begin{document}
+
+\noindent\textbf{Name:}\blankline{2.25in}\hfill\textbf{BUID:}\blankline{1.55in}\newline
+
+\begin{center}
+ \Large In-Class Worksheet: Simple Linear Regression
+\end{center}
+
+\subsection*{Scenario}
+Simple linear regression models a numerical response using one numerical explanatory variable. Today we practice identifying variable roles, interpreting fitted lines, computing residuals, and connecting least squares to the regression model.
+
+\medskip
+\noindent\textbf{Goals:} \textbf{(1)} identify response and explanatory variables, \textbf{(2)} state basic model assumptions, \textbf{(3)} interpret slope and intercept, \textbf{(4)} compute residuals and RSS.
+
+\subsection*{Part 1: Response and Explanatory Variables}
+For each research question, identify the explanatory variable and the response variable. Remember: these roles depend on the research question and do not automatically imply causation.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabularx}{\textwidth}{p{7.3cm}p{4cm}X}
+\toprule
+\textbf{Research question} & \textbf{Explanatory variable} & \textbf{Response variable} \\
+\midrule
+Can commute distance help predict commute time? & & \\[1.8em]
+Can study hours help predict exam score? & & \\[1.8em]
+Can temperature help predict electricity demand? & & \\[1.8em]
+Can a patient's symptoms help predict disease status? & & \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection*{Part 2: Model Assumptions}
+The simple linear regression model is
+\[
+Y_i = \beta_0 + \beta_1x_i + \varepsilon_i.
+\]
+Match each assumption to a short interpretation.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabularx}{\textwidth}{p{4.3cm}X}
+\toprule
+\textbf{Assumption} & \textbf{What it means in context} \\
+\midrule
+\textbf{L}inearity & \\[2em]
+\textbf{I}ndependent observations & \\[2em]
+\textbf{N}ormal errors & \\[2em]
+\textbf{E}qual (constant) variance & \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection*{Part 3: Rent and Apartment Size}
+A rental website lists apartments in a large city. For each listing we record the size (square feet) and the monthly rent (dollars). A fitted linear model for predicting rent from size is
+\[
+\widehat{\text{rent}} = 800 + 2.5\times \text{size}.
+\]
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.75em]
+\item What are the response variable and explanatory variable? \\[3em]
+\item What relationship would you expect the scatterplot to show? Describe its likely direction, form, and strength. \\[3em]
+\item What does the ``hat'' on $\widehat{\text{rent}}$ mean? \\[2.5em]
+\item Predict the rent for a 700-square-foot apartment.
+\[
+\widehat{\text{rent}} = \blankline{3.5in}
+\]
+\item Interpret the slope $2.5$ in context. \\[3em]
+\item The intercept is $800$. Is it practically meaningful here? Explain briefly. \\[3em]
+\end{enumerate}
+
+\subsection*{Part 4: Interpreting a Regression Model}
+Suppose the fitted model is
+\[
+\widehat{\text{exam score}} = 52 + 4.8 \times \text{study hours}.
+\]
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.75em]
+\item Interpret the intercept. Is it practically meaningful here? \\[3.5em]
+\item Interpret the slope. \\[3em]
+\item Predict the exam score for a student who studied 6 hours.
+\[
+\widehat{\text{exam score}} = \blankline{3.5in}
+\]
+\end{enumerate}
+
+\subsection*{Part 5: Residuals and Least Squares}
+Suppose we observe three data points and use the fitted line $\hat y = 1+x$.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.55}
+\begin{tabular}{ccccc}
+\toprule
+$x_i$ & $y_i$ & $\hat y_i$ & $e_i = y_i - \hat y_i$ & $e_i^2$ \\
+\midrule
+1 & 2 & & & \\[1.7em]
+2 & 3 & & & \\[1.7em]
+3 & 5 & & & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.75em]
+\item Compute the residual sum of squares.
+\[
+RSS = \sum_{i=1}^n e_i^2 = \blankline{2.5in}
+\]
+\item Which observations have positive residuals? What does a positive residual mean visually? \\[3em]
+\end{enumerate}
+
+\subsection*{Wrap-Up}
+In one sentence, explain the connection between least squares and maximum likelihood under normal errors. \\[4em]
+
+\end{document}

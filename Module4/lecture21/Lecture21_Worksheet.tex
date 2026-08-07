@@ -1,0 +1,193 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage[margin=1.15in]{geometry}
+\usepackage{xcolor}
+\usepackage{parskip}
+\usepackage{float}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath}
+
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\rhead{Lecture 21}
+\lhead{MA 214: Applied Statistics (Spring 2026)}
+\renewcommand{\headrulewidth}{.4mm}
+
+\newcommand{\blankline}[1]{\underline{\hspace{#1}}}
+
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  frame=single,
+  framerule=0.4pt,
+  breaklines=true,
+  showstringspaces=false,
+  keywordstyle=\color{blue!60!black},
+  commentstyle=\color{green!40!black},
+  stringstyle=\color{orange!60!black}
+}
+
+\begin{document}
+
+\noindent\textbf{Name:}\blankline{2.25in}\hfill\textbf{BUID:}\blankline{1.55in}
+
+\medskip
+
+\noindent\textbf{Name:}\blankline{2.25in}\hfill\textbf{BUID:}\blankline{1.55in}\newline
+
+\begin{center}
+ \Large In-Class Worksheet: Bayesian Linear Regression
+\end{center}
+
+\subsection*{Scenario}
+In Lecture 15 you fit the \emph{Ames Housing} regression the frequentist way: $n = 2{,}930$ homes in Ames, Iowa (De Cock, 2011), modeling \texttt{sale\_price} (in \$000s) from \texttt{living\_area} (sq ft). You found
+\[
+\widehat{\text{price}} = 13.3 + 0.112 \cdot \text{living\_area}, \qquad s_e = 56.5, \qquad R^2 = 0.500,
+\]
+and at a $1{,}500$ sq ft house (which is exactly $\bar x$): a $95\%$ CI for the mean response of $[178.8,\ 182.9]$ and a $95\%$ prediction interval for an individual house of $[70.0,\ 291.7]$.
+
+\medskip
+
+\noindent Today you fit \textbf{the same regression the Bayesian way} and compare. The priors are
+\[
+\beta_0 \sim N(0,\ 100^2), \qquad \beta_1 \sim N(0,\ 1^2), \qquad \log(\sigma) \sim N(\log 50,\ 0.5^2).
+\]
+
+\medskip
+\noindent\textbf{Goals:}
+\textbf{(1)} read what each prior claims,
+\textbf{(2)} check the priors before the data,
+\textbf{(3)} get a credible interval for the slope,
+\textbf{(4)} predict a house, and see when Bayesian and frequentist answers coincide.
+
+\medskip
+\noindent\textbf{Files.} Download \texttt{lecture21\_activity.R} and \texttt{ames\_housing.csv} from Blackboard. The \texttt{Setup} section loads the data, fits OLS for comparison, and defines \texttt{log\_posterior} and \texttt{run\_mcmc} (the same 3D random-walk sampler from lecture). Work in \textbf{pairs}: one runs R, the other records answers.
+
+\subsection*{Part 1: Reading the Priors}
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.6em]
+    \item For each prior, say whether it is \textbf{vague}, \textbf{weakly informative}, or \textbf{informative}, and \emph{why} --- in terms of houses, not formulas. (Hint: the OLS slope is $0.112$, i.e.\ about \$$112$ per square foot. How many standard deviations is that from the prior mean of $\beta_1$?)
+
+    \vspace{0.3em}
+    \begin{center}
+    \renewcommand{\arraystretch}{1.5}
+    \begin{tabular}{>{\bfseries}p{3.2cm} p{2.6cm} p{7cm}}
+    \toprule
+    \textbf{Prior} & \textbf{Which kind?} & \textbf{Why (in words)} \\
+    \midrule
+    $\beta_0 \sim N(0, 100^2)$ & \blankline{2.2cm} & \\[2em]
+    $\beta_1 \sim N(0, 1^2)$ & \blankline{2.2cm} & \\[2em]
+    $\log\sigma \sim N(\log 50, 0.5^2)$ & \blankline{2.2cm} & \\[2em]
+    \bottomrule
+    \end{tabular}
+    \end{center}
+
+    \item The penguin lecture used an \emph{informative} slope prior, $\beta_1 \sim N(40, 5^2)$, because an expert had told us something specific. Here $\beta_1 \sim N(0, 1^2)$. What is this prior claiming about the price of an extra square foot --- and is that a claim anyone actually believes? \\[3.5em]
+\end{enumerate}
+
+\newpage
+
+\subsection*{Part 2: Prior Predictive Check}
+Run \textbf{2A}, which draws $60$ $(\beta_0, \beta_1)$ pairs from the prior and plots the lines they imply over the Ames data --- before the data have any say.
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.6em]
+    \item Describe what you see. Do the prior's lines look like plausible housing markets? Which prior is responsible for most of the spread? \\[3.5em]
+
+    \item Run \textbf{2B}: it reports what the prior expects the mean price of a $1{,}500$ sq ft house to be. Record it, and say whether the range is sensible for Ames, Iowa.
+
+    \vspace{0.3em}
+    \begin{center}
+    \renewcommand{\arraystretch}{1.4}
+    \begin{tabular}{>{\bfseries}p{6cm}c}
+    \toprule
+    Prior mean price at $1{,}500$ sq ft & \blankline{3.5cm} \\
+    Prior $95\%$ range & \blankline{3.5cm} \\
+    \bottomrule
+    \end{tabular}
+    \end{center}
+    \vspace{0.4em}
+
+    \item In lecture, the penguin prior allowed negative body mass and we called it ``vague, not thoughtful'' --- but harmless, because $40$ penguins would overwhelm it. Ames has $2{,}930$ houses. Does a sloppy prior matter \emph{more} or \emph{less} here? Explain. \\[3.5em]
+\end{enumerate}
+
+\subsection*{Part 3: Fit It, and Read the Slope}
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.6em]
+    \item Run \textbf{3A} (four chains from prior-drawn starts). Adjust the step sizes until the acceptance rate is between $0.2$ and $0.5$, read the burn-in off the trace plots, and record $\widehat{R}$.
+
+    \vspace{0.3em}
+    \begin{center}
+    \renewcommand{\arraystretch}{1.4}
+    \begin{tabular}{>{\bfseries}p{4cm}ccc}
+    \toprule
+    & Acceptance rate & Burn-in used & $\widehat{R}$ for $\beta_1$ \\
+    \midrule
+    Your run & \blankline{2.5cm} & \blankline{2.5cm} & \blankline{2.5cm} \\
+    \bottomrule
+    \end{tabular}
+    \end{center}
+    \vspace{0.3em}
+
+    Does your $\widehat{R}$ pass Lecture 19's rule? If not, what do you do about it \emph{before} reporting any number below? \\[2.5em]
+
+    \item Run \textbf{3B}: the $95\%$ credible interval for $\beta_1$, next to the OLS confidence interval.
+
+    \vspace{0.3em}
+    \begin{center}
+    \renewcommand{\arraystretch}{1.4}
+    \begin{tabular}{>{\bfseries}p{4cm}ccc}
+    \toprule
+    & Estimate & Lower & Upper \\
+    \midrule
+    Frequentist (OLS) & \blankline{2.2cm} & \blankline{2.2cm} & \blankline{2.2cm} \\
+    Bayesian & \blankline{2.2cm} & \blankline{2.2cm} & \blankline{2.2cm} \\
+    \bottomrule
+    \end{tabular}
+    \end{center}
+    \vspace{0.4em}
+
+    In lecture, the penguin prior \emph{shifted} the slope ($50.4 \to 45.7$) and \emph{narrowed} the interval. Compare your two rows here. Did the prior shift or narrow anything? Why is this case different from the penguins? \\[3.5em]
+
+    \newpage
+    \item Write the Bayesian interval as a sentence about houses, starting ``Given these data, there is a $95\%$ probability that\ldots''. Then write the sentence a frequentist is allowed to say about their interval. \\[4em]
+\end{enumerate}
+
+\subsection*{Part 4: Predicting a House}
+Run \textbf{4A}, which predicts at $\tilde x = 1{,}500$ sq ft two ways: the line $\bar y$, and a new house $\tilde y$.
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.6em]
+    \item Record your intervals next to the Lecture 15 answers:
+
+    \vspace{0.3em}
+    \begin{center}
+    \renewcommand{\arraystretch}{1.5}
+    \begin{tabular}{>{\bfseries}p{4.6cm}ccc}
+    \toprule
+    & Estimate & Lower & Upper \\
+    \midrule
+    Lec 15 CI for mean response & $180.8$ & $178.8$ & $182.9$ \\
+    Bayesian: the line $\bar y$ & \blankline{2cm} & \blankline{2cm} & \blankline{2cm} \\
+    \midrule
+    Lec 15 PI for a house & $180.8$ & $70.0$ & $291.7$ \\
+    Bayesian: a new house $\tilde y$ & \blankline{2cm} & \blankline{2cm} & \blankline{2cm} \\
+    \bottomrule
+    \end{tabular}
+    \end{center}
+    \vspace{0.4em}
+
+    \item Your two Bayesian intervals differ enormously in width. Which uncertainty does each one carry, and which term is doing almost all the work in the wider one? \\[3.5em]
+
+    \item How close are the Bayesian and frequentist rows? State the general rule this illustrates --- and say what would have to change for the two to disagree. \\[3.5em]
+\end{enumerate}
+
+\subsection*{Part 5: Wrap-Up}
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.6em]
+    \item Suppose a realtor tells you confidently that Ames sells for ``about \$$150$ per square foot,'' and you encode this as $\beta_1 \sim N(0.150,\ 0.002^2)$ --- a very sharp prior. Run \textbf{5A} with this prior. What happens to the posterior for $\beta_1$, and is the result trustworthy? What does this tell you about the cost of a confident prior? \\[4.5em]
+
+    \item You now have three ways to put an interval on $\beta_1$: the $t$-based confidence interval (Lecture 13), the bootstrap (Lecture 13), and the posterior credible interval (today). For the Ames data with $n = 2{,}930$, all three land in nearly the same place. Give one situation where you would specifically want the Bayesian one anyway. \\[4.5em]
+\end{enumerate}
+
+\end{document}

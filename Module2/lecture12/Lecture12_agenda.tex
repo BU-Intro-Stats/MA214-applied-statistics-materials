@@ -1,0 +1,43 @@
+% !TEX root =  Lecture13.tex
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Recap/Agenda
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Module 2: Statistical Inference}
+    \begin{itemize}
+        \item \hl{Previously:} two \emph{categorical} variables: two-way tables, expected counts, and the $\chi^2$ statistic.
+        \item \hl{This time:} back to \emph{numbers}, but now \hl{three or more groups} of them.
+          \begin{itemize}
+              \item why running every pairwise $t$-test is a trap;
+              \item one statistic for $k$ groups: variability \emph{between} the groups over variability \emph{within} them, the $F$-statistic;
+              \item its null distribution, the same two ways: shuffle the group labels, or use the $F$ model;
+              \item the conditions, and which road survives when they fail;
+              \item after a significant $F$: \emph{which} groups actually differ?
+          \end{itemize}
+        \item \hl{Reading:} IMS Chapter 22.
+        \item \hl{Homework for today:}
+        \item \hl{Homework for next class:}
+    \end{itemize}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Learning objectives:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+    \frametitle{Lecture Objectives}
+    \goals{%
+    \begin{itemize}
+    \item explain why testing every pair inflates the false-positive rate, and what a single simultaneous test buys you;
+    \item split the total variability into a \emph{between-group} and a \emph{within-group} part, and build $F$ out of them;
+    \item obtain $F$'s null distribution by \emph{shuffling the group labels} \textbf{and} from the $F_{df_1, df_2}$ model, and explain why they agree;
+    \item check the conditions (normality, and above all \emph{equal variances}), and know which road survives when they fail;
+    \item after a significant $F$, say \emph{which} groups differ without walking back into the trap you started with.
+    \end{itemize}}
+    \objectives{%
+    \begin{itemize}
+    \item \textbf{(M2, LO3)} Analysis of Variance (ANOVA)
+    \end{itemize}}
+\end{frame}

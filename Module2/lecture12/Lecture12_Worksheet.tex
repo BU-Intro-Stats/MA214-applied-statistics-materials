@@ -1,0 +1,139 @@
+\documentclass{article}
+\usepackage[margin=1.15in]{geometry}
+\usepackage{xcolor}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{tabularx}
+\usepackage{listings}
+
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\rhead{Lecture 12}
+\lhead{MA 214: Applied Statistics (Spring 2026)}
+\renewcommand{\headrulewidth}{.4mm}
+
+\newcommand{\blankline}[1]{\underline{\hspace{#1}}}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  frame=single,
+  framerule=0.4pt,
+  breaklines=true,
+  showstringspaces=false
+}
+
+\begin{document}
+
+\noindent\textbf{Name:}\blankline{2.25in}\hfill\textbf{BUID:}\blankline{1.55in}
+
+\medskip
+
+\noindent\textbf{Name:}\blankline{2.25in}\hfill\textbf{BUID:}\blankline{1.55in}\newline
+
+\begin{center}
+ \Large In-Class Worksheet: Analysis of Variance
+\end{center}
+
+\subsection*{Scenario}
+The Portal Project weighs desert rodents in plots that receive different fencing treatments. For \emph{Dipodomys merriami} (one kangaroo-rat species), we ask whether mean body weight (grams) differs across the five plot types. The captures, summarized:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lrrr}
+\toprule
+Plot type & $n$ & Mean (g) & SD (g) \\
+\midrule
+Control                    & 6560 & 43.4 & 6.94 \\
+Long-term Krat Exclosure   &  212 & 43.3 & 6.05 \\
+Rodent Exclosure           &  831 & 42.3 & 7.43 \\
+Short-term Krat Exclosure  & 1107 & 42.4 & 6.17 \\
+Spectab Exclosure          & 1552 & 43.1 & 6.47 \\
+\midrule
+\textbf{All} & \textbf{10262} & \textbf{43.2} & \textbf{6.86} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\newpage
+
+\subsection*{Part 1: Set up the test}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item State $H_0$ and $H_A$ in words, using the five plot types. \\[3.5em]
+\item Here $k = 5$ and $n = 10262$. Give $df_1$ and $df_2$. \hfill $df_1 = \blankline{0.8in}\quad df_2 = \blankline{0.8in}$ \\[1.5em]
+\item Check the equal-variance rule of thumb from the SD column (largest SD $<\;2\times$ smallest SD). Does it pass? Show the numbers. \\[3em]
+\item Before running anything: from the means alone, would you expect a large or a small $F$? Explain what \emph{else} you would need to know to be sure. \\[3.5em]
+\end{enumerate}
+
+\subsection*{Part 2: Complete the ANOVA table}
+Running \texttt{aov(weight \textasciitilde{} plot\_type)} produces the table below, but two cells are missing. Recall $MS = SS / df$ and $F = MSG / MSE$.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.6}
+\begin{tabular}{lrrrr}
+\toprule
+ & Df & Sum Sq & Mean Sq & $F$ value \\
+\midrule
+\texttt{plot\_type} & 4     & 1482   & \blankline{0.9in} & \blankline{0.9in} \\
+\texttt{Residuals}  & 10257 & 476767 & 46.5 & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item Fill in the two blanks. \hfill $MSG = \blankline{1in}\quad F = \blankline{1in}$ \\[1.5em]
+\item R reports $\Pr(>F) = 2.1\times10^{-6}$. In one sentence, what do you conclude about the five means? \\[3em]
+\item The means in the scenario table span barely one gram ($42.3$ to $43.4$). Reconcile that with the tiny p-value. Is the effect \emph{large}? What is doing the work in making $p$ so small? \\[4em]
+\end{enumerate}
+
+\subsection*{Part 3: Find the bugs}
+A classmate wants the \emph{shuffle} p-value for the same test. \texttt{f\_stat(y, g)} correctly returns the $F$-statistic for response \texttt{y} and labels \texttt{g}. Their code runs without an error message --- and is wrong in \textbf{three} separate ways.
+
+\begin{lstlisting}[language=R]
+f_obs <- f_stat(dm$weight, dm$plot_type)          # 7.97
+
+# null distribution by shuffling
+null <- replicate(10000,
+  f_stat(sample(dm$weight), sample(dm$plot_type)))
+
+2 * mean(null >= f_obs)                            # randomization p-value
+
+pf(f_obs, 4, 10257)                                # check against the formula
+\end{lstlisting}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item Bug 1 is in the \texttt{null} line: they shuffled \emph{both} \texttt{weight} and \texttt{plot\_type}. Why is shuffling one of them enough, and what should the line be? \\[3.5em]
+\item Bug 2: the factor of \texttt{2}. Why is it wrong for an $F$-test, when it was right for the two-sided $z$-test in Lecture 10? \\[3.5em]
+\item Bug 3: the last line returns $0.9999$, not the $2.1\times10^{-6}$ we expect. What argument is missing from \texttt{pf()}, and why does its absence give a number so close to 1? \\[3.5em]
+\end{enumerate}
+
+\subsection*{Part 4: Which road do you trust?}
+A colleague runs the \emph{same} ANOVA idea on three \emph{species} of kangaroo rat instead of on plot types. The group SDs are:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lrr}
+\toprule
+Species & Mean (g) & SD (g) \\
+\midrule
+\emph{D.\ merriami}    &  43.2 & 6.8 \\
+\emph{D.\ ordii}       &  48.9 & 7.9 \\
+\emph{D.\ spectabilis} & 120.1 & 22.9 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item Does the equal-variance condition hold here? Show the ratio. \\[2.5em]
+\item Your colleague says: ``No problem --- I'll just use the shuffle test instead of the $F$ formula, since shuffling makes no assumptions.'' Why is that reasoning wrong? \\[4em]
+\item Name the test that \emph{does} handle unequal variances, and write the one line of R that runs it. \\[3em]
+\item Different question: even with equal variances, when might you \emph{prefer} a statistic built from group medians over the $F$-statistic? What does the shuffle approach let you do that the $F$ formula cannot? \\[4em]
+\end{enumerate}
+
+\end{document}

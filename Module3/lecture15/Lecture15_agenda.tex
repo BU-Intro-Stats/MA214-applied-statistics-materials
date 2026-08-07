@@ -1,0 +1,53 @@
+% !TEX root =  Lecture15.tex
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Recap/Agenda
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Module 3: Regression Inference}
+    \begin{itemize}
+        \item \hl{Previously:} reading an \texttt{lm()} table row by row: collinearity, transformations, interactions (Lecture 14). All of it about whether the \emph{coefficients} are real.
+        \item \hl{This time:} what the model is \emph{for}. Take the same $890$ planets and predict the next one.
+          \begin{itemize}
+              \item two intervals, two questions (the \hl{mean} response, or \hl{one new} observation) and the three sources of a prediction's uncertainty;
+              \item prediction after a \hl{transformation}, the danger of \hl{extrapolation}, and choosing a \hl{polynomial} degree by \hl{cross-validation}.
+          \end{itemize}
+        \item \hl{Reading:} IMS Ch.\ 25, plus the supplement on prediction and cross-validation.
+        \item \hl{Homework:} the assigned reading.
+    \end{itemize}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Learning objectives:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+    \frametitle{Lecture Objectives}
+    \goals{%
+    \begin{itemize}
+    \item tell a \hl{confidence interval for the mean response} from a \hl{prediction interval} for a new observation, and say which question each one answers;
+    \item name the three terms of $\mathrm{SE}_{\hat y}$, and explain why one of them never shrinks;
+    \item build a prediction interval on a \hl{transformed} scale and back-transform it correctly;
+    \item say why \hl{extrapolation} is dangerous even when the interval looks narrow;
+    \item fit a \hl{polynomial} model, recognize \hl{overfitting}, and choose the degree by \hl{$k$-fold cross-validation}, and say why CV is sound where adjusted $R^2$ and AIC are not.
+    \end{itemize}}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+    \frametitle{Lecture Objectives}
+    \objectives{%
+    \begin{itemize}
+    \item \textbf{(M3, LO4)} Building and Interpreting Non-linear and Interaction Models: \emph{the polynomial half}
+    \item \textbf{(M3, LO5)} Prediction and Cross-Validation for Model Comparison
+    \end{itemize}}
+    \vspace{0.3em}
+    {\small Also revisited:}
+    \objectives{%
+    \begin{itemize}
+    \item \textbf{(M1, LO3)} Using Regression Models: interpolation vs.\ extrapolation, from Lecture 4
+    \item \textbf{(M1, LO4)} Model Selection: adjusted $R^2$ and AIC from Lecture 7, and where they run out
+    \end{itemize}}
+\end{frame}

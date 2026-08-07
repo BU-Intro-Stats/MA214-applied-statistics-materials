@@ -1,0 +1,179 @@
+\documentclass{article}
+\usepackage[margin=1.15in]{geometry}
+\usepackage{xcolor}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{tabularx}
+\usepackage{listings}
+
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\rhead{Lecture 15}
+\lhead{MA 214: Applied Statistics (Spring 2026)}
+\renewcommand{\headrulewidth}{.4mm}
+
+\newcommand{\blankline}[1]{\underline{\hspace{#1}}}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  frame=single,
+  framerule=0.4pt,
+  breaklines=true,
+  showstringspaces=false
+}
+
+\begin{document}
+
+\noindent\textbf{Name:}\blankline{2.25in}\hfill\textbf{BUID:}\blankline{1.55in}
+
+\medskip
+
+\noindent\textbf{Name:}\blankline{2.25in}\hfill\textbf{BUID:}\blankline{1.55in}\newline
+
+\begin{center}
+ \Large In-Class Worksheet: Prediction and Cross-Validation
+\end{center}
+
+\subsection*{Scenario}
+The \emph{Ames Housing} data records $n = 2{,}930$ homes sold in Ames, Iowa (De Cock, 2011). We model \texttt{sale\_price} (in \$000s) from \texttt{living\_area} (square feet) and, later, whatever else earns its place.
+
+\smallskip
+Living areas run from $334$ to $5{,}642$ sq ft, with a mean of $1{,}500$.
+
+\subsection*{Part 1: Read the two intervals}
+
+Fitting \texttt{lm(sale\_price $\sim$ living\_area)} gives $\widehat{\text{price}} = 13.3 + 0.112 \cdot \text{living\_area}$, with $s_e = 56.5$ and $R^2 = 0.500$. At a house of $1{,}500$ sq ft:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lrrr}
+\toprule
+interval & fit & lower & upper \\
+\midrule
+CI for the mean response & $180.8$ & $178.8$ & $182.9$ \\
+PI for an individual house & $180.8$ & $70.0$ & $291.7$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item The PI is $54$ times wider than the CI. In one sentence each, say what question the CI answers and what question the PI answers --- in terms of \emph{houses}, not formulas. \\[3.5em]
+\item Which one would you quote to somebody about to list \emph{their} house? Which to a city planner forecasting the tax base? \\[3.5em]
+\item $1{,}500$ sq ft is exactly $\bar x$. What does that tell you about the third term of $\mathrm{SE}_{\hat y}$ here --- and therefore about how much of the PI's width comes from the scatter alone? \\[3.5em]
+\end{enumerate}
+
+\newpage
+
+\subsection*{Part 2: Extrapolate, and watch nothing happen}
+
+Now predict a $6{,}000$ sq ft house --- larger than any of the $2{,}930$ in the data.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lrrrr}
+\toprule
+& fit & lower & upper & PI width \\
+\midrule
+at $1{,}500$ sq ft (the center) & $180.8$ & $70.0$ & $291.7$ & $221.7$ \\
+at $6{,}000$ sq ft (extrapolation) & $683.4$ & $570.9$ & $795.9$ & $225.0$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item The interval got wider by $1.5\%$. Does that reassure you? Explain what the interval is, and is not, accounting for. \\[4em]
+\item The model claims a \$$683{,}000$ house, plus or minus about \$$112{,}000$. Name one thing about $6{,}000$ sq ft houses in Ames that the model has \emph{no way} of knowing. \\[3.5em]
+\item State, in one sentence, why the danger of extrapolation is that the interval \emph{does not} blow up. \\[3.5em]
+\end{enumerate}
+
+\subsection*{Part 3: Find the bugs}
+
+A classmate wants to choose a polynomial degree for \texttt{sale\_price $\sim$ living\_area} by $5$-fold cross-validation, then report a prediction interval for a new house. Their code runs without a single error message --- and is wrong in \textbf{three} separate ways.
+
+\begin{lstlisting}[language=R]
+ames <- read_csv("ames_housing.csv")
+
+# Pick the degree that fits best, then cross-validate it
+best_d <- which.max(sapply(1:8, function(d)
+  summary(lm(sale_price ~ poly(living_area, d), data = ames))$r.squared))
+
+folds <- sample(rep(1:5, length.out = nrow(ames)))
+errs  <- sapply(1:5, function(j) {
+  train <- ames[folds != j, ]
+  fit   <- lm(sale_price ~ poly(living_area, best_d), data = train)
+  mean((train$sale_price - predict(fit, newdata = train))^2)
+})
+cv_error <- sum(errs)
+
+# 95% interval for a new 2,000 sq ft house
+predict(fit, tibble(living_area = 2000), interval = "confidence")
+\end{lstlisting}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item \textbf{Bug 1} is \texttt{best\_d}. Which degree will \texttt{which.max()} on $R^2$ always return, and why does choosing the degree \emph{before} cross-validating defeat the entire point? \\[4em]
+\item \textbf{Bug 2} is inside the \texttt{sapply}. They fit on \texttt{train} and then score on \texttt{train}. What should be scored, and what does the code actually measure as written? \\[4em]
+\item \textbf{Bug 3} is the last line --- two things are wrong with it. Find both. \\[4em]
+\end{enumerate}
+
+\newpage
+
+\subsection*{Part 4: Four criteria, four answers}
+
+Fit \texttt{sale\_price $\sim$ poly(living\_area, d)} for $d = 1, \ldots, 8$. Here are all four criteria --- CV by repeated $5$-fold, under two different losses:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{crrrr}
+\toprule
+degree & adj.\ $R^2$ & AIC & CV-MSE & CV-MAE \\
+\midrule
+$1$ & $0.499$ & $31962$ & $3214$ & $\mathbf{38.6}$ \\
+$2$ & $0.506$ & $31926$ & $3219$ & $39.2$ \\
+$3$ & $0.517$ & $31858$ & $\mathbf{3129}$ & $38.7$ \\
+$4$ & $0.520$ & $31842$ & $3140$ & $38.6$ \\
+$5$ & $0.520$ & $31844$ & $3453$ & $38.9$ \\
+$6$ & $0.520$ & $31843$ & $5128$ & $39.7$ \\
+$7$ & $0.523$ & $31826$ & $11865$ & $39.8$ \\
+$8$ & $\mathbf{0.524}$ & $\mathbf{31821}$ & $68941$ & $41.0$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\smallskip
+\noindent {\small MSE $= \frac{1}{n}\sum(y_i - \hat y_i)^2$ punishes big misses hard; MAE $= \frac{1}{n}\sum|y_i - \hat y_i|$ treats every dollar equally.}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item Which degree does each criterion choose? \\[0.4em]
+adj.\ $R^2$: \blankline{0.7in} \quad AIC: \blankline{0.7in} \quad CV-MSE: \blankline{0.7in} \quad CV-MAE: \blankline{0.7in} \\[1em]
+\item \textbf{Adjusted $R^2$ and AIC both pick degree 8} --- the most complex model on offer, whose CV-error is $22$ times the best. Both are supposed to penalise complexity. Why did they fail here? Give a different reason for each. \\[5em]
+\item \textbf{The two losses disagree} (MSE says $3$, MAE says $1$). Nothing about the data changed --- only what we decided counts as a bad prediction. What does that tell you about ``the best model''? \\[4.5em]
+\item Which model would you actually report to a homeowner, and why? \\[4em]
+\end{enumerate}
+
+\newpage
+
+\subsection*{Part 5: Build your own}
+
+You still have \texttt{overall\_qual}, \texttt{year\_built}, \texttt{total\_bsmt\_sf}, \texttt{garage\_area}, \texttt{lot\_area} and more.
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item Build two or three candidate models. Compare them by adjusted $R^2$, AIC, and $5$-fold CV. Record the winners. \\[4.5em]
+\item Do the criteria agree this time? If they do, does that make you \emph{more} confident --- and if they do not, which one would you trust? \\[4em]
+\item For your chosen model, produce a $95\%$ \emph{prediction} interval for a specific house of your invention. Check first that its predictors all lie inside the data. \\[4.5em]
+\item Your model's CV-MSE is in units of (\$000s)$^2$. Take the square root. Is that number small enough that you would use this model to price a real house? Answer honestly. \\[4em]
+\end{enumerate}
+
+\subsection*{Compare with the groups around you}
+
+\noindent\fbox{\parbox{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}{%
+Compare your final model with at least two neighboring pairs. Did cross-validation choose the same degree for everyone --- and if not, why not? Whose interval would you quote to someone selling a house, and is it a CI or a PI? Having heard them, would you change your model?
+\\[6em]
+}}
+
+\end{document}

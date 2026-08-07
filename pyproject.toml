@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "course-site-builder"
+version = "0.1.0"
+description = "Reusable schedule and MkDocs site generator for course websites."
+requires-python = ">=3.10"
+dependencies = [
+    "pandas",
+    "openpyxl",
+]
+
+[project.scripts]
+course-site-builder = "course_site_builder.cli:cli_main"
+
+[tool.setuptools.packages.find]
+include = ["course_site_builder*"]

@@ -1,0 +1,54 @@
+% !TEX root =  Lecture18.tex
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Recap/Agenda
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Module 4: Bayesian Statistics}
+    \begin{itemize}
+        \item \hl{Previously:} Lecture 17 opened this module: priors, Bayes' rule, sequential updating.
+        \item \hl{This time:} Lecture 17 spread a prior over five candidate values of $p$. Now the grid becomes a \hl{curve}.
+          \begin{itemize}
+              \item the \hl{Beta} prior, and why Beta $+$ Binomial hands back a Beta;
+              \item what makes a prior \hl{conjugate}, and the one pattern all three models share;
+              \item two more families: \hl{Normal-Normal} and \hl{Gamma-Poisson};
+              \item how much your prior is worth, measured in observations, and where conjugacy runs out.
+          \end{itemize}
+        \item \hl{Reading:} Bayes Rules!\ Chapters 3 and 5.
+        \item \hl{Homework:}
+    \end{itemize}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Learning objectives:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+    \frametitle{Lecture Objectives}
+    \goals{%
+    \begin{itemize}
+    \item explain what makes a prior \hl{conjugate} to a likelihood, and derive the Beta-Binomial posterior by multiplying shapes, with no integration;
+    \item apply all three update rules (\hl{Beta-Binomial}, \hl{Normal-Normal}, \hl{Gamma-Poisson}) and read their parameters as ``prior successes'' or ``prior observations'';
+    \item state the \hl{prior sample size} $n_0$ for each family, and use it to compute the weights on prior and data;
+    \item explain why the posterior mean is always a \hl{weighted average} of the prior mean and the MLE, and predict which side it falls on;
+    \item say what conjugate models buy you, and \hl{where they run out}.
+    \end{itemize}}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+    \frametitle{Lecture Objectives}
+    \objectives{%
+    \begin{itemize}
+    \item \textbf{(M4, LO3)} Conjugate Models
+    \end{itemize}}
+    \vspace{0.3em}
+    {\small Building on, and revisiting:}
+    \objectives{%
+    \begin{itemize}
+    \item \textbf{(M4, LO1)} Bayesian Inference: the prior, likelihood and posterior of Lecture 17, now with the parameter on a continuous scale
+    \item \textbf{(M4, LO2)} Comparing Bayesian and Frequentist Approaches: the MLE reappears here as one end of a tug-of-war
+    \end{itemize}}
+\end{frame}

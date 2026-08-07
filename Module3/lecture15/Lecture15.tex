@@ -1,0 +1,622 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Slide options
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Option 1: Slides with solutions
+
+\documentclass[slidestop,compress,mathserif]{beamer}
+\usepackage{booktabs}
+\newcommand{\soln}[1]{\textit{#1}}
+\newcommand{\solnGr}[1]{#1}
+
+% Option 2: Handouts without solutions
+
+%\documentclass[11pt,containsverbatim,handout]{beamer}
+%\usepackage{pgfpages}
+%\pgfpagesuselayout{4 on 1}[letterpaper,landscape,border shrink=5mm]
+%\newcommand{\soln}[1]{ }
+%\newcommand{\solnGr}{ }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Style
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{../../common/lec_style.tex}
+\graphicspath{ {../../common/} {figures/}  }
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Preamble
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title[Lecture 15]{Lecture 15: Prediction and cross-validation}
+\subtitle{Module 3: Regression Inference}
+\author{Introduction to Modern Statistics, 2nd Edition}
+\institute{$\:$ \\ {\footnotesize Based on slides developed by Mine \c{C}etinkaya-Rundel of OpenIntro.  \\
+The slides may be copied, edited, and/or shared via the \webLink{http://creativecommons.org/licenses/by-sa/3.0/us/}{CC BY-SA license.} \\
+Some images may be included under fair use guidelines (educational purposes).}}
+\date{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Begin document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Title page
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\maketitleframe
+
+\include{Lecture15_agenda}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Predicting a new planet}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{What is a model actually \emph{for}?}
+
+Two lectures spent asking whether coefficients are \emph{real}. Today: what we do with the model once we believe it.
+
+\pause
+\vspace{0.4em}
+A telescope finds a new planet and measures its mass: $50$ Earth masses. \hl{How big is it?}
+
+\pause
+\vspace{0.4em}
+We have Lecture 14's fit, on the same $890$ planets:
+$$\widehat{\text{radius}} = 2.54 + 1.21\cdot\text{mass}^{1/3} \quad\Longrightarrow\quad \hat y^\ast = 7.01 \text{ Earth radii.}$$
+
+\pause
+\vspace{0.2em}
+\dq{That is a single number. What \emph{question} does it answer, and is it the one the astronomer asked?}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Two questions, one fitted value}
+
+The number $7.01$ answers \emph{both} of these. The \hl{uncertainty around it does not.}
+
+\pause
+\vspace{0.5em}
+\textbf{1. The average planet.} ``Across \emph{all} planets of $50$ Earth masses, what is the typical radius?''
+
+{\small $\to$ a \hl{confidence interval for the mean response} $\mu(x^\ast)$ at the predictor value $x^\ast$. We are chasing a fixed, unknown number.}
+
+\pause
+\vspace{0.5em}
+\textbf{2. This planet.} ``The one the telescope just found: how big is \emph{it}?''
+
+{\small $\to$ a \hl{prediction interval} for a single new $y^\ast$. We are chasing a \emph{random} quantity that has not happened yet.}
+
+\pause
+\vspace{0.3em}
+{\small The second is a strictly harder question, and the arithmetic will say so.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Two intervals, two questions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{At $\text{mass} = 50$, side by side}
+
+\twocol{0.5}{0.5}
+{
+\begin{center}
+\includegraphics[width=0.95\textwidth]{ci_vs_pi_point.pdf}
+\end{center}
+}
+{
+{\small
+\hl{CI for the mean:} $[6.73,\ 7.29]$, width $0.56$.
+
+\vspace{0.7em}
+\hl{PI for an individual:} $[-0.69,\ 14.71]$, width $15.39$, \textbf{$27\times$ wider}.
+
+\vspace{0.7em}
+Same $\hat y^\ast$. Same data. Same model. Different \emph{question}.}
+}
+
+\pause
+\vspace{-0.2em}
+\dq{The prediction interval's lower end is $-0.69$. What is wrong with that?}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Every $x$ has both, so both become bands}
+
+\begin{center}
+\includegraphics[width=0.90\textwidth]{ci_vs_pi_bands.pdf}
+\end{center}
+
+\pause
+\vspace{-0.3em}
+{\small The confidence band hugs the line: with $890$ planets we know where the \emph{line} is. The prediction band must contain the \emph{scatter}, and the scatter is what it is however much data we collect.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The two standard errors}
+
+\formula{The only difference is a $+1$}{With $s_e$ the residual standard deviation, at a new $x^\ast$: $$\mathrm{SE}_{\hat\mu} = s_e\sqrt{\tfrac{1}{n} + \tfrac{(x^\ast - \bar x)^2}{(n-1)s_x^2}}, \qquad \mathrm{SE}_{\hat y} = s_e\sqrt{\mathbf{1} + \tfrac{1}{n} + \tfrac{(x^\ast - \bar x)^2}{(n-1)s_x^2}}.$$}
+
+\pause
+\vspace{0.4em}
+Both intervals are then the usual $\hat y^\ast \pm t^\ast_{\,n-2}\cdot\mathrm{SE}$, the same recipe as every interval since Lecture 13.
+
+\pause
+\vspace{0.2em}
+{\small That lone $\mathbf{1}$ is the whole lecture. Where does it come from?}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Three terms, three sources of doubt}
+$$\mathrm{SE}_{\hat y} = s_e\sqrt{\underbrace{1}_{\text{(1) the scatter}} + \underbrace{\tfrac{1}{n}}_{\text{(2) the line's height}} + \underbrace{\tfrac{(x^\ast - \bar x)^2}{(n-1)s_x^2}}_{\text{(3) the line's tilt}}}$$
+
+\pause
+\vspace{0.2em}
+{\small
+\begin{enumerate}
+\item \textbf{The scatter.} Real planets do not sit \emph{on} the line. This is the term the CI does not have.
+\item \textbf{The height.} We estimated $\hat\beta_0$ from data; the error shrinks like $1/n$.
+\item \textbf{The tilt.} An error in $\hat\beta_1$ is harmless at $\bar x$ and grows as you move away.
+\end{enumerate}}
+
+\pause
+\vspace{0.1em}
+{\small On our planets, at $x^\ast$: $\;1$, $\;0.0011$, $\;0.0002$. \hl{The scatter is $99.9\%$ of it.}}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Term (3), drawn}
+
+\twocol{0.52}{0.48}
+{
+\begin{center}
+\includegraphics[width=0.95\textwidth]{band_width_xstar.pdf}
+\end{center}
+}
+{
+{\small The width of the prediction interval, as a function of \emph{where} you predict.
+
+\vspace{0.7em}
+A shallow parabola with its minimum at $\bar x$: prediction is sharpest in the middle of your data, blunter at the edges.
+
+\vspace{0.7em}
+\hl{But read the vertical scale.} It barely moves. Term (1) swamps the other two.}
+}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{What infinite data would, and would not, buy}
+
+Let $n \to \infty$. Terms (2) and (3) both vanish:
+$$\mathrm{SE}_{\hat\mu} \;\longrightarrow\; 0, \qquad\qquad \mathrm{SE}_{\hat y} \;\longrightarrow\; s_e .$$
+
+\pause
+\vspace{0.4em}
+\keyidea{With enough data the \hl{confidence} interval shrinks to a point: we would know the mean radius at $x^\ast$ exactly. The \hl{prediction} interval never falls below $\pm t^\ast s_e$; on our data it stalls at a width of $15.4$ Earth radii. Individual planets vary, and no amount of data makes them stop.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Prediction after a transformation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{That negative radius}
+
+The prediction interval said a $50$-Earth-mass planet could have a radius of $-0.69$.
+
+\pause
+\vspace{0.4em}
+\caution{The model is not confused. It is being faithful to what we told it to assume. We put \hl{normal errors on the raw radius scale}, and a normal distribution has no floor. Once $\hat y^\ast$ is close enough to zero relative to $s_e$, the interval walks straight through it.}
+
+\pause
+\vspace{0.4em}
+Lecture 14 had already rejected this model on the \emph{diagnostics}: the residuals fanned out. Here is the same verdict in a form you cannot argue with: \hl{it predicts planets that cannot exist.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Predicting with Lecture 14's model instead}
+
+Fit $\log(\text{radius}) \sim \log(\text{mass})$, build the interval \emph{on the log scale}, exponentiate at the end. At $\text{mass} = 50$:
+
+\pause
+\vspace{0.3em}
+{\footnotesize
+\begin{center}
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+& \textbf{interval} & \textbf{center} & \textbf{arms} & \\
+\midrule
+on the $\log$ scale & $[0.88,\ 2.57]$ & $1.72$ & $-0.84\ /\ +0.84$ & (symmetric) \\
+back-transformed & $[2.42,\ 13.01]$ & $5.61$ & $-3.19\ /\ +7.40$ & \hl{(asymmetric)} \\
+\bottomrule
+\end{tabular}
+\end{center}}
+
+\pause
+\vspace{0.3em}
+{\small The upper arm is $2.3\times$ the lower, and the interval \hl{cannot cross zero}, since $e^{\text{anything}} > 0$. A symmetric interval in $\log y$ becomes a skewed one in $y$, exactly right for a quantity that is positive and right-skewed.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The band, back on the planets' own scale}
+
+\begin{center}
+\includegraphics[width=0.55\textwidth]{loglog_prediction_band.pdf}
+\end{center}
+
+\pause
+\vspace{-0.3em}
+\keyidea{Transform, do \emph{all} the inference on the transformed scale, and back-transform \emph{last}. One catch: $e^{\hat\mu}$ is the predicted \hl{median}, not the mean.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Extrapolation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Predicting where you have no data}
+
+Lecture 4 drew the line between \hl{interpolation} (inside the data) and \hl{extrapolation} (outside), and warned you off the second. Now we can watch what the \emph{intervals} do out there.
+
+\pause
+\vspace{0.2em}
+\begin{center}
+\includegraphics[width=0.58\textwidth]{extrapolation_bands.pdf}
+\end{center}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The interval does not warn you}
+
+{\small
+\begin{center}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+predicting at $\text{mass}^{1/3} =$ & $\hat y^\ast$ & PI width \\
+\midrule
+$5.1$ \quad (the center of the data) & $8.7$ & $15.39$ \\
+$20.7$ \quad (the last planet we have) & $27.7$ & $15.58$ \\
+$50.0$ \quad (far outside anything observed) & $63.2$ & $16.86$ \\
+\bottomrule
+\end{tabular}
+\end{center}}
+
+\pause
+\vspace{0.2em}
+The band widens by \emph{ten percent} over that entire journey. It looks perfectly healthy.
+
+\pause
+\vspace{0.2em}
+\caution{But $63.2$ Earth radii is larger than any planet known, since Jupiter is $11$. The model is confidently, precisely wrong. \hl{Extrapolation is dangerous not because the interval blows up, but because it does not.} Nothing in the arithmetic knows the data ran out.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Polynomial models}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{When a straight line is not enough}
+
+Lecture 14 bent the model by \emph{transforming} a variable. The other way is to add \hl{powers} of it:
+$$y = \beta_0 + \beta_1 x + \beta_2 x^2 + \varepsilon, \qquad y = \beta_0 + \beta_1 x + \beta_2 x^2 + \beta_3 x^3 + \varepsilon, \ \ldots$$
+
+\pause
+\vspace{0.3em}
+\keyidea{A polynomial regression is still a \hl{linear model}, linear \emph{in the parameters} $\beta_j$, which is all least squares ever asked for. So \texttt{lm()}, the $t$ tests, the intervals and the LINE checks all carry over unchanged. ``Non-linear'' describes the \emph{curve}, not the algebra.}
+
+\pause
+\vspace{0.2em}
+{\small In R: \texttt{lm(y \textasciitilde{} poly(x, 3))}. Each extra degree buys one more bend.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{And when a polynomial extrapolates}
+
+\begin{center}
+\includegraphics[width=0.64\textwidth]{polynomial_extrapolation.pdf}
+\end{center}
+
+\pause
+\vspace{-0.3em}
+{\small At $1.5\times$ the edge of the data the three models predict a radius of $40$, $81$, and \hl{$93{,}511$} Earth radii. The degree-$10$ curve was the \emph{best} fit inside the data ($R^2 = 0.82$). Outside it, a high-degree polynomial is not a model. It is a catapult.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Overfitting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Fits better, predicts worse}
+
+Take a realistic sample of $n = 60$ planets, not all $890$, and raise the degree.
+
+\pause
+\vspace{0.1em}
+\begin{center}
+\includegraphics[width=0.60\textwidth]{overfit_demo.pdf}
+\end{center}
+
+\pause
+\vspace{-0.4em}
+{\small The degree-$10$ curve threads through the points beautifully. It is chasing \hl{noise}, and noise does not repeat in the next sample.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{You cannot grade a model on the data that trained it}
+
+\keyidea{In-sample $R^2$ can only ever \emph{rise} as you add terms: a degree-$10$ polynomial will always ``explain'' more of the training data than a line does. Judging a model by how well it fits the data it was fitted to is grading your own homework.}
+
+\pause
+\vspace{0.4em}
+Lecture 7 gave us two tools that try to correct for exactly this: \hl{adjusted $R^2$} and \hl{AIC}. Both subtract a penalty for the number of parameters.
+
+\pause
+\vspace{0.4em}
+\dq{Are they enough? Each was derived under assumptions, so what happens when we push them to degree $10$ on $60$ points?}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Cross-validation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Where the two penalties come from, and stop}
+
+\begin{itemize}
+\item \textbf{Adjusted $R^2$} penalises parameters, but its penalty is derived \hl{specifically for linear regression, assuming the model is correct}. Outside that, it has nothing to say.
+\pause
+\item \textbf{AIC} is more general (it needs only a likelihood) but its $+2k$ penalty is an \hl{asymptotic} approximation, trustworthy when $n$ is far larger than $k$. At $n = 60$ with $k = 11$, that is a stretch.
+\end{itemize}
+
+\pause
+\vspace{0.5em}
+Both are \emph{theories} about how badly a model will generalize.
+
+\pause
+\vspace{0.3em}
+\hl{So why theorize?} We could hide some data, fit without it, and \emph{look}.
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{$k$-fold cross-validation}
+
+\formula{The algorithm}{%
+\begin{enumerate}\setlength{\itemsep}{1pt}
+\item Choose an error measure: squared error $(y_i - \hat y_i)^2$, absolute error, or a negative log-likelihood.
+\item Split the data into $k$ equal \hl{folds}.
+\item For each fold $j$: fit on the \emph{other} $k-1$ folds, predict fold $j$, record its average error $\mathrm{err}_j$.
+\end{enumerate}
+$$\text{CV-error} \;=\; \frac{1}{k}\sum_{j=1}^{k} \mathrm{err}_j .$$}
+
+\pause
+\vspace{0.3em}
+{\small Every observation gets predicted exactly once, by a model that \hl{never saw it}. Lower CV-error means better prediction on data you do not have. Usually $k = 5$ or $10$.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{One split is not enough}
+
+\caution{At $n = 60$ a single $5$-fold split gives a \emph{jumpy} answer: the winning degree moves around depending on where the folds happened to fall. So repeat the whole procedure with fresh splits (here, $20$ times) and average. Every curve that follows is a repeated-CV curve.}
+
+\pause
+\vspace{0.4em}
+{\small This is not a technicality. Cross-validation \emph{estimates} a quantity, and like any estimate it has a standard error. One split is a sample of size one.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Adjusted $R^2$ chooses degree 10}
+
+\begin{center}
+\includegraphics[width=0.58\textwidth]{adjr2_by_degree.pdf}
+\end{center}
+
+\pause
+\vspace{-0.3em}
+{\small It rises, essentially without pause, all the way to the most complex model on offer. The penalty is real, but far too gentle to hold back a degree-$10$ polynomial fitted to $60$ points.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{AIC does better, and still cannot see the cliff}
+
+\begin{center}
+\includegraphics[width=0.58\textwidth]{aic_by_degree.pdf}
+\end{center}
+
+\pause
+\vspace{-0.3em}
+{\small AIC stops at degree $7$, a real improvement. But its curve is nearly \emph{flat} from $6$ to $10$: it sees nothing alarming about the highest degrees.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Cross-validation sees the cliff}
+
+\begin{center}
+\includegraphics[width=0.58\textwidth]{cv_comparison.pdf}
+\end{center}
+
+\pause
+\vspace{-0.3em}
+{\small \emph{(Log scale, or it would not fit.)} The error falls, flattens, then \hl{explodes}: at degree $10$ it is roughly $4{,}000\times$ its minimum. Meanwhile adjusted $R^2$ was still going \emph{up}.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The same ten models, four verdicts}
+
+{\small
+\begin{center}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lcl@{}}
+\toprule
+\textbf{Criterion} & \textbf{Picks} & \textbf{What it is really doing} \\
+\midrule
+$R^2$ & $10$ & rewards complexity, always. \hl{Never use it.} \\
+Adjusted $R^2$ & $10$ & a penalty, but built for a \emph{correct} linear model \\
+AIC & $7$ & a likelihood penalty: asymptotic, wants $n \gg k$ \\
+\hl{CV-error} & $6$ & \hl{measures prediction on data it never saw} \\
+\bottomrule
+\end{tabular}
+\end{center}}
+
+\pause
+\vspace{0.2em}
+\keyidea{The point is not which degree wins; $6$ and $7$ are a coin toss here. It is that only cross-validation \hl{punishes} the catastrophic models, with no assumption that the model is correct, no asymptotics, and for \emph{any} model you can fit and predict from.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Wrap-up}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Summary: the two intervals}
+
+\begin{itemize}
+\item One fitted value, \hl{two questions}: the \emph{mean} response at $x^\ast$ (a confidence interval), or \emph{one new} observation (a prediction interval).
+\item The prediction interval carries an extra $s_e^2$, the irreducible scatter. It shrinks to $\pm t^\ast s_e$, never to zero. On our planets it is \hl{$27\times$} the CI.
+\item Its three terms: the \hl{scatter} (which dominates), the line's \hl{height}, the line's \hl{tilt} (worst far from $\bar x$).
+\item Transform, infer on the transformed scale, back-transform \emph{last}: a symmetric log interval becomes an \hl{asymmetric, strictly positive} one.
+\item \hl{Extrapolation} is dangerous because the interval stays narrow while the model goes wrong.
+\end{itemize}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Summary: choosing a model}
+
+\begin{itemize}
+\item A \hl{polynomial} is still a linear model, linear in the parameters, so all the usual inference tools apply. But it \emph{overfits}: in-sample $R^2$ can only rise with degree.
+\item So a model cannot be graded on the data that trained it. \hl{Adjusted $R^2$} and \hl{AIC} try, but each rests on assumptions that fail for a flexible model on a small sample.
+\item \hl{Cross-validation} grades a model on data it has never seen. It assumes only independence, and it is the one criterion that punishes the models that predict catastrophically.
+\item Repeat the folds and average: a single split is a sample of size one.
+\end{itemize}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Coming up next}
+
+\hl{Lecture 16: logistic regression inference.} Module 3's last act, and everything today generalizes to it.
+
+\vspace{0.4em}
+\begin{itemize}
+\item The response goes \hl{binary}: survived / did not. Coefficients become \hl{odds ratios}, and their confidence intervals with them.
+\item Squared error is meaningless for a $0/1$ outcome, so the \emph{loss} changes: the \hl{Brier score}, the \hl{log-loss}. Then the \emph{same} $k$-fold machinery runs on top of it, unchanged.
+\end{itemize}
+
+\vspace{0.4em}
+{\small Cross-validation is not a regression trick. It is how you grade any model at all. IMS Ch.\ 26.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Activity
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Activity: what is this house worth?}
+
+\activity{$2{,}930$ houses sold in Ames, Iowa. Predict a sale price from living area and whatever else earns its place: but decide \emph{first} which of the two intervals the question calls for. Then choose a polynomial degree by cross-validation, and see whether adjusted $R^2$ agrees with you.}
+
+\vspace{0.3em}
+{\small
+\begin{itemize}
+\item Work in \emph{pairs} (analyst + guide); one worksheet per pair.
+\item We pause for check-ins. \hl{Be ready to share}.
+\item Data and starter code are on Blackboard; reference these slides as you go.
+\end{itemize}}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Compare with the groups around you}
+
+\textbf{When you reach the end of Part 5:}
+
+\vspace{0.3em}
+\begin{enumerate}
+\item Compare your final model with at least two neighboring pairs.
+\item Did cross-validation choose the same degree for everyone? If not, why not?
+\item Whose interval would you actually quote to someone selling a house, and is it a CI or a PI?
+\item Having heard them, would you change your model? Say why, or why not.
+\end{enumerate}
+
+\vspace{0.5em}
+\hl{Write your answers in the box at the end of the worksheet.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% End document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}

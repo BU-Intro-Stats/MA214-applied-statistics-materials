@@ -1,0 +1,111 @@
+\documentclass{article}
+\usepackage[margin=1.15in]{geometry}
+\usepackage{xcolor}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{tabularx}
+\usepackage{listings}
+
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\rhead{Lecture 10}
+\lhead{MA 214: Applied Statistics (Spring 2026)}
+\renewcommand{\headrulewidth}{.4mm}
+
+\newcommand{\blankline}[1]{\underline{\hspace{#1}}}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  frame=single,
+  framerule=0.4pt,
+  breaklines=true,
+  showstringspaces=false
+}
+
+\begin{document}
+
+\noindent\textbf{Name:}\blankline{2.25in}\hfill\textbf{BUID:}\blankline{1.55in}
+
+\medskip
+
+\noindent\textbf{Name:}\blankline{2.25in}\hfill\textbf{BUID:}\blankline{1.55in}\newline
+
+\begin{center}
+ \Large In-Class Worksheet: Inference with Mathematical Models
+\end{center}
+
+\subsection*{Goals}
+\noindent\textbf{(1)} compute exact and approximate probabilities, \textbf{(2)} turn a standard error into an interval and a p-value, \textbf{(3)} read and debug the R code that does it, \textbf{(4)} tell paired data from two samples, \textbf{(5)} know when a formula is not allowed.
+
+\subsection*{Part 1: Exact, approximate, simulated}
+A biologist traps $n=20$ rodents and finds $14$ males. She wants to test $H_0: p = 0.5$.
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item Which model gives the \emph{exact} null distribution of the number of males? Write it down, with its parameters. \\[2.5em]
+\item She instead simulates $1{,}000$ datasets under $H_0$ and counts. Would her p-value equal the exact one? Explain in one sentence what would change if she re-ran the simulation. \\[3.5em]
+\item Check the condition for using a \emph{normal approximation} here ($np \ge 10$ and $n(1-p) \ge 10$, computed under $H_0$). Is it satisfied? \\[2.5em]
+\end{enumerate}
+
+\subsection*{Part 2: From a standard error to an interval}
+Last week we bootstrapped the mean weight of $n = 348$ kangaroo rats. This week we have the summary statistics instead: $\bar{x} = 43.95$ g and $s = 6.56$ g.
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item Compute the standard error of the mean. \hfill $\mathrm{SE} = \blankline{1.2in}$ \\[1em]
+\item Build the 95\% confidence interval $\bar{x} \pm 1.96\,\mathrm{SE}$: \quad $\big[\;\blankline{.8in}\;,\;\blankline{.8in}\;\big]$ grams. \\[1em]
+\item Last week's bootstrap percentile interval was $[43.27,\ 44.63]$. Compare. Why should we \emph{expect} these to agree --- and what would it have meant if they had not? \\[4em]
+\item You want an interval half as wide. By what factor must $n$ grow? (Look at where $n$ sits in the formula.) \hfill \blankline{1.2in} \\[1.5em]
+\end{enumerate}
+
+\newpage
+
+\subsection*{Part 3: Find the bugs}
+A classmate wants a 95\% confidence interval for the mean weight. The vector \texttt{w} holds the $348$ weights. Their code runs without an error message --- and is wrong in \textbf{three} separate ways.
+
+\begin{lstlisting}[language=R]
+xbar <- mean(w)
+se   <- sd(w)                      # standard error
+
+xbar + c(-1, 1) * 1.96 * se        # 95% CI
+
+# and to test H0: mu = 40
+z <- (xbar - 40) / se
+pnorm(-abs(z))                     # p-value
+\end{lstlisting}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item Bug 1 is on the \texttt{se} line. What is missing, and is their interval too wide or too narrow? \\[3.5em]
+\item Bug 2: $s$ was estimated from the data. Which critical value should they have used instead of $1.96$, and would it make the interval wider or narrower? \\[3.5em]
+\item Bug 3 is on the last line. What kind of p-value does \texttt{pnorm(-abs(z))} give, and what should it be for a two-sided test? \\[3em]
+\item Rewrite the corrected code: \\[5em]
+\end{enumerate}
+
+\subsection*{Part 4: Paired, or two samples?}
+For each study, circle one and name the statistic you would compute.
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=1em]
+\item Cholesterol of 40 patients, measured before and after a diet. \hfill \textbf{paired / two-sample} \\
+Statistic: \blankline{3in}
+\item Weights of the 204 male and 144 female rats trapped in 1999. \hfill \textbf{paired / two-sample} \\
+Statistic: \blankline{3in}
+\item Prices of the same 73 textbooks at two different shops. \hfill \textbf{paired / two-sample} \\
+Statistic: \blankline{3in}
+\item In one sentence: what is the \emph{test} for whether data can be paired? \\[3em]
+\end{enumerate}
+
+\subsection*{Part 5: When is a formula not allowed?}
+For each goal, say whether today's formulas apply. If they do not, say what you would do instead --- and be honest about what that costs.
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item A confidence interval for the \emph{90th percentile} of rat weight, from all 348 rats. \\[3em]
+\item A p-value for whether a coin is fair, from 200 flips. \\[3em]
+\item A confidence interval for the mean weight of $n = 6$ rats trapped at a new site. \\
+\emph{Careful.} You have three tools now. Say what each one would require of you here --- and whether bootstrapping is really a way out. (Look back at the $n=5$ picture from Lecture 9.) \\[5em]
+\end{enumerate}
+
+\end{document}

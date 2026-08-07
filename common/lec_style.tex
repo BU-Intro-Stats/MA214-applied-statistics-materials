@@ -1,0 +1,423 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% MA213/214 shared slide style
+%
+% "Calm & Cool" palette + content-type callout boxes.
+% Overhauled (2026) from the original OpenIntro/metropolis style:
+%   - all OpenIntro visual branding removed (logo, grid, colors)
+%   - a low-key cool palette (see colors below)
+%   - tcolorbox callout boxes so students recognize content types
+% See common/README.md for the command cheat-sheet.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usetheme{metropolis}
+
+%%%%%%%%%%%%%%%%
+% Packages
+%%%%%%%%%%%%%%%%
+
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{epstopdf}
+\usepackage{amsmath}  	% this permits text in eqnarray among other benefits
+\usepackage{url}		% produces hyperlinks
+\usepackage{hyperref}	% allows for color usage in tables
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage{colortbl}	% allows for color usage in tables
+\usepackage{multirow}	% allows for rows that span multiple rows in tables
+\usepackage{color}		% this package has a variety of color options
+\usepackage{pgf}
+\usepackage{calc}
+\usepackage{ulem}
+\usepackage{multicol}
+\usepackage{textcomp}
+\usepackage{txfonts}
+\usepackage{listings}
+\usepackage{tikz}
+\usepackage{array}
+\usepackage{wasysym}
+\usepackage{fancyvrb}
+\usepackage{etoolbox}             % \ifstrempty for optional box subtitles
+\usepackage[most]{tcolorbox}      % content-type callout boxes
+\tcbuselibrary{listings}          % R-code block (\begin{rblock})
+\usepackage{fontawesome5}         % box icons
+
+%%%%%%%%%%%%%%%%
+% Remove navigation symbols
+%%%%%%%%%%%%%%%%
+
+\setbeamertemplate{navigation symbols}{}
+
+%%%%%%%%%%%%%%%%
+% "Calm & Cool" palette
+%%%%%%%%%%%%%%%%
+
+% chrome / structure / body
+\definecolor{ccSlate}{HTML}{2E3742}   % frametitle bar, structure, section pages (deep neutral slate)
+\definecolor{ccInk}{HTML}{2B2B2B}     % body text
+\definecolor{ccWash}{HTML}{FCF8F1}    % gentle warm title-slide background wash (complements the cool blues)
+
+% example (blue)
+\definecolor{ccBlue}{HTML}{2F6690}
+\definecolor{ccBlueBg}{HTML}{EAF1F7}
+% interactive activity / discussion (green)
+\definecolor{ccGreen}{HTML}{4E8A6B}
+\definecolor{ccGreenBg}{HTML}{E9F3EC}
+% solution (purple)
+\definecolor{ccPurple}{HTML}{6F5499}
+\definecolor{ccPurpleBg}{HTML}{EFEAF6}
+% worksheet / focused work (terracotta)
+\definecolor{ccTerra}{HTML}{C2693E}
+\definecolor{ccTerraBg}{HTML}{FAEDE4}
+% formula / definition (neutral slate)
+\definecolor{ccGray}{HTML}{5C6B7A}
+\definecolor{ccGrayBg}{HTML}{EEF1F4}
+% caution / common pitfall (brick red)
+\definecolor{ccRed}{HTML}{B23A48}
+\definecolor{ccRedBg}{HTML}{FAEAEC}
+% key idea / takeaway (muted gold)
+\definecolor{ccGold}{HTML}{9C7A28}
+\definecolor{ccGoldBg}{HTML}{F7F1DF}
+% learning goals / lesson outcomes (teal)
+\definecolor{ccTeal}{HTML}{2C6E6B}
+\definecolor{ccTealBg}{HTML}{E6F0EF}
+% learning objectives (indigo)
+\definecolor{ccIndigo}{HTML}{45507A}
+\definecolor{ccIndigoBg}{HTML}{ECEEF4}
+% R code / output (gray)
+\definecolor{ccCode}{HTML}{5F5E5A}
+\definecolor{ccCodeBg}{HTML}{F4F5F6}
+
+% neutral grays kept from the original style
+\definecolor{gray}{rgb}{0.5, 0.5, 0.5}
+\definecolor{darkGray}{rgb}{0.3, 0.3, 0.3}
+\definecolor{darkerGray}{rgb}{0.2, 0.2, 0.2}
+
+% Backwards-compatible aliases: old OpenIntro color names now point at the
+% new palette, so existing \textcolor{oiB}{...}, \hl{...}, etc. keep working.
+\colorlet{oiB}{ccBlue}
+\colorlet{oiG}{ccGreen}
+\colorlet{hlblue}{ccBlue}
+\colorlet{rubineRed}{ccRed}
+\colorlet{irishGreen}{ccGreen}
+\colorlet{lightGreen}{ccGreen}
+
+%%%%%%%%%%%%%%%%
+% Restyle metropolis with the Calm & Cool chrome
+%%%%%%%%%%%%%%%%
+
+\metroset{block=fill}
+
+\setbeamercolor{normal text}{fg=ccInk, bg=white}
+\setbeamercolor{structure}{fg=ccSlate}
+\setbeamercolor{alerted text}{fg=ccBlue}
+\setbeamercolor{example text}{fg=ccGreen}
+\setbeamercolor{frametitle}{bg=ccSlate, fg=white}
+\setbeamercolor{progress bar}{fg=ccBlue}
+\setbeamercolor{title separator}{fg=ccBlue}
+\setbeamercolor{title}{fg=ccSlate}
+\setbeamercolor{subtitle}{fg=ccBlue}
+\setbeamercolor{author}{fg=ccInk}
+\setbeamercolor{institute}{fg=ccGray}
+\setbeamercolor{date}{fg=ccGray}
+\setbeamercolor{section title}{fg=ccSlate}
+\setbeamercolor{standout}{fg=white, bg=ccSlate}
+
+% Section pages sit on the same warm wash as the title slide. We keep
+% metropolis's section-title styling and just paint a full-page ccWash
+% background behind it (needs >=2 pdflatex passes for the current-page node).
+\setbeamertemplate{section page}{%
+  \begin{tikzpicture}[remember picture, overlay]
+    \fill[ccWash] (current page.south west) rectangle (current page.north east);
+  \end{tikzpicture}%
+  \centering
+  \begin{minipage}{22em}
+    \raggedright
+    \usebeamercolor[fg]{section title}%
+    \usebeamerfont{section title}%
+    \insertsectionhead\\[-1ex]
+    \usebeamertemplate*{progress bar in section page}%
+    \par
+  \end{minipage}\par
+  \vspace{\baselineskip}
+}
+
+%%%%%%%%%%%%%%%%
+% Custom inline text commands (recolored to the palette)
+%%%%%%%%%%%%%%%%
+
+% degree
+\newcommand{\degree}{\ensuremath{^\circ}}
+
+% cite
+\newcommand{\ct}[1]{
+\vfill
+{\tiny #1}}
+
+\newcommand{\NamedNote}[2]{
+\rule{2.5cm}{0.25pt} \\ \textit{\footnotesize{\textcolor{rubineRed}{#1:} \textcolor{darkerGray}{#2}}}}
+
+% Note
+\newcommand{\Note}[1]{
+\rule{2.5cm}{0.25pt} \\ \textit{\footnotesize{\textcolor{rubineRed}{Note:} \textcolor{darkerGray}{#1}}}}
+
+% Remember
+\newcommand{\Remember}[1]{\textit{\scriptsize{\textcolor{ccTerra}{Remember:} #1}}}
+
+% expected counts
+\newcommand{\ex}[1]{\textit{\textcolor{ccBlue}{#1}}}
+
+% red
+\newcommand{\red}[1]{\textit{\textcolor{rubineRed}{#1}}}
+
+% pink
+\newcommand{\pink}[1]{\textit{\textcolor{rubineRed!90!white!50}{#1}}}
+
+% green
+\newcommand{\green}[1]{\textit{\textcolor{irishGreen}{#1}}}
+
+% orange
+\newcommand{\orange}[1]{\textit{\textcolor{ccTerra}{#1}}}
+
+% links: webURL, webLink, appLink
+\newcommand{\webURL}[1]{\urlstyle{same}{ \textit{\textcolor{darkGray}{\url{#1}}}}}
+\newcommand{\webLink}[2]{\href{#1}{\textcolor{darkGray}{{#2}}}}
+\newcommand{\appLink}[2]{\href{#1}{\textcolor{white}{{#2}}}}
+
+% mail
+\newcommand{\mail}[1]{\href{mailto:#1}{\textit{\textcolor{darkGray}{#1}}}}
+
+% highlighting: hl, hlGr, mathhl
+\newcommand{\hl}[1]{\textit{\textcolor{hlblue}{#1}}}
+\newcommand{\hlGr}[1]{\textit{\textcolor{lightGreen}{#1}}}
+\newcommand{\mathhl}[1]{\textcolor{hlblue}{\ensuremath{#1}}}
+
+%%%%%%%%%%%%%%%%
+% Structural helpers (unchanged from the original)
+%%%%%%%%%%%%%%%%
+
+% two col: two columns
+\newenvironment{twocol}[4]{
+\begin{columns}[c]
+\column{#1\textwidth}
+#3
+\column{#2\textwidth}
+#4
+\end{columns}
+}
+
+% slot (for probability calculations)
+\newenvironment{slot}[2]{
+\begin{array}{c}
+\underline{#1} \\
+#2
+\end{array}
+}
+
+% pr: left and right parentheses
+\newcommand{\pr}[1]{
+\left( #1 \right)
+}
+
+% cancel
+\newcommand{\cancel}[1]{%
+    \tikz[baseline=(tocancel.base)]{
+        \node[inner sep=0pt,outer sep=0pt] (tocancel) {#1};
+        \draw[red, line width=0.5mm] (tocancel.south west) -- (tocancel.north east);
+    }%
+}
+
+% removepagenumbers
+\newcommand{\removepagenumbers}{%
+  \setbeamertemplate{footline}{}
+}
+
+% change margin
+\newenvironment{changemargin}[2]{%
+\begin{list}{}{%
+\setlength{\topsep}{0pt}%
+\setlength{\leftmargin}{#1}%
+\setlength{\rightmargin}{#2}%
+\setlength{\listparindent}{\parindent}%
+\setlength{\itemindent}{\parindent}%
+\setlength{\parsep}{\parskip}%
+}%
+\item}{\end{list}}
+
+% footnote
+\long\def\symbolfootnote[#1]#2{\begingroup%
+\def\thefootnote{\fnsymbol{footnote}}\footnote[#1]{#2}\endgroup}
+
+% commands from the book
+\newenvironment{data}[1]{\texttt{#1}}{}
+\newenvironment{var}[1]{\texttt{#1}}{}
+\newenvironment{resp}[1]{\texttt{#1}}{}
+
+%%%%%%%%%%%%%%%%
+% Content-type callout boxes (tcolorbox)
+%
+% Each type has a colored title strip (icon + label) over a light fill.
+% Color = content type; the label + icon reinforce it (so the cue does
+% not rely on color alone).
+%%%%%%%%%%%%%%%%
+
+\tcbset{
+  cccallout/.style 2 args={
+    enhanced, breakable=false,
+    colback=#2, colframe=#1, colbacktitle=#1, coltitle=white,
+    fonttitle=\bfseries\footnotesize,
+    boxrule=0.6pt, arc=2.5pt, outer arc=2.5pt,
+    left=5pt, right=5pt, top=3pt, bottom=3pt, boxsep=2pt,
+    toptitle=2pt, bottomtitle=2pt, lefttitle=5pt,
+    before skip=5pt, after skip=5pt,
+  },
+}
+
+% One-off / collection of examples (blue): \workedexample[subtitle]{body}.
+% (Named \workedexample, not \example, because beamer defines \example.)
+\newtcolorbox{examplebox}[1][]{cccallout={ccBlue}{ccBlueBg},
+  title={\faIcon{lightbulb}~~Example\ifstrempty{#1}{}{ \textmd{---}\ #1}}}
+\newcommand{\workedexample}[2][]{\begin{examplebox}[#1]#2\end{examplebox}}
+
+% Running-example header (blue): \examplehead{name} at the top of each frame of a
+% multi-slide running example. A one-off or a collection of examples uses the
+% \workedexample box above instead.
+\newcommand{\examplehead}[1]{%
+  \vspace{-0.4em}\par\noindent\tcbox[on line, colback=ccBlue, colframe=ccBlue, coltext=white,
+    boxrule=0pt, arc=2pt, left=5pt, right=5pt, top=1pt, bottom=1pt,
+    box align=base, nobeforeafter]{\footnotesize\bfseries\faIcon{lightbulb}\,Running example}%
+  \ifstrempty{#1}{}{\enspace{\footnotesize\bfseries\textcolor{ccBlue}{#1}}}%
+  \par\nobreak\vspace{-0.6em}{\color{ccBlue}\rule{\linewidth}{0.7pt}}\par\nobreak\vspace{-0.8em}}
+
+% Interactive activity (green): \activity[subtitle]{body}
+\newtcolorbox{activitybox}[1][]{cccallout={ccGreen}{ccGreenBg},
+  title={\faIcon{users}~~Activity\ifstrempty{#1}{}{ #1}}}
+\newcommand{\activity}[2][]{\begin{activitybox}[#1]#2\end{activitybox}}
+
+% Discussion question (green): \dq{body}
+\newtcolorbox{dqbox}{cccallout={ccGreen}{ccGreenBg}, title={\faIcon{comments}~~Discussion}}
+\newcommand{\dq}[1]{\begin{dqbox}#1\end{dqbox}}
+
+% Solution (purple): \solnbox{body}. Gated by the per-deck \soln toggle, so it
+% shows in the instructor build and vanishes from the student handout build.
+% (Named \solnbox, not \solution, because beamer already defines \solution.)
+\newtcolorbox{solutionbox}{cccallout={ccPurple}{ccPurpleBg}, title={\faIcon{key}~~Solution}}
+\newcommand{\solnbox}[1]{\soln{\begin{solutionbox}#1\end{solutionbox}}}
+
+% Worksheet / focused work (terracotta): \worksheet[subtitle]{body}
+\newtcolorbox{worksheetbox}[1][]{cccallout={ccTerra}{ccTerraBg},
+  title={\faIcon{pencil-alt}~~Worksheet\ifstrempty{#1}{}{ #1}}}
+\newcommand{\worksheet}[2][]{\begin{worksheetbox}[#1]#2\end{worksheetbox}}
+
+% Formula / definition (neutral slate). Supports both real usages found in the
+% decks: \formula{title}{body} and the bare \formula{body} (title defaults to
+% "Formula"). The second group is an optional brace argument.
+\newtcolorbox{formulabox}[1][Formula]{cccallout={ccGray}{ccGrayBg},
+  title={\faIcon{square-root-alt}~~#1}}
+\NewDocumentCommand{\formula}{m g}{%
+  \IfNoValueTF{#2}%
+    {\begin{formulabox}#1\end{formulabox}}%
+    {\begin{formulabox}[#1]#2\end{formulabox}}}
+
+% Common pitfall / caution (brick red): \caution[subtitle]{body}
+\newtcolorbox{cautionbox}[1][]{cccallout={ccRed}{ccRedBg},
+  title={\faIcon{exclamation-triangle}~~Caution\ifstrempty{#1}{}{ #1}}}
+\newcommand{\caution}[2][]{\begin{cautionbox}[#1]#2\end{cautionbox}}
+
+% Key idea / takeaway (muted gold): \keyidea[subtitle]{body}
+\newtcolorbox{keyideabox}[1][]{cccallout={ccGold}{ccGoldBg},
+  title={\faIcon{star}~~Key idea\ifstrempty{#1}{}{ #1}}}
+\newcommand{\keyidea}[2][]{\begin{keyideabox}[#1]#2\end{keyideabox}}
+
+% Learning goals / lesson outcomes (teal): \goals{body}. Sits under the short
+% LO headings on the objectives slide; body is the "you should be able to" list.
+\newtcolorbox{goalsbox}{cccallout={ccTeal}{ccTealBg}, fontupper=\footnotesize,
+  top=1pt, bottom=2pt, boxsep=1pt, before skip=3pt,
+  title={\faIcon{bullseye}~~By the end of today, you should be able to\ldots}}
+\newcommand{\goals}[1]{\begin{goalsbox}#1\end{goalsbox}}
+
+% Learning objectives (indigo): \objectives{body} -- the formal LO headings,
+% shown alongside \goals on the objectives slide.
+\newtcolorbox{objectivesbox}{cccallout={ccIndigo}{ccIndigoBg}, fontupper=\small,
+  top=1pt, bottom=2pt, boxsep=1pt, before skip=3pt,
+  title={\faIcon{clipboard-list}~~Learning objectives}}
+\newcommand{\objectives}[1]{\begin{objectivesbox}#1\end{objectivesbox}}
+
+% Defaults for a bare \begin{lstlisting}. Without these it inherits the listings
+% package defaults: 11pt type, fixed-width columns (which spaces code out as
+% "a g e _ f i t"), and no line breaking, so a long line silently runs off the
+% right edge of the slide. A deck that passes its own basicstyle still wins.
+% Layout only -- syntax coloring is left to the \begin{rblock} environment.
+\lstset{
+  basicstyle=\ttfamily\footnotesize, columns=fullflexible,
+  breaklines=true, breakindent=1.5em, showstringspaces=false,
+  numbers=none, frame=none}
+
+% R code / output (gray): \begin{rblock}[subtitle] ... \end{rblock}
+% NOTE: a frame containing an rblock must be declared \begin{frame}[fragile].
+\lstdefinestyle{ccR}{
+  language=R, basicstyle=\ttfamily\footnotesize, columns=fullflexible,
+  breaklines=true, showstringspaces=false, numbers=none, frame=none,
+  keywordstyle=\color{ccBlue}, commentstyle=\color{ccGreen!75!black},
+  stringstyle=\color{ccTerra}}
+\newtcblisting{rblock}[1][]{cccallout={ccCode}{ccCodeBg},
+  title={\faIcon{terminal}~~R\ifstrempty{#1}{}{ #1}},
+  listing only, listing style=ccR}
+
+% --- Legacy boxes (kept so existing decks compile) ---
+
+% app: application exercise -> alias of activity
+\newcommand{\app}[1]{\activity{#1}}
+
+% pq: practice question (green, interactive family)
+\newtcolorbox{pqbox}{cccallout={ccGreen}{ccGreenBg}, title={\faIcon{list-ol}~~Practice}}
+\newcommand{\pq}[1]{\begin{pqbox}#1\end{pqbox}}
+
+% solnMult: solutions for multiple-choice practice questions (uses \soln toggle)
+\newcommand{\solnMult}[1]{
+\item[] \vspace{-0.59cm}
+\only<1>{\item #1}
+\soln{\only<2->{\item \orange{#1}}}
+}
+
+%%%%%%%%%%%%%%%%
+% De-branded title frame + attribution
+%%%%%%%%%%%%%%%%
+
+% Eyebrow line on the title slide; a deck may \renewcommand this.
+\newcommand{\coursetag}{MA214: Applied Statistics}
+
+% Attribution: all slides released under CC BY-SA, crediting both the
+% instructor (later material) and OpenIntro (basis of the earlier material).
+\newcommand{\courseattribution}{%
+  Slides by Jonathan H.~Huggins, building on materials from OpenIntro's
+  \emph{Introduction to Modern Statistics} (Mine \c{C}etinkaya-Rundel et al.).
+  Released under the
+  \webLink{http://creativecommons.org/licenses/by-sa/3.0/us/}{CC BY-SA license}.
+  Some images included under fair use (educational purposes).}
+
+% \maketitleframe: de-branded title slide (no logo, no grid). Uses the deck's
+% \title, \subtitle, and \coursetag.
+\newcommand{\maketitleframe}{%
+  \addtocounter{framenumber}{-1}%
+  {\removepagenumbers
+  \setbeamercolor{background canvas}{bg=ccWash}%
+  \begin{frame}[plain]
+    \vspace*{2.6em}
+    {\color{ccSlate}\rule{\textwidth}{2.5pt}}\par\vspace{1.5em}
+    {\usebeamerfont{date}\scshape\color{ccGray}\coursetag}\par\vspace{0.55em}
+    {\usebeamerfont{title}\color{ccSlate}\inserttitle\par}
+    \vspace{0.45em}{\color{ccBlue}\rule{3em}{2.5pt}}\par\vspace{0.7em}
+    {\usebeamerfont{subtitle}\color{ccBlue}\insertsubtitle\par}
+    \vfill
+    {\color{ccGray!55}\rule{\textwidth}{0.4pt}}\par\vspace{0.45em}
+    {\tiny\color{ccGray}\courseattribution\par}
+    \vspace*{0.4em}
+  \end{frame}}}
+
+%%%%%%%%%%%%%%%%
+% Graphics
+%%%%%%%%%%%%%%%%
+
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}

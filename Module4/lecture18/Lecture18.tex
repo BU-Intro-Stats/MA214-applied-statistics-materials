@@ -1,0 +1,819 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Slide options
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Option 1: Slides with solutions
+
+\documentclass[slidestop,compress,mathserif]{beamer}
+\usepackage{booktabs}
+\usepackage{array}
+\newcommand{\soln}[1]{\textit{#1}}
+\newcommand{\solnGr}[1]{#1}
+
+% Option 2: Handouts without solutions
+
+%\documentclass[11pt,containsverbatim,handout]{beamer}
+%\usepackage{booktabs}
+%\usepackage{array}
+%\usepackage{pgfpages}
+%\pgfpagesuselayout{4 on 1}[letterpaper,landscape,border shrink=5mm]
+%\newcommand{\soln}[1]{ }
+%\newcommand{\solnGr}{ }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Style
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{../../common/lec_style.tex}
+\graphicspath{ {../../common/} {figures/}  }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Preamble
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title[Lecture 18]{Lecture 18: Conjugate models}
+\subtitle{Module 4: Bayesian Statistics}
+\author{Jonathan H.~Huggins}
+\institute{}
+\date{}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Title page
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\maketitleframe
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Agenda
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\include{Lecture18_agenda}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{From a grid to a curve}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{From discrete to continuous parameters}
+
+Lecture 17 pinned the response rate $p$ to five candidate values. In reality $p$ can be \textbf{any} value in $[0,1]$.
+
+\pause
+\medskip
+
+So the prior stops being a bar chart and becomes a \hl{curve}, and so does the posterior. Probability is now \textbf{area under the curve}, and ``sums to one'' becomes ``total area is one.''
+
+\pause
+\medskip
+
+\formula{Posterior $\propto$ likelihood $\times$ prior}{Nothing else changes. At every value of $p$ we still multiply the prior height by the likelihood, then rescale so the total area comes to one: $f(p \mid x) \;\propto\; L(p ; x)\, f(p)$. The rescaling constant is a fixed number: it does not depend on $p$, so it never changes the \emph{shape}.}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The Beta-Binomial model}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The Beta distribution}
+
+We need a prior that lives on $[0,1]$, since $p$ is a probability. The \hl{Beta distribution} is a flexible family that does exactly that, governed by two \textbf{shape parameters} $\alpha > 0$ and $\beta > 0$.
+
+\pause
+\medskip
+
+If $p \sim \text{Beta}(\alpha, \beta)$, its density is
+\[
+f(p) \;\propto\; p^{\alpha - 1}(1 - p)^{\beta - 1}.
+\]
+\pause
+There is a normalizing constant out front, but you never need it. What matters is the \textbf{shape}, $p^{\alpha-1}(1-p)^{\beta-1}$.
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Shapes of the Beta distribution}
+
+\begin{center}
+\includegraphics[width=0.94\textwidth]{beta_shapes.pdf}
+\end{center}
+
+\vspace{-0.3em}
+{\small
+\begin{itemize}
+\item $\alpha = \beta = 1$: flat, no prior preference at all
+\item $\alpha > \beta$ tilts toward large $p$; $\alpha < \beta$ tilts toward small $p$
+\item Larger $\alpha + \beta$: more concentrated, a \emph{stronger} prior conviction
+\end{itemize}}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Reading $\alpha$ and $\beta$}
+
+If $p \sim \text{Beta}(\alpha, \beta)$:
+\[
+E(p) = \frac{\alpha}{\alpha + \beta},
+\qquad
+\text{Var}(p) = \frac{\alpha\beta}{(\alpha+\beta)^2\,(\alpha+\beta+1)}.
+\]
+\pause
+\keyidea{Read $\alpha$ as ``prior successes'' and $\beta$ as ``prior failures'': the prior behaves like $\alpha + \beta$ observations already seen. That $\alpha+\beta$ is the \hl{strength} of the prior, and sitting in the variance denominator it is what shrinks the spread.}
+
+\pause
+\medskip
+
+\textbf{For example:} $\text{Beta}(5,5)$ has mean $0.5$, like having already seen 5 successes and 5 failures. $\text{Beta}(1,1)$ is flat, the weakest prior of all.
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Combining Beta and Binomial}
+
+Combine a Beta prior with the Binomial likelihood from Lecture 17:
+\vspace{-0.6em}
+\begin{align*}
+\text{Prior:} \quad & p \sim \text{Beta}(\alpha, \beta) \\
+\text{Data:} \quad & X \mid p \sim \text{Binomial}(n, p)
+\end{align*}
+\pause
+\vspace{-0.8em}
+
+Now just multiply the two shapes together:
+\vspace{-0.6em}
+\begin{align*}
+f(p \mid x) &\propto \underbrace{p^x(1-p)^{n-x}}_{\text{likelihood}} \cdot \underbrace{p^{\alpha-1}(1-p)^{\beta-1}}_{\text{prior}} \\[-0.2em]
+&= p^{(\alpha + x) - 1}(1-p)^{(\beta + n - x) - 1}.
+\end{align*}
+\pause
+\vspace{-0.3em}
+
+That is a Beta shape again, with new parameters. No integration, just exponents:
+\vspace{-0.6em}
+\[
+p \mid X = x \;\sim\; \text{Beta}(\alpha + x,\; \beta + n - x)
+\]
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The Beta-Binomial update rule}
+
+\[
+\text{Beta}(\alpha, \beta) \;\xrightarrow{\;x \text{ successes in } n \text{ trials}\;}\; \text{Beta}(\alpha + x,\; \beta + n - x)
+\]
+\pause
+\medskip
+
+\textbf{Read it as bookkeeping:} start with $\alpha$ prior successes and $\beta$ prior failures, observe $x$ real successes and $n-x$ real failures, and end with $\alpha + x$ and $\beta + n - x$. You just \emph{added them up}.
+
+\pause
+\medskip
+
+\caution{Because the update is this cheap, \hl{sequential updating} (Lecture 17) is nearly free here: feed in one batch, then the next, adding to $\alpha$ and $\beta$ each time. Same answer as pooling all the data at once, and as before the order never matters.}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Example: the drug trial, continuous}
+
+The same Phase 1 trial as Lecture 17, but now $p$ gets a curve, not a grid.
+
+\pause
+\medskip
+
+\textbf{Prior:} we expect a low response rate. $\text{Beta}(1, 5)$ encodes that: mean $1/6 \approx 0.167$.
+
+\pause
+\medskip
+
+\textbf{Data:} $n = 6$ patients, $x = 2$ respond. The MLE is $\hat p = 2/6 \approx 0.333$, but with only six observations the likelihood is broad: many values of $p$ stay plausible.
+
+\pause
+\medskip
+
+\textbf{Posterior:} add them up.
+\vspace{-0.3em}
+\[
+p \mid x = 2 \;\sim\; \text{Beta}(1 + 2,\; 5 + 4) = \text{Beta}(3, 9),
+\qquad E(p \mid x) = \tfrac{3}{12} = \hl{0.250}
+\]
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Visualizing the update}
+\examplehead{Phase 1 drug trial}
+
+\begin{center}
+\includegraphics[width=0.84\textwidth]{beta_binomial_update.pdf}
+\end{center}
+
+\vspace{-0.3em}
+Prior mean $0.167$, MLE $0.333$, posterior mean $0.250$. The posterior lands \emph{between} them.
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The conjugate pattern}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Two things just happened}
+\examplehead{Phase 1 drug trial}
+
+\textbf{One:} the posterior came out in the \emph{same family} as the prior: Beta in, Beta out. When that happens we call the prior \hl{conjugate} to the likelihood.
+
+\pause
+\medskip
+
+\textbf{Two:} the posterior mean landed between the prior mean and the MLE, and not arbitrarily:
+\vspace{-0.2em}
+\[
+E(p \mid x) = \frac{\alpha + x}{\alpha + \beta + n}
+= \underbrace{\frac{\alpha + \beta}{\alpha + \beta + n}}_{\text{weight on prior}} \cdot \underbrace{\frac{\alpha}{\alpha+\beta}}_{\text{prior mean}}
+\;+\; \underbrace{\frac{n}{\alpha + \beta + n}}_{\text{weight on data}} \cdot \underbrace{\frac{x}{n}}_{\text{MLE}}
+\]
+\pause
+\vspace{-0.2em}
+
+Our trial: $\alpha+\beta = 6$ against $n = 6$, so the weights are $0.5$ and $0.5$, and indeed $0.5 \times 0.167 + 0.5 \times 0.333 = 0.250$.
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The weighted-average rule}
+
+\keyidea{In every conjugate model in this lecture, the \hl{posterior mean is a weighted average of the prior mean and the MLE}. The weights are a tug-of-war between a \hl{prior sample size} $n_0$, how many observations the prior is worth, and the real sample size $n$: $\;\text{posterior mean} = \frac{n_0}{n_0+n}\,(\text{prior mean}) + \frac{n}{n_0+n}\,(\text{MLE})$.}
+
+\pause
+\medskip
+
+For the Beta-Binomial, $n_0 = \alpha + \beta$. That is the only ingredient that changes when we switch families. The rule itself is unchanged.
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{How much is your prior worth?}
+
+Everything follows from comparing $n_0$ against $n$:
+
+\pause
+\medskip
+\begin{itemize}
+\item $n$ \textbf{small} next to $n_0$: the \textbf{prior} dominates, and you brought more conviction than evidence.
+\pause
+\medskip
+\item $n$ \textbf{large} next to $n_0$: the \textbf{data} dominates, and with enough of it the posterior mean is essentially the MLE. \hl{Bayesians and frequentists converge}, the promise from Lecture 17.
+\pause
+\medskip
+\item A \textbf{weak} prior (small $n_0$) is overturned by little data; a \textbf{strong} prior needs a lot of it.
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Different people, different priors}
+\examplehead{Phase 1 drug trial}
+
+Five oncologists are asked what they believe about the drug's response rate $p$, \emph{before} any trial data:
+
+\pause
+\medskip
+
+\begin{itemize}
+\item \textbf{Dr.\ Alvarez:} strongly skeptical, expects almost no responders
+\item \textbf{Dr.\ Banerjee:} expects a low response rate, like existing drugs
+\item \textbf{Dr.\ Chen:} no strong opinion either way
+\item \textbf{Dr.\ Diallo:} cautiously optimistic
+\item \textbf{Dr.\ Eriksen:} strongly optimistic, expects most patients to respond
+\end{itemize}
+
+\pause
+\medskip
+
+Encode each as a Beta prior, then run all five through the same update with the same data ($n=6$, $x=2$).
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Five priors, one dataset, five posteriors}
+\examplehead{Phase 1 drug trial}
+
+\begin{center}
+\includegraphics[width=\textwidth]{five_oncologists_grid.pdf}
+\end{center}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Five priors, one dataset, five posteriors}
+\examplehead{Phase 1 drug trial}
+
+\begin{center}
+{\footnotesize
+\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{lcccc}
+\toprule
+Oncologist & Prior & $n_0 = \alpha+\beta$ & Posterior & Post.\ mean \\
+\midrule
+Dr.\ Alvarez  & $\text{Beta}(1, 20)$ & 21 & $\text{Beta}(3, 24)$ & 0.111 \\
+Dr.\ Banerjee & $\text{Beta}(1, 5)$  & 6  & $\text{Beta}(3, 9)$  & 0.250 \\
+Dr.\ Chen     & $\text{Beta}(1, 1)$  & 2  & $\text{Beta}(3, 5)$  & 0.375 \\
+Dr.\ Diallo   & $\text{Beta}(4, 2)$  & 6  & $\text{Beta}(6, 6)$  & 0.500 \\
+Dr.\ Eriksen  & $\text{Beta}(10, 2)$ & 12 & $\text{Beta}(12, 6)$ & 0.667 \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\pause
+\vspace{-0.2em}
+{\small Chen's prior is worth $n_0 = 2$ against $n = 6$ real observations; Alvarez's is worth $21$.}
+
+\pause
+\dq{Six patients, five conclusions. Who is doing anything wrong?}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Six patients, five conclusions}
+\examplehead{Phase 1 drug trial}
+
+\textbf{Nobody is doing anything wrong.} Same rule, same data. They differ only in the prior.
+
+\pause
+\begin{itemize}
+\item Six patients is thin evidence. Their posterior means span $0.11$ to $0.67$; at $n = 200$ that spread collapses to $0.06$.
+\pause
+\item Each prior is a written-down Beta, so the disagreement is \emph{visible}. A frequentist reports $\hat p = 0.333$ and leaves it unstated.
+\end{itemize}
+
+\pause
+\keyidea{The prior is where the subjectivity sits, and writing it down is what makes it auditable.}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The Normal-Normal model}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Example: birthweight at a rural hospital}
+
+A neonatal researcher wants the mean birthweight $\mu$ (grams) at a rural hospital serving a high-risk population.
+
+\pause
+\medskip
+\begin{itemize}
+\item \hl{National data:} mean $\approx 3300$ g, SD $\sigma = 500$ g \quad (we treat $\sigma$ as known)
+\pause
+\item \hl{Prior:} this hospital is probably near the national average, so $\mu \sim N(3300, 200^2)$. A prior SD of $200$ g ($\approx 0.45$ lbs) is moderately informative
+\pause
+\item \hl{Data:} $n = 12$ births here, sample mean $\bar{x} = 2980$ g
+\end{itemize}
+
+\pause
+\medskip
+\dq{The parameter is now a weight in grams, not a probability. Does anything actually change?}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The Normal likelihood}
+
+With $X_1,\ldots,X_n \mid \mu \stackrel{\text{iid}}{\sim} N(\mu, \sigma^2)$ and $\sigma^2$ known, multiplying the $n$ densities together and keeping only what depends on $\mu$ leaves
+\[
+L(\mu\,; \mathbf{x}) \;\propto\; \exp\!\left(-\frac{1}{2\sigma^2}\sum_{i=1}^n(x_i - \mu)^2\right).
+\]
+\pause
+The identity $\sum_i (x_i - \mu)^2 = n(\mu - \bar{x})^2 + \sum_i (x_i - \bar{x})^2$ has a second piece free of $\mu$, so this collapses to
+\[
+L(\mu\,; \bar{x}) \;\propto\; \exp\!\left(-\frac{n}{2\sigma^2}(\mu - \bar{x})^2\right).
+\]
+\pause
+That is a Normal shape in $\mu$, centered at $\bar{x}$. So \hl{the whole sample enters only through $\bar{x}$}.
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The MLE and the shape of the likelihood}
+\examplehead{Birthweight}
+
+\begin{center}
+\includegraphics[width=0.74\textwidth]{normal_likelihood_mle.pdf}
+\end{center}
+
+\vspace{-0.3em}
+{\small The likelihood is largest where $(\mu - \bar x)^2$ is smallest, so $\hat\mu_{\text{MLE}} = \bar{x}$: a squared distance is smallest when it is zero, no calculus needed. Its width is $\sigma/\sqrt{n}$, so more data or a smaller $\sigma$ makes it narrower.}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The Normal-Normal update}
+
+Put a Normal prior on the parameter: $\mu \sim N(\mu_0, \sigma_0^2)$, with $\mu_0$ the prior mean and $\sigma_0$ how unsure we are. Multiply the two Normal shapes and, as with Beta, a Normal comes out.
+
+\pause
+\medskip
+
+\formula{Precisions add}{The \hl{precision} of a distribution is $1/\text{variance}$: high precision means low uncertainty. The prior has precision $1/\sigma_0^2$ and the data has precision $n/\sigma^2$. Writing $\sigma_n$ for the posterior SD, the posterior precision is their sum: $\;\frac{1}{\sigma_n^2} = \frac{1}{\sigma_0^2} + \frac{n}{\sigma^2}$.}
+
+\pause
+\medskip
+
+So evidence \emph{accumulates}: every observation adds precision and the posterior can only get narrower.
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The same pattern, in grams}
+
+Define the \hl{prior sample size} $n_0 = \sigma^2/\sigma_0^2$: the number of real births that would carry the same precision as the prior. Then the posterior mean is
+\[
+\mu_n = \frac{n_0}{n_0 + n}\,\mu_0 + \frac{n}{n_0 + n}\,\bar{x},
+\qquad
+\sigma_n = \frac{\sigma}{\sqrt{n_0 + n}}.
+\]
+\pause
+\keyidea{This is the \emph{same} weighted average as the Beta-Binomial. Only the recipe for $n_0$ changed: there $n_0 = \alpha + \beta$, here $n_0 = \sigma^2/\sigma_0^2$. The posterior behaves like $n_0 + n$ observations: $n_0$ imagined, $n$ real.}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Birthweight: prior observations and weights}
+\examplehead{Birthweight}
+
+\textbf{Setup:} prior $N(3300, 200^2)$; data $n = 12$, $\bar{x} = 2980$ g, $\sigma = 500$ g.
+
+\pause\smallskip
+
+\textbf{Step 1. How much is the prior worth?}
+\vspace{-0.2em}
+\[
+n_0 = \frac{\sigma^2}{\sigma_0^2} = \frac{500^2}{200^2} = \frac{250{,}000}{40{,}000} = \hl{6.25}
+\]
+\vspace{-0.4em}
+
+The prior is worth about \hl{6 previously observed births}, against 12 real ones.
+
+\pause\smallskip
+
+\textbf{Step 2. Effective sample size and posterior SD.}
+\vspace{-0.2em}
+\[
+n_0 + n = 6.25 + 12 = 18.25,
+\qquad
+\sigma_n = \frac{500}{\sqrt{18.25}} \approx \hl{117}\text{ g}
+\]
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Birthweight: the posterior}
+\examplehead{Birthweight}
+
+\textbf{Step 3. The weighted average.}
+\vspace{-0.2em}
+\[
+\mu_n
+  = \underbrace{\tfrac{6.25}{18.25}}_{0.34} \times 3300
+  + \underbrace{\tfrac{12}{18.25}}_{0.66} \times 2980
+  \approx \hl{3090}\text{ g}
+\]
+\pause
+The 12 births get two thirds of the weight, so the posterior sits nearer the data, though the prior still pulls it $110$ g above $\bar x$.
+
+\pause
+\medskip
+
+Since the posterior is Normal, we can read an interval straight off it: $3090 \pm 1.96 \times 117 = (2860,\ 3319)$ g. That is a \hl{credible interval}: an interval $\mu$ falls in with probability $0.95$, given this data. \hl{Lecture 20} makes that precise.
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Visualizing the Normal-Normal update}
+\examplehead{Birthweight}
+
+\begin{center}
+\includegraphics[width=0.86\textwidth]{normal_normal_update.pdf}
+\end{center}
+
+\vspace{-0.3em}
+Same picture as the drug trial, different units. The posterior is narrower than \emph{both} inputs, because precisions add.
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The Gamma-Poisson model}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Example: whale sightings off Cape Cod}
+
+A marine biologist is estimating $\lambda$, the rate of whale sightings per day off Cape Cod during spring migration.
+
+\pause
+\medskip
+\begin{itemize}
+\item \hl{Historical records:} about 3 sightings per day
+\pause
+\item \hl{Data:} over $n = 7$ days they record $5, 2, 4, 6, 3, 7, 4$, so $\sum x_i = 31$ and $\bar{x} = 4.43$/day
+\end{itemize}
+
+\pause
+\medskip
+\dq{Has the sighting rate risen above the historical 3 per day, or is 7 days just noisy?}
+
+\pause
+\medskip
+A third parameter type: not a probability, not a mean weight, but a \textbf{rate}, any positive number.
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The Poisson distribution}
+
+The \hl{Poisson} models counts with no fixed upper bound: earthquakes per year, goals per match, patients arriving per hour, whales per day.
+\[
+X \mid \lambda \sim \text{Poisson}(\lambda), \qquad P(X = x \mid \lambda) = \frac{\lambda^x e^{-\lambda}}{x!}, \quad x = 0, 1, 2, \ldots
+\]
+\pause
+\begin{itemize}
+\item $\lambda > 0$ is the average event rate, the parameter we want
+\pause
+\item $E(X) = \lambda$ and $\text{Var}(X) = \lambda$: \hl{mean equals variance}, so busier rates are also more variable
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Shapes of the Poisson distribution}
+
+\begin{center}
+\includegraphics[width=\textwidth]{poisson_pmfs.pdf}
+\end{center}
+
+\vspace{-0.2em}
+{\small As $\lambda$ grows the distribution shifts right, spreads out, and starts to look symmetric. Note these are bars, not a curve: the \emph{data} is still discrete counts. It is the \emph{parameter} $\lambda$ that gets a continuous prior.}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The Poisson likelihood}
+
+Multiply the $n$ probabilities together and keep only what depends on $\lambda$:
+\[
+L(\lambda\,; \mathbf{x}) = \prod_{i=1}^n \frac{\lambda^{x_i} e^{-\lambda}}{x_i!} \;\propto\; \lambda^{\sum x_i}\, e^{-n\lambda}
+\]
+\pause
+So, as with the Normal, the sample enters only through a summary: here the \textbf{total count} $\sum x_i$.
+
+\pause
+\medskip
+
+The MLE is the sample mean, $\hat\lambda_{\text{MLE}} = \bar{x}$. For the whales, $\hat\lambda = 31/7 \approx \hl{4.43}$ sightings/day.
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The Gamma distribution}
+
+We need a prior for a rate, so it must live on the positive numbers. The \hl{Gamma distribution} does:
+\[
+\lambda \sim \text{Gamma}(\alpha, \beta), \qquad f(\lambda) \;\propto\; \lambda^{\alpha - 1} e^{-\beta\lambda}
+\]
+\pause
+\begin{itemize}
+\item \textbf{Mean:} $E(\lambda) = \alpha/\beta$; \quad \textbf{Variance:} $\text{Var}(\lambda) = \alpha/\beta^2$
+\pause
+\item \textbf{Interpretation:} $\alpha$ is a ``prior total count'' and $\beta$ a ``prior number of observations'', so $\beta$ is this family's \hl{prior sample size $n_0$}
+\end{itemize}
+
+\pause
+\medskip
+
+\dq{Look at that density. Where have you already seen a shape like $\lambda^{\text{something}} e^{-\text{something} \times \lambda}$?}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Shapes of the Gamma distribution}
+\examplehead{Whale sightings}
+
+\begin{center}
+\includegraphics[width=0.86\textwidth]{gamma_shapes.pdf}
+\end{center}
+
+\vspace{-0.3em}
+The two parameters move the center and the spread independently. $\text{Gamma}(6,2)$ has mean $3$, the historical whale rate, so it is the natural prior here.
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The Gamma-Poisson update}
+
+Multiply the Gamma prior shape by the Poisson likelihood shape:
+\[
+\underbrace{\lambda^{\alpha-1}e^{-\beta\lambda}}_{\text{prior}} \cdot \underbrace{\lambda^{\sum x_i}e^{-n\lambda}}_{\text{likelihood}}
+= \lambda^{(\alpha + \sum x_i) - 1}\, e^{-(\beta + n)\lambda}
+\]
+\pause
+Gamma in, Gamma out: conjugate again, and again just adding.
+\[
+\lambda \mid \mathbf{x} \sim \text{Gamma}\Big(\alpha + \textstyle\sum_i x_i,\; \beta + n\Big)
+\]
+\pause
+Add the observed \textbf{total count} to $\alpha$. Add the \textbf{number of observations} to $\beta$. Exactly the Beta-Binomial move, in different clothes.
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Whale sightings: computing the posterior}
+\examplehead{Whale sightings}
+
+\textbf{Prior:} $\text{Gamma}(6, 2)$, mean $6/2 = 3$/day, matching the historical baseline.
+\textbf{Data:} $n = 7$ days, $\sum x_i = 31$.
+
+\pause
+\medskip
+\[
+\lambda \mid \mathbf{x} \sim \text{Gamma}(6 + 31,\; 2 + 7) = \text{Gamma}(37, 9)
+\]
+\pause
+\[
+E(\lambda \mid \mathbf{x}) = \frac{37}{9} \approx \hl{4.11}\text{/day},
+\qquad
+\text{SD} = \sqrt{37/9^2} \approx \hl{0.68}\text{/day}
+\]
+\pause
+Check the pattern: $n_0 = \beta = 2$ against $n = 7$, so weights $\tfrac{2}{9} \approx 0.22$ and $\tfrac{7}{9} \approx 0.78$, and $\tfrac{2}{9}(3) + \tfrac{7}{9}(4.43) \approx 4.11$. \hl{Third family, same rule.}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Whale sightings: answering the question}
+\examplehead{Whale sightings}
+
+The biologist asked whether the rate has risen above 3. With a whole posterior in hand, just ask it:
+\[
+P(\lambda > 3 \mid \mathbf{x}) \approx \hl{0.96}
+\qquad {\small \texttt{pgamma(3, 37, 9, lower.tail = FALSE)}}
+\]
+\pause
+A \hl{96\% posterior probability} that the rate exceeds the historical 3 per day. An interval reads off as easily: \texttt{qgamma(c(.025,.975), 37, 9)} gives $(2.89,\ 5.54)$.
+
+\pause
+\caution{No null hypothesis, no p-value, no sampling distribution. A posterior answers ``how likely is this claim?'' directly. \hl{Lecture 20} develops this properly.}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Visualizing the Gamma-Poisson update}
+\examplehead{Whale sightings}
+
+\begin{center}
+\includegraphics[width=0.86\textwidth]{gamma_poisson_update.pdf}
+\end{center}
+
+\vspace{-0.3em}
+Three families, three pictures, one story: the posterior sits between the prior and the likelihood, and is narrower than either.
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Wrap-up}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The three conjugate families}
+
+\vspace{-0.2em}
+\begin{center}
+{\scriptsize
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{lccc}
+\toprule
+ & \textbf{Beta-Binomial} & \textbf{Normal-Normal} & \textbf{Gamma-Poisson} \\
+\midrule
+Parameter & probability $p$ & mean $\mu$ & rate $\lambda$ \\
+Data & $\text{Bin}(n,p)$ & $N(\mu, \sigma^2)$ & $\text{Pois}(\lambda)$ \\
+Prior & $\text{Beta}(\alpha,\beta)$ & $N(\mu_0, \sigma_0^2)$ & $\text{Gamma}(\alpha,\beta)$ \\
+Posterior & $\text{Beta}(\alpha\!+\!x,\; \beta\!+\!n\!-\!x)$ & $N(\mu_n, \sigma_n^2)$ & $\text{Gamma}(\alpha\!+\!\textstyle\sum x_i,\; \beta\!+\!n)$ \\
+\textbf{Prior size $n_0$} & $\alpha + \beta$ & $\sigma^2/\sigma_0^2$ & $\beta$ \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\pause
+{\small Only the bottom row differs. Once you know $n_0$, the posterior mean is the same weighted average every time.}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Limitations of conjugate priors}
+
+\hl{What they buy you:}
+\begin{itemize}
+\item a posterior in closed form: no computation, just arithmetic on the parameters;
+\item parameters you can read aloud: ``prior successes,'' ``prior sample size'';
+\item sequential updating for free.
+\end{itemize}
+
+\pause
+\medskip
+
+\hl{What they cost you:}
+\begin{itemize}
+\item the conjugate prior may \emph{not} be what you believe: what if your prior should be bimodal, or heavy-tailed?
+\pause
+\item conjugacy holds only for a few prior/likelihood pairs. Most real models have \textbf{no conjugate prior at all}.
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Summary}
+
+\begin{itemize}
+\item A prior is \hl{conjugate} to a likelihood when the posterior comes out in the same family: Beta/Binomial, Normal/Normal, Gamma/Poisson.
+\pause
+\item The update is then pure bookkeeping: \hl{add the data to the prior's parameters}. No integration.
+\pause
+\item In all three, the \hl{posterior mean is a weighted average} of the prior mean and the MLE, with weights $\frac{n_0}{n_0+n}$ and $\frac{n}{n_0+n}$.
+\pause
+\item The \hl{prior sample size $n_0$} says how many observations your prior is worth. It is the only thing that changes between families.
+\pause
+\item With enough data the prior washes out and the posterior mean approaches the MLE.
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Coming up next}
+
+\hl{Conjugacy was the easy case}, and a rare one. Closed-form posteriors come only from the handful of prior/likelihood pairs that multiply into their own family.
+
+\vspace{0.4em}
+\begin{itemize}
+\item \hl{Lecture 19: posterior approximation.} With no conjugate prior, which is most of the time, you cannot write the posterior down. So you \emph{sample} from it instead, with \hl{Markov chain Monte Carlo}, and study the draws (BR!\ Chs.\ 6--7).
+\pause
+\item That brings its own problem: the samples are only trustworthy if the chain behaved. Hence \hl{trace plots} and the diagnostics \hl{R-hat} and \hl{ESS}, which decide whether the output is usable.
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{In-class activity}
+
+You'll work in \textbf{pairs} (one analyst, one guide).
+
+\medskip
+\begin{itemize}
+\item Pick up the worksheet.
+\item Work through the problems together.
+\item \hl{Don't use Gen AI except for debugging}
+\item Your worksheet will be collected and graded.
+\end{itemize}
+
+\medskip
+\textbf{Recommendations:}
+\begin{itemize}
+\item Read each question carefully before starting
+\item Discuss your answers with your partner before writing them down.
+\end{itemize}
+
+\end{frame}
+
+\end{document}

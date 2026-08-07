@@ -1,0 +1,40 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{xcolor}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{amsmath}
+\usepackage{needspace}
+
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\rhead{Lecture 9}
+\lhead{MA 214: Applied Statistics}
+\renewcommand{\headrulewidth}{.4mm}
+
+% A key concept: bold heading, then open space to write, then a faint divider.
+\newcommand{\concept}[1]{%
+  \par\needspace{1.5in}\medskip\noindent{\large\bfseries #1}\par
+  \vspace{1.15in}%
+  \noindent{\color{black!15}\rule{\linewidth}{0.4pt}}\par\smallskip}
+
+\begin{document}
+
+\noindent\textbf{Name:}\underline{\hspace{2.25in}}\hfill\textbf{Date:}\underline{\hspace{1.4in}}
+
+\begin{center}
+ \Large Lecture 9 Notes: Confidence Intervals with Bootstrapping
+\end{center}
+
+\noindent\textit{Room to record each key idea from today's lecture in your own words --- a definition,
+an example, and any cautions. These pages are yours to keep.}
+\medskip
+
+\concept{From testing to estimation}
+\concept{Parameter vs.\ statistic}
+\concept{The bootstrap}
+\concept{Two recipes for a confidence interval}
+\concept{Interpreting a confidence interval}
+\concept{Limits of the bootstrap}
+\end{document}

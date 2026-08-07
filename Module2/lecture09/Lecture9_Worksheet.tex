@@ -1,0 +1,119 @@
+\documentclass{article}
+\usepackage[margin=1.15in]{geometry}
+\usepackage{xcolor}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{tabularx}
+\usepackage{listings}
+
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\rhead{Lecture 9}
+\lhead{MA 214: Applied Statistics (Spring 2026)}
+\renewcommand{\headrulewidth}{.4mm}
+
+\newcommand{\blankline}[1]{\underline{\hspace{#1}}}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  frame=single,
+  framerule=0.4pt,
+  breaklines=true,
+  showstringspaces=false
+}
+
+\begin{document}
+
+\noindent\textbf{Name:}\blankline{2.25in}\hfill\textbf{BUID:}\blankline{1.55in}\newline
+
+\begin{center}
+ \Large In-Class Worksheet: Confidence Intervals with Bootstrapping
+\end{center}
+
+\subsection*{Scenario}
+The Portal Project is a long-term ecological study near Portal, Arizona. Our sample is the $n=348$ kangaroo rats (\textit{Dipodomys merriami}) weighed there in 1999. The observed sample mean weight is $\bar{x}=43.95$ g and the observed sample median is $45$ g.
+
+\medskip
+\noindent\textbf{Goals:} \textbf{(1)} match a scientific question to a parameter, \textbf{(2)} build both kinds of interval from bootstrap output, \textbf{(3)} find the bugs in bootstrap code, \textbf{(4)} interpret an interval --- and refuse to over-interpret it.
+
+\newpage
+
+\subsection*{Part 1: What parameter answers which question?}
+Match each scientific question to the parameter that answers it. Options: the mean $\mu$, the median $m$, the 10th percentile $q_{0.10}$, the 90th percentile $q_{0.90}$.
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item ``What is the total biomass of the kangaroo rat population at this site?'' \hfill \blankline{1.2in}
+\item ``How big do the big ones get?'' \hfill \blankline{1.2in}
+\item ``What does a typical individual weigh?'' \hfill \blankline{1.2in}
+\item Two of your answers above could reasonably be defended for (C). Which two, and what would make you prefer one over the other? Look at the histogram of weights on the slides. \\[5em]
+\end{enumerate}
+
+\subsection*{Part 2: Building both intervals from bootstrap output}
+We bootstrapped the \textbf{mean} weight with $B=2000$ resamples. Here is the output:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lcccccc}
+\toprule
+Percentile of the bootstrap means & 0.5\% & 2.5\% & 25\% & 50\% & 97.5\% & 99.5\% \\
+\midrule
+Value (g) & 43.05 & 43.27 & 43.71 & 43.95 & 44.63 & 44.92 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent The standard deviation of those 2000 bootstrap means is $\mathrm{SE}_{boot} = 0.355$ g.
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item Write the 95\% \textbf{percentile} CI for $\mu$: \quad $\big[\;\blankline{.8in}\;,\;\blankline{.8in}\;\big]$ grams.
+\item Write the 95\% \textbf{standard error} CI, $\bar{x} \pm 2\,\mathrm{SE}_{boot}$: \quad $\big[\;\blankline{.8in}\;,\;\blankline{.8in}\;\big]$ grams.
+\item The two intervals nearly coincide. What does that tell you about the \emph{shape} of the bootstrap distribution? \\[3.5em]
+\item Now write the 99\% percentile CI: \quad $\big[\;\blankline{.8in}\;,\;\blankline{.8in}\;\big]$ grams. \\
+Is it wider or narrower than the 95\% one, and \textbf{why must that be so}? \\[3.5em]
+\end{enumerate}
+
+\newpage
+
+\subsection*{Part 3: Find the bugs}
+A classmate wants a 95\% bootstrap CI for the mean weight. The vector \texttt{w} holds all $n=348$ observed weights. Their code runs without any error message --- and is wrong in \textbf{three} separate ways.
+
+\begin{lstlisting}[language=R]
+boot_means <- replicate(2000,
+  mean(sample(w, size = 50, replace = FALSE)))
+
+quantile(boot_means, c(0.05, 0.95))
+\end{lstlisting}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item Bug 1 is in \texttt{replace}. What does the code do instead of bootstrapping, and why does that break the whole idea? \\[4em]
+\item Bug 2 is in \texttt{size}. What should it be, and what does the interval look like (too wide? too narrow?) if it is left at 50? \\[4em]
+\item Bug 3 is in the \texttt{quantile()} line. What confidence level does this code actually produce? Fix it. \\[3.5em]
+\item Rewrite the corrected two lines: \\[5em]
+\end{enumerate}
+
+\subsection*{Part 4: Interpreting --- and not over-interpreting}
+The correct 95\% bootstrap CI for the mean weight is $[43.3,\;44.6]$ grams.
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item Write a one-sentence interpretation in context. It must mention \emph{the procedure} and \emph{repeated samples}. \\[4em]
+\item A referee objects: ``Your interval is too wide. Just re-run it with $B = 100{,}000$ resamples.'' Is the referee right? Explain what raising $B$ does and does not do. \\[4em]
+\item A colleague writes: ``95\% of kangaroo rats weigh between 43.3 and 44.6 g.'' In fact 95\% of the rats in the sample weigh between 26 and 55 g. What has the colleague confused? \\[4em]
+\item All 348 rats were caught at a single unusually lush site. Does bootstrapping more resamples fix this? What \emph{would}? \\[4em]
+\end{enumerate}
+
+\subsection*{Part 5: Which method?}
+For each question, write \textbf{R} (randomization test), \textbf{B} (bootstrap CI), or \textbf{M} (mathematical model), and say in a few words why.
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item A plausible range for the 90th percentile weight, whose sampling distribution has no tidy formula. \hfill \blankline{.5in} \\[1.5em]
+\item Evidence that rats caught in wet years differ in mean weight from those caught in dry years. \hfill \blankline{.5in} \\[1.5em]
+\item The exact probability of catching 8 or more males in the next 10 captures, assuming a 50/50 sex ratio. \hfill \blankline{.5in} \\[1.5em]
+\end{enumerate}
+
+\end{document}

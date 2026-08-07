@@ -1,0 +1,42 @@
+% !TEX root =  Lecture11.tex
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Recap/Agenda
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Module 2: Statistical Inference}
+    \begin{itemize}
+        \item \hl{Previously:} inference from \emph{formulas}: the CLT, $z$ and $t$, two-sample and paired data. All of it about means and proportions.
+        \item \hl{This time:} what if both variables are \emph{categorical}?
+          \begin{itemize}
+              \item two-way tables, and what independence predicts: \emph{expected counts};
+              \item the $X^2$ statistic, one number for a whole table;
+              \item its null distribution, the same two ways: shuffle the labels, or use the $\chi^2$ model;
+              \item conditions, and reading the residuals rather than just the p-value.
+          \end{itemize}
+        \item \hl{Reading:} IMS Chapter 18.
+        \item \hl{Homework for today:}
+        \item \hl{Homework for next class:}
+    \end{itemize}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Learning objectives:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+    \frametitle{Lecture Objectives}
+    \goals{%
+    \begin{itemize}
+    \item state what independence means for a two-way table, and turn it into expected counts;
+    \item compute $X^2$ and say what each piece of it is doing;
+    \item obtain its null distribution by shuffling \emph{and} from the $\chi^2_{df}$ model, and explain why they agree;
+    \item check the conditions, and know which road survives when they fail;
+    \item interpret the result: the p-value for \emph{whether}, the standardized residuals for \emph{where}.
+    \end{itemize}}
+    \objectives{%
+    \begin{itemize}
+    \item \textbf{(M2, LO4)} Testing Independence
+    \end{itemize}}
+\end{frame}

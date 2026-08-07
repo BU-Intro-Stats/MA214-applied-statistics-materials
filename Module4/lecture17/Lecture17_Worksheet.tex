@@ -1,0 +1,336 @@
+\documentclass{article}
+\usepackage[margin=1.15in]{geometry}
+\usepackage{xcolor}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{tabularx}
+\usepackage{listings}
+
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\rhead{Lecture 17}
+\lhead{MA 214: Applied Statistics (Spring 2026)}
+\renewcommand{\headrulewidth}{.4mm}
+
+\newcommand{\blankline}[1]{\underline{\hspace{#1}}}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  frame=single,
+  framerule=0.4pt,
+  breaklines=true,
+  showstringspaces=false
+}
+
+\begin{document}
+
+\noindent\textbf{Name:}\blankline{2.25in}\hfill\textbf{BUID:}\blankline{1.55in}
+
+\medskip
+
+\noindent\textbf{Name:}\blankline{2.25in}\hfill\textbf{BUID:}\blankline{1.55in}\newline
+
+\begin{center}
+ \Large In-Class Worksheet: Review of Bayesian Statistics
+\end{center}
+
+\subsection*{Scenario}
+You are working in a cell biology lab. Your cell culture is behaving strangely --- cells are growing more slowly than expected and changing shape. You need to figure out what is going on.
+You suspect cell culture contamination, a common problem in which difficult-to-detect pathogens like mycoplasma alter experimental results.
+
+\medskip
+\noindent\textbf{Goals:}
+\textbf{(1)} apply Bayes' rule to compute posterior probabilities,
+\textbf{(2)} explore how the prior affects the posterior,
+\textbf{(3)} update sequentially and check that order does not matter,
+\textbf{(4)} use Bayes' rule with several hypotheses, and
+\textbf{(5)} put a prior on a parameter.
+
+\medskip
+\noindent\textbf{Setup.} You will work in PAIRS. One person is the \textbf{analyst} (writes the code), the other is the \textbf{guide} (reads the questions and fills out the worksheet). Open RStudio and start a new script --- you will write the code yourself in this activity.
+
+\subsection*{Part 1: Bayes' Rule by Hand}
+\textbf{\color{red} Do not use Gen AI when completing this part!}
+
+Your lab is well maintained, and historically only 5\% of cell cultures become contaminated. You run a visual turbidity test on your culture. The test has sensitivity 90\% and specificity 85\%.
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.6em]
+	\item Identify the prior, the likelihood, and the marginal likelihood (the normalizing constant) in this problem. \\[3em]
+	\item Calculate $P(\text{contaminated} \mid \text{positive test})$. Show your work. \\
+	\newpage
+	\item Is the result surprising? In one sentence, explain why the posterior probability of contamination is relatively low despite the positive test. \\[3em]
+	\item \textbf{Updating with a second test.} You run a follow-up DNA staining test (independent of the first, with the same sensitivity and specificity). It also comes back positive.
+	Using your answer to (B) as the new prior, compute $P(\text{contaminated} \mid \text{two positive tests})$.
+	\\[5em]
+\end{enumerate}
+
+\subsection*{Part 2: Exploring Priors in R}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.6em]
+	\item \textbf{Write the function.} Write an R function that applies Bayes' rule for a binary event. It should take the prior, the sensitivity and the false positive rate, and return the posterior. Sketch it here:
+
+	\vspace{0.3em}
+	\begin{lstlisting}[language=R]
+bayes_binary <- function(prior, sensitivity, false_pos_rate) {
+
+}
+\end{lstlisting}
+
+	\vspace{0.3em}
+	Check it against your hand calculation from Part 1(B). Do they agree? \\[2em]
+
+	\item \textbf{Three lab settings.} Use your function to compute the posterior under three different base contamination rates: 2\% (pristine facility), 10\% (average lab), and 30\% (older facility with known issues).
+
+	\vspace{0.3em}
+	\begin{center}
+	\renewcommand{\arraystretch}{1.2}
+	\begin{tabular}{>{\raggedright\arraybackslash}p{5cm}ccc}
+	\toprule
+	& \textbf{Prior = 0.02} & \textbf{Prior = 0.10} & \textbf{Prior = 0.30} \\
+	\midrule
+	$P(\text{contaminated} \mid +)$ & \blankline{2.5cm} & \blankline{2.5cm} & \blankline{2.5cm} \\
+	\bottomrule
+	\end{tabular}
+	\end{center}
+
+	\vspace{0.3em}
+	The test never changed. Explain why the three answers are so different. \\[3em]
+
+	\item \textbf{Visualize.} Plot the posterior against the prior across the whole range from 0 to 1, and add the line $y = x$ for reference. Where is the curve steepest, and what does that tell you about when the prior matters most? \\[4em]
+
+\end{enumerate}
+
+\newpage
+
+\subsection*{Part 3: Sequential Updating}
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.6em]
+	\item \textbf{Five sequential tests.} Write a loop that runs 5 sequential tests on the culture, each coming back positive, starting from $P(\text{contaminated}) = 0.05$. Remember: each test's posterior becomes the next test's prior.
+
+	Take $H_0: \text{not contaminated}$. For the frequentist $p$-value, assume the tests are independent under $H_0$, so after $k$ positive tests $p_k = 0.15^k$. The Bayesian counterpart is $p_{\text{Bayes},k} = P(H_0 \mid \text{data}) = 1 - P(\text{contaminated} \mid \text{data})$. Recall $s = -\log_2(p)$. Record all four quantities after each test:
+
+	\vspace{0.3em}
+	\begin{center}
+	\renewcommand{\arraystretch}{1.2}
+	\begin{tabular}{>{\raggedright\arraybackslash}p{5.2cm}ccccc}
+	\toprule
+	\textbf{After test \#} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} \\
+	\midrule
+	$P(\text{contaminated} \mid \text{data})$ & \blankline{1.2cm} & \blankline{1.2cm} & \blankline{1.2cm} & \blankline{1.2cm} & \blankline{1.2cm} \\[.5em]
+	Frequentist $p$-value & \blankline{1.2cm} & \blankline{1.2cm} & \blankline{1.2cm} & \blankline{1.2cm} & \blankline{1.2cm} \\
+	Frequentist $s$-value (bits) & \blankline{1.2cm} & \blankline{1.2cm} & \blankline{1.2cm} & \blankline{1.2cm} & \blankline{1.2cm} \\[.5em]
+	Bayesian $p_{\text{Bayes}}$ & \blankline{1.2cm} & \blankline{1.2cm} & \blankline{1.2cm} & \blankline{1.2cm} & \blankline{1.2cm} \\
+	Bayesian $s_{\text{Bayes}}$ (bits) & \blankline{1.2cm} & \blankline{1.2cm} & \blankline{1.2cm} & \blankline{1.2cm} & \blankline{1.2cm} \\
+	\bottomrule
+	\end{tabular}
+	\end{center}
+
+	\vspace{0.3em}
+	After how many positive tests would you say there is strong evidence for contamination? Does your answer depend on whether you look at the frequentist $s$-value or the Bayesian one?
+
+	\vspace{4em}
+
+	\item \textbf{Plot.} Visualize how the posterior evolves over the 5 tests. Describe the pattern --- is the rise steady, or does it accelerate somewhere? \\[4em]
+
+	\item \textbf{Bayesian vs.\ frequentist.} Compare the two $s$-values across the 5 tests. One grows in a straight line and the other does not. Explain why, and say what you would report to your PI after two positive tests. \\[5em]
+
+\end{enumerate}
+
+\newpage
+
+\subsection*{Part 4: Identifying the Contaminant}
+\textbf{\color{red} Do not use Gen AI when completing this part!}
+
+Now suppose you are confident the culture is contaminated. The next question is: \textbf{what type of contaminant?}
+
+\medskip
+Based on known contamination rates in cell biology labs, the prior probabilities are as below. Note that these four numbers are themselves a \textbf{probability distribution} --- they are non-negative and they sum to one.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{>{\raggedright\arraybackslash}p{3.7cm} >{\raggedright\arraybackslash}p{7.3cm} c}
+\toprule
+\textbf{Contaminant} & \textbf{Description} & \textbf{Prior} \\
+\midrule
+Mycoplasma & Tiny bacteria, invisible under standard microscopy & 0.55 \\
+Bacteria & Visible bacterial contamination & 0.25 \\
+Fungal & Mold or yeast contamination & 0.10 \\
+Cross-contamination & Wrong cell line mixed in & 0.10 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.6em]
+	\item \textbf{First observation: microscopy.} You examine the culture under a standard microscope and see \textbf{no visible particles or turbidity}. The likelihoods of this observation under each hypothesis are:
+
+	\vspace{0.3em}
+	\begin{center}
+	\renewcommand{\arraystretch}{1.2}
+	\begin{tabular}{>{\raggedright\arraybackslash}p{3cm} c >{\raggedright\arraybackslash}p{6cm}}
+	\toprule
+	\textbf{Contaminant} & \textbf{$P(\text{no visible} \mid H)$} & \textbf{Reason} \\
+	\midrule
+	Mycoplasma & 0.95 & invisible under standard microscopy \\
+	Bacteria & 0.10 & usually causes visible turbidity \\
+	Fungal & 0.05 & usually produces visible filaments \\
+	Cross-contam & 0.90 & wrong cell line looks normal \\
+	\bottomrule
+	\end{tabular}
+	\end{center}
+
+	\vspace{0.3em}
+	Compute the posterior for each hypothesis by filling in the table.
+
+	\vspace{0.3em}
+	\begin{center}
+	\renewcommand{\arraystretch}{1.3}
+	\begin{tabular}{>{\raggedright\arraybackslash}p{3cm} c c c c}
+	\toprule
+	\textbf{Contaminant} & \textbf{Prior} & \textbf{Likelihood} & \textbf{Product} & \textbf{Posterior} \\
+	\midrule
+	Mycoplasma & 0.55 & 0.95 & \blankline{1.5cm} & \blankline{1.5cm} \\
+	Bacteria & 0.25 & 0.10 & \blankline{1.5cm} & \blankline{1.5cm} \\
+	Fungal & 0.10 & 0.05 & \blankline{1.5cm} & \blankline{1.5cm} \\
+	Cross-contam & 0.10 & 0.90 & \blankline{1.5cm} & \blankline{1.5cm} \\
+	\midrule
+	& & & Total: \blankline{1.5cm} & \\
+	\bottomrule
+	\end{tabular}
+	\end{center}
+
+	\item Which contaminant became much more likely? Which became much less likely? Why does this make sense? \\[3em]
+
+	\newpage
+	\item \textbf{Second observation: PCR test.} You run a PCR test specifically for mycoplasma DNA, and it comes back \textbf{positive}. The likelihoods are:
+
+	\vspace{0.3em}
+	\begin{center}
+	\renewcommand{\arraystretch}{1.2}
+	\begin{tabular}{>{\raggedright\arraybackslash}p{3cm} c >{\raggedright\arraybackslash}p{6cm}}
+	\toprule
+	\textbf{Contaminant} & \textbf{$P(\text{PCR+} \mid H)$} & \textbf{Reason} \\
+	\midrule
+	Mycoplasma & 0.95 & PCR highly sensitive for mycoplasma \\
+	Bacteria & 0.05 & small cross-reactivity \\
+	Fungal & 0.02 & very little cross-reactivity \\
+	Cross-contam & 0.03 & unlikely to trigger mycoplasma PCR \\
+	\bottomrule
+	\end{tabular}
+	\end{center}
+
+	\vspace{0.3em}
+	Using your posteriors from (A) as the new priors, compute the updated posteriors.
+
+	\vspace{0.3em}
+	\begin{center}
+	\renewcommand{\arraystretch}{1.3}
+	\begin{tabular}{>{\raggedright\arraybackslash}p{3cm} c c c c}
+	\toprule
+	\textbf{Contaminant} & \textbf{Prior (from A)} & \textbf{Likelihood} & \textbf{Product} & \textbf{Posterior} \\
+	\midrule
+	Mycoplasma & \blankline{1.5cm} & 0.95 & \blankline{1.5cm} & \blankline{1.5cm} \\
+	Bacteria & \blankline{1.5cm} & 0.05 & \blankline{1.5cm} & \blankline{1.5cm} \\
+	Fungal & \blankline{1.5cm} & 0.02 & \blankline{1.5cm} & \blankline{1.5cm} \\
+	Cross-contam & \blankline{1.5cm} & 0.03 & \blankline{1.5cm} & \blankline{1.5cm} \\
+	\midrule
+	& & & Total: \blankline{1.5cm} & \\
+	\bottomrule
+	\end{tabular}
+	\end{center}
+
+	\item Interpret the result: which hypothesis is now dominant, how did the PCR shift your beliefs compared to (A), and what would you recommend as the lab's next step? \\[5em]
+
+	\item \textbf{Does the order matter?} Suppose the PCR result had come back \emph{before} you looked under the microscope. Without redoing the full arithmetic, predict what the final posterior would be, and justify your prediction in one sentence. Then check it in R. \\[5em]
+
+\end{enumerate}
+
+\newpage
+
+\subsection*{Part 5: Putting a Prior on a Parameter}
+
+So far every unknown has been a \emph{hypothesis}. Now make the unknown a \emph{number}.
+
+\medskip
+Your lab runs 8 flasks this month. Let $\theta$ be the probability that any given flask becomes contaminated, and assume flasks are independent. You cannot observe $\theta$ --- you can only observe how many flasks go bad. Restrict $\theta$ to four candidate values, with this prior:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{c|cccc}
+\toprule
+$\theta$ & 0.05 & 0.15 & 0.30 & 0.50 \\
+\midrule
+$f(\theta)$ & 0.40 & 0.30 & 0.20 & 0.10 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\medskip
+This month, \textbf{3 of the 8 flasks} are contaminated.
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.6em]
+	\item Write down the likelihood $L(\theta ; x = 3)$ for one value of $\theta$, using the binomial formula. Then compute all four in R with \texttt{dbinom()}. \\[3em]
+
+	\item Fill in the table. Remember: multiply, total, then divide through by the total.
+
+	\vspace{0.3em}
+	\begin{center}
+	\renewcommand{\arraystretch}{1.3}
+	\begin{tabular}{c c c c c}
+	\toprule
+	$\theta$ & Prior $f(\theta)$ & Likelihood $L(\theta ; x)$ & Product & Posterior $f(\theta \mid x)$ \\
+	\midrule
+	0.05 & 0.40 & \blankline{1.5cm} & \blankline{1.5cm} & \blankline{1.5cm} \\
+	0.15 & 0.30 & \blankline{1.5cm} & \blankline{1.5cm} & \blankline{1.5cm} \\
+	0.30 & 0.20 & \blankline{1.5cm} & \blankline{1.5cm} & \blankline{1.5cm} \\
+	0.50 & 0.10 & \blankline{1.5cm} & \blankline{1.5cm} & \blankline{1.5cm} \\
+	\midrule
+	& & Total: & \blankline{1.5cm} & 1.000 \\
+	\bottomrule
+	\end{tabular}
+	\end{center}
+
+	\item Compute the prior mean and the posterior mean of $\theta$. \\[3em]
+
+	\item Three of eight flasks went bad, i.e.\ $3/8 = 0.375$. Yet the posterior does not peak at $0.375$, and the posterior mean is nowhere near it. Explain what is holding it back, and say what you would expect to happen if you saw 30 of 80 flasks go bad instead. \\[5em]
+
+\end{enumerate}
+
+\newpage
+
+\subsection*{Part 6: Find the Bugs}
+
+A labmate wrote the code below to run the sequential updating from Part 3. It runs without error and prints five numbers --- but the numbers are wrong. There are \textbf{three} bugs.
+
+\begin{lstlisting}[language=R]
+sensitivity    <- 0.90
+false_pos_rate <- 0.85
+prior          <- 0.05
+
+posteriors <- numeric(5)
+
+for (i in 1:5) {
+  numerator   <- sensitivity * prior
+  denominator <- numerator + false_pos_rate
+  posteriors[i] <- numerator / denominator
+}
+
+posteriors
+\end{lstlisting}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.6em]
+	\item Find all three bugs. For each, quote the line, say what is wrong, and give the correction. \\[9em]
+
+	\item One of the three bugs would be invisible if the loop ran only \emph{one} iteration. Which one, and why? \\[4em]
+
+	\item Fix the code and confirm it reproduces your Part 3(A) answers. \\[3em]
+
+\end{enumerate}
+
+\end{document}

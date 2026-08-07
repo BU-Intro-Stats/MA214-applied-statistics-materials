@@ -1,0 +1,573 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Slide options
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Option 1: Slides with solutions
+
+\documentclass[slidestop,compress,mathserif]{beamer}
+\usepackage{booktabs}
+\newcommand{\soln}[1]{\textit{#1}}
+\newcommand{\solnGr}[1]{#1}
+
+% Option 2: Handouts without solutions
+
+%\documentclass[11pt,containsverbatim,handout]{beamer}
+%\usepackage{pgfpages}
+%\pgfpagesuselayout{4 on 1}[letterpaper,landscape,border shrink=5mm]
+%\newcommand{\soln}[1]{ }
+%\newcommand{\solnGr}{ }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Style
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{../../common/lec_style.tex}
+\graphicspath{ {../../common/} {figures/}  }
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Preamble
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title[Lecture 16]{Lecture 16: Logistic regression inference}
+\subtitle{Module 3: Regression Inference}
+\author{Introduction to Modern Statistics, 2nd Edition}
+\institute{$\:$ \\ {\footnotesize Based on slides developed by Mine \c{C}etinkaya-Rundel of OpenIntro.  \\
+The slides may be copied, edited, and/or shared via the \webLink{http://creativecommons.org/licenses/by-sa/3.0/us/}{CC BY-SA license.} \\
+Some images may be included under fair use guidelines (educational purposes).}}
+\date{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Begin document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Title page
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\maketitleframe
+
+\include{Lecture16_agenda}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The logistic model, revisited}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The model, from Lecture 6}
+
+Module 3 has been inference for a \emph{numerical} response. Its last stop: a response that is \hl{binary}. We built the model in Lecture 6; today we do inference on it.
+
+\pause
+\vspace{0.4em}
+\formula{Logistic regression}{With $p = P(Y = 1 \mid x)$, the model is linear in the \hl{log-odds}: $$\log\!\left(\tfrac{p}{1-p}\right) = \beta_0 + \beta_1 x_1 + \cdots + \beta_p x_p.$$ A one-unit rise in $x_j$ \hl{multiplies the odds by $e^{\beta_j}$}, the \emph{odds ratio}. Fitted by maximum likelihood.}
+
+\pause
+\vspace{0.3em}
+{\small \hl{Today:} tests and CIs for the $\beta_j$, predicted probabilities, diagnostics, and cross-validation, all for a $0/1$ outcome.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Which species survive?}
+
+\textbf{Question:} what predicts whether a species survives a $20$-year window?
+
+\pause
+\vspace{0.3em}
+\textbf{Data:} $200$ species from conservation studies.
+{\small
+\begin{itemize}
+\item \texttt{survived}: $1$ = survived, $0$ = extinct (\hl{$94$ of $200$ survived})
+\item \texttt{habitat\_area}: protected habitat (km$^2$)
+\item \texttt{population\_size}: initial head-count
+\item \texttt{genetic\_diversity}: a $0$--$1$ index
+\item \texttt{human\_impact}: a $0$--$10$ score
+\end{itemize}}
+
+\pause
+\vspace{0.2em}
+\textbf{Goal:} fit the logistic model and do \emph{formal inference}: is each effect real, and how large?
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The fitted curve}
+
+\begin{center}
+\includegraphics[width=0.66\textwidth]{survival_curve.pdf}
+\end{center}
+
+\pause
+\vspace{-0.3em}
+{\small One predictor at a time: survival probability climbs with habitat area, along a smooth S-shaped logistic curve, never leaving $[0,1]$ as a straight line would.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Conditions for valid inference}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{What the tests and intervals rely on}
+
+For the tests and CIs to be trustworthy:
+
+\pause
+\vspace{0.2em}
+{\small
+\begin{enumerate}\setlength{\itemsep}{2pt}
+\item \textbf{Independence:} each species independent of the others.
+\item \textbf{Linearity in the log-odds:} linear in each predictor (\emph{not} the probability, which is S-shaped).
+\item \textbf{Enough data:} roughly $\geq 10$ events \emph{and} $\geq 10$ non-events per predictor.
+\end{enumerate}}
+
+\pause
+\vspace{0.2em}
+\caution{No normality, no equal variance. Those were about a continuous error term. Here the response is Bernoulli, its variance $p(1-p)$ fixed by the mean. The conditions change with the response.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Checking linearity in the log-odds}
+
+Bin a predictor, compute the empirical log-odds $\log\frac{\hat p}{1-\hat p}$ in each bin, and plot against the predictor.
+
+\pause
+\vspace{0.2em}
+\begin{center}
+\includegraphics[width=0.58\textwidth]{logodds_linearity.pdf}
+\end{center}
+
+\pause
+\vspace{-0.3em}
+{\small Here the points track a line, so the log-odds linearity condition holds for \texttt{habitat\_area}.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Inference for a coefficient}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{One coefficient at a time}
+
+Just like Lecture 14, one row of the table at a time, but the reference distribution is now a $z$ (normal), not a $t$.
+
+\pause
+\vspace{0.3em}
+\formula{Test and interval for $\beta_j$}{To test $H_0: \beta_j = 0$, $$z = \frac{\hat\beta_j}{\mathrm{SE}(\hat\beta_j)} \;\overset{H_0}{\approx}\; N(0,1), \qquad p = 2\,P(Z > |z|).$$ A $95\%$ CI is $\hat\beta_j \pm z^\ast\,\mathrm{SE}(\hat\beta_j)$ with $z^\ast = 1.96$.}
+
+\pause
+\vspace{0.3em}
+{\small The normal (not $t$) because logistic regression is fit by maximum likelihood, and MLE standard errors are \hl{asymptotic}: exact only as $n \to \infty$. Another reason the sample-size condition matters.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{Reading the software output}
+
+\begin{Verbatim}[fontsize=\small]
+model <- glm(survived ~ habitat_area + population_size +
+                        genetic_diversity + human_impact,
+             family = binomial, data = species)
+model |> tidy()
+\end{Verbatim}
+
+\pause
+\vspace{0.2em}
+\begin{Verbatim}[fontsize=\small]
+  term               estimate std.error statistic  p.value
+  (Intercept)        -2.00     0.641      -3.11    1.9e-3
+  habitat_area        0.0112   0.00177     6.31    2.8e-10
+  population_size     0.000421 0.000133    3.17    1.6e-3
+  genetic_diversity   2.65     0.856       3.09    2.0e-3
+  human_impact       -0.523    0.0839     -6.23    4.6e-10
+\end{Verbatim}
+
+\pause
+\vspace{0.2em}
+{\small Every predictor clears $p < 0.01$. The \texttt{statistic} column is the $z$, and the signs read directly: more habitat and diversity help; more human impact hurts.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{From a coefficient to an odds ratio}
+
+The coefficient lives on the log-odds scale. \hl{Exponentiate} to get the odds ratio, and exponentiate the interval's endpoints for its CI:
+$$\mathrm{OR} = e^{\hat\beta_j}, \qquad \left(e^{\hat\beta_j - z^\ast\mathrm{SE}},\; e^{\hat\beta_j + z^\ast\mathrm{SE}}\right).$$
+
+\pause
+\vspace{0.3em}
+\textbf{\texttt{habitat\_area}:} $e^{0.0112} = 1.011$, 95\% CI $(1.008,\ 1.015)$.
+
+{\small Each extra km$^2$ multiplies the odds of survival by $1.011$, tiny per km$^2$.}
+
+\pause
+\vspace{0.3em}
+\keyidea{Scale the predictor to a meaningful step before interpreting. A \hl{$100$ km$^2$} increase multiplies the odds by $1.011^{100} = \hl{3.05}$, 95\% CI $(2.16,\ 4.31)$, so the odds of survival roughly \emph{triple}.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{Odds ratios straight from R}
+
+\begin{Verbatim}[fontsize=\small]
+model |> tidy(conf.int = TRUE, exponentiate = TRUE) |>
+  select(term, estimate, conf.low, conf.high)
+\end{Verbatim}
+
+\pause
+\vspace{0.2em}
+\begin{Verbatim}[fontsize=\small]
+  term               estimate  conf.low  conf.high
+  (Intercept)          0.136    0.0365     0.458
+  habitat_area         1.011    1.008      1.015
+  population_size      1.000    1.000      1.001
+  genetic_diversity   14.09     2.758     80.55
+  human_impact         0.593    0.497      0.691
+\end{Verbatim}
+
+\pause
+\vspace{0.2em}
+{\small An OR above $1$ raises the odds, below $1$ lowers them, and a CI straddling $1$ means ``no evidence of an effect.'' \texttt{genetic\_diversity} is dramatic, but its predictor only spans $0.1$ to $0.9$, so the honest step is a $0.1$ change, not a full unit.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Predicting a probability}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{A confidence interval for $p^\ast$}
+
+For a new species $x^\ast$ we want a CI for $p^\ast = P(Y=1 \mid x^\ast)$. Build it \hl{on the log-odds scale, then transform}, the move from Lecture 15.
+
+\pause
+\vspace{0.2em}
+{\small
+\begin{enumerate}\setlength{\itemsep}{1pt}
+\item Predict the log-odds $\hat\eta^\ast$ and $\mathrm{SE}(\hat\eta^\ast)$ (\texttt{predict(type="link")}).
+\item CI on the log-odds scale: $\hat\eta^\ast \pm z^\ast\,\mathrm{SE}(\hat\eta^\ast)$.
+\item Inverse-logit both endpoints: $p = 1/(1 + e^{-\eta})$.
+\end{enumerate}}
+
+\pause
+\vspace{0.2em}
+\keyidea{Transforming the \emph{endpoints} keeps the interval inside $[0,1]$. For a median species: log-odds $-0.51 \pm 0.43 \Rightarrow \hat p = 0.38$, 95\% CI $(0.28,\ 0.48)$. Never build the CI on the probability scale directly.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Diagnostics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Do the predictions separate the outcomes?}
+
+\begin{center}
+\includegraphics[width=0.62\textwidth]{predicted_probs.pdf}
+\end{center}
+
+\pause
+\vspace{-0.3em}
+{\small Colored by the actual outcome. A good model pushes survivors right and extinctions left; overlap in the middle is where it is unsure, and some overlap is honest.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Binned residuals}
+
+Individual $0/1$ residuals are useless to eyeball, so \hl{bin} by fitted probability and average the residual in each bin.
+
+\pause
+\begin{center}
+\includegraphics[width=0.52\textwidth]{binned_residuals.pdf}
+\end{center}
+
+\pause
+\vspace{-0.4em}
+{\small Bin averages should scatter around $0$ inside the $\pm 2\,\mathrm{SE}$ band. Strays signal a missing term or the wrong form.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Prediction and cross-validation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{From a probability to a decision}
+
+The model outputs a \emph{probability} $\hat p_i$. To make a call, pick a threshold $c$ (often $0.5$): predict $\hat Y_i = 1$ if $\hat p_i \geq c$.
+
+\pause
+\vspace{0.3em}
+Comparing $\hat Y_i$ to the truth gives the \hl{confusion matrix}:
+
+\vspace{0.2em}
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+& \textbf{Predicted 1} & \textbf{Predicted 0} \\
+\midrule
+\textbf{Actual 1} & True Positive & False Negative \\
+\textbf{Actual 0} & False Positive & True Negative \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\pause
+\vspace{0.3em}
+{\small The \hl{misclassification rate} is $(\mathrm{FP} + \mathrm{FN})/n$, the fraction the model got wrong.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Accuracy can lie}
+
+\caution{With \hl{imbalanced} outcomes, accuracy is a trap. If $90\%$ of species survived, ``predict survived for everyone'' scores $90\%$ accuracy while missing \emph{every single} extinction. The threshold $c = 0.5$ is a default, not a law.}
+
+\pause
+\vspace{0.4em}
+Two ways out:
+\begin{itemize}
+\item move the threshold to match the \emph{costs} of the two errors;
+\pause
+\item score the \hl{probabilities} directly, and never pick a threshold at all.
+\end{itemize}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Two losses for probabilities}
+
+For a continuous $Y$ we scored predictions with squared error. For a probability, two standard replacements:
+
+\pause
+\vspace{0.3em}
+\formula{Brier score and log-loss}{\vspace{-0.7em}\begin{align*} \text{Brier} &= \tfrac{1}{n}\textstyle\sum_{i=1}^n (y_i - \hat p_i)^2 \\[0.2em] \text{Log-loss} &= -\tfrac{1}{n}\textstyle\sum_{i=1}^n \big[y_i \log \hat p_i + (1-y_i)\log(1-\hat p_i)\big] \end{align*}\vspace{-0.7em}\\ Brier is MSE on probabilities (range $[0,1]$); log-loss is the negative average log-likelihood (range $[0,\infty)$). Lower is better.}
+
+\pause
+\vspace{0.3em}
+{\small Both are $0$ for a perfect confident call. To see how they \emph{differ}, look at one observation at a time.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Per-observation loss}
+
+\textbf{The loss when the truth is $y_i = 1$}, as the predicted $\hat p_i$ moves from confident-right to confident-wrong:
+
+\vspace{0.4em}
+\begin{center}
+\begin{tabular}{lccccc}
+\toprule
+$\hat p_i$ & $0.99$ & $0.80$ & $0.50$ & $0.20$ & $0.01$ \\
+\midrule
+Brier $(y_i-\hat p_i)^2$ & $0.00$ & $0.04$ & $0.25$ & $0.64$ & $0.98$ \\
+Log-loss $-\log \hat p_i$   & $0.01$ & $0.22$ & $0.69$ & $1.61$ & $\hl{4.61}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\pause
+\vspace{0.4em}
+{\small Both climb as the prediction gets worse. But at the confident-wrong end ($\hat p = 0.01$) Brier is capped near $1$ while log-loss shoots to $\hl{4.61}$, heading to $\infty$ as $\hat p \to 0$.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Brier vs.\ log-loss: the difference}
+
+\dq{Both are $0$ for a perfect confident call. So when does it matter which you use?}
+
+\pause
+\vspace{0.4em}
+\keyidea{When the model is \hl{confidently wrong}. Predicting $\hat p = 0.01$ for a species that \emph{did} survive costs Brier $0.98$ but log-loss $\mathbf{4.61}$. Log-loss punishes overconfident mistakes far more harshly. Use it when a sure-but-wrong prediction is the expensive kind of error.}
+
+\pause
+\vspace{0.3em}
+{\small And both \hl{sidestep the threshold} entirely: they grade the probabilities themselves, so there is no $c$ to choose.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Choosing the threshold}
+
+\dq{Should we always use $c = 0.5$?}
+
+\pause
+\vspace{0.3em}
+It depends on which error costs more:
+\begin{itemize}
+\item \textbf{Conservation triage:} missing an at-risk species (FN) is worse than a false alarm (FP). Lower the threshold ($c = 0.3$) to flag more species.
+\pause
+\item \textbf{Spam filter:} blocking a real email (FP) is worse than a stray spam (FN). Raise it ($c = 0.9$).
+\end{itemize}
+
+\pause
+\vspace{0.3em}
+{\small The threshold is a \emph{decision}, not a statistic. It belongs to whoever pays for the mistakes.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Cross-validation, now for classification}
+
+The Lecture 15 machinery, unchanged, with only the loss swapped.
+
+\pause
+\vspace{0.3em}
+\formula{$k$-fold CV for logistic regression}{%
+\begin{enumerate}\setlength{\itemsep}{1pt}
+\item Pick a loss: misclassification, Brier, or log-loss.
+\item Split into $k$ folds. For each fold $j$, fit on the other $k-1$, predict $\hat p_i$ on fold $j$, average the loss over it.
+\end{enumerate}
+$$\text{CV-error} = \frac{1}{k}\sum_{j=1}^{k}\mathrm{err}_j.$$}
+
+\pause
+\vspace{0.3em}
+{\small Same benefits as before: few assumptions, and you \hl{choose the loss to match the analysis}. On the species data ($5$-fold, $20$ repeats) the full model beats a two-predictor one on all three losses: misclassification $0.19$ vs $0.30$, log-loss $0.44$ vs $0.59$.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Wrap-up}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Linear vs.\ logistic inference, side by side}
+
+{\small
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{lll}
+\toprule
+& \textbf{Linear regression} & \textbf{Logistic regression} \\
+\midrule
+Response & continuous $Y$ & binary $Y \in \{0,1\}$ \\
+Model & $Y = \beta_0 + \beta_1 X + \varepsilon$ & $\log\frac{p}{1-p} = \beta_0 + \beta_1 X$ \\
+Fit by & least squares & maximum likelihood \\
+\midrule
+Statistic & $t = \hat\beta / \mathrm{SE}$ & $z = \hat\beta / \mathrm{SE}$ \\
+Null dist. & $t_{n-p-1}$ (exact) & $N(0,1)$ (asymptotic) \\
+CI for $\beta$ & $\hat\beta \pm t^\ast\,\mathrm{SE}$ & $\hat\beta \pm z^\ast\,\mathrm{SE}$ \\
+\midrule
+$\hat\beta$ means & $\hat\beta$ units of $Y$ per unit $X$ & odds $\times\, e^{\hat\beta}$ per unit $X$ \\
+Conditions & LINE & independence, log-odds \\
+& & linearity, large $n$ \\
+\bottomrule
+\end{tabular}
+\end{center}}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Summary}
+
+\begin{itemize}
+\item Logistic regression models the \hl{log-odds} linearly; $e^{\hat\beta_j}$ is an \hl{odds ratio}. Fit by maximum likelihood.
+\item Test a coefficient with $z = \hat\beta_j/\mathrm{SE} \sim N(0,1)$; interval $\hat\beta_j \pm z^\ast\mathrm{SE}$. \hl{Exponentiate} the endpoints for the odds-ratio CI, and scale the predictor to a meaningful step.
+\item For a predicted probability, build the CI on the log-odds scale and \hl{inverse-logit the endpoints}, so it stays in $[0,1]$.
+\item Conditions: independence, \hl{linearity in the log-odds}, a large enough sample. Check with the log-odds and binned-residual plots.
+\item Score probabilities with the \hl{Brier score} or \hl{log-loss}, and log-loss punishes confident mistakes hardest. Select models by cross-validation, with the loss of your choosing.
+\end{itemize}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Coming up next}
+
+\hl{That closes Module 3.} Five lectures on regression inference: the slope, multiple regression, transformations and interactions, prediction and cross-validation, and now logistic.
+
+\vspace{0.4em}
+\begin{itemize}
+\item \hl{Lecture 17 is next, a whole new module.} Everything so far has been frequentist: the parameter is fixed, the interval is random.
+\item \hl{Bayesian statistics} turns that around: the parameter gets a distribution, and ``$95\%$'' will mean something different. It opens with priors, updating, and how belief becomes a posterior (Bayes Rules!\ Chs.\ 1, 2, and 4).
+\item The \hl{linear-vs-logistic table} is your one-page summary of Module 3.
+\end{itemize}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Activity
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Activity: what raises the risk of heart disease?}
+
+\activity{$208$ Cleveland heart-disease patients, labeled with heart disease or not. Fit a logistic model from age, blood pressure, cholesterol and max heart rate, then
+\begin{itemize}\setlength{\itemsep}{1pt}
+\item read each coefficient as an odds ratio with its CI;
+\item check the conditions;
+\item compare models by cross-validation, with a loss that fits a medical screen.
+\end{itemize}}
+
+\vspace{0.3em}
+{\small
+\begin{itemize}
+\item Work in \emph{pairs} (analyst + guide), one worksheet per pair.
+\item We pause for check-ins. \hl{Be ready to share}.
+\item Data and starter code are on Blackboard.
+\end{itemize}}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Compare with the groups around you}
+
+\textbf{When you reach the end of Part 5:}
+
+\vspace{0.3em}
+\begin{enumerate}
+\item Compare your final model with at least two neighboring pairs.
+\item Did everyone read the cholesterol odds ratio the same way: per unit, or per meaningful step?
+\item For a screening test, would you set the threshold above or below $0.5$? Did your neighbors agree?
+\item Having heard them, would you change your model or your threshold?
+\end{enumerate}
+
+\vspace{0.5em}
+\hl{Write your answers in the box at the end of the worksheet.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% End document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}

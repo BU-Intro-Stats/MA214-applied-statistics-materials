@@ -1,0 +1,103 @@
+\documentclass{article}
+\usepackage[margin=1.15in]{geometry}
+\usepackage{xcolor}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{tabularx}
+
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\rhead{Lecture 2}
+\lhead{MA 214: Applied Statistics}
+\renewcommand{\headrulewidth}{.4mm}
+
+\newcommand{\blankline}[1]{\underline{\hspace{#1}}}
+
+\begin{document}
+
+\noindent\textbf{Name:}\blankline{2.25in}\hfill\textbf{BUID:}\blankline{1.55in}\newline
+
+\begin{center}
+ \Large In-Class Worksheet: Statistical Models and Maximum Likelihood
+\end{center}
+
+\subsection*{Scenario}
+A statistical model gives a probability description of possible data values. Today we practice choosing simple models, writing likelihoods, and connecting maximum likelihood to least squares.
+
+\medskip
+\noindent\textbf{Goals:} \textbf{(1)} match data types to simple probability models, \textbf{(2)} compute an MLE for a Bernoulli model (a proportion), \textbf{(3)} compute the MLE of a mean and variance for a normal model.
+
+\subsection*{Part 1: Choose a Model and Name the Parameter}
+For each variable, write one possible model and name the parameter(s). There may be more than one reasonable model.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.55}
+\begin{tabularx}{\textwidth}{p{6.7cm}p{4.2cm}X}
+\toprule
+\textbf{Variable} & \textbf{One possible model} & \textbf{Parameter(s)} \\
+\midrule
+Whether a randomly selected student submitted the weekly homework. & & \\[2.1em]
+Time until a course webpage loads, measured in seconds. & & \\[2.1em]
+Number of emails received by an instructor in one hour. & & \\[2.1em]
+Number of quiz objectives passed by one student out of 4 objectives. & & \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection*{Part 2: MLE from Start to Finish}
+A small survey asks 12 students whether they used public transportation this week.
+\[
+1,\ 1,\ 0,\ 1,\ 0,\ 1,\ 1,\ 1,\ 0,\ 1,\ 1,\ 0.
+\]
+Let $X_i = 1$ if student $i$ used public transportation, and $X_i=0$ otherwise.
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.75em]
+\item Choose a model for $X_i$:
+\[
+X_i \sim \blankline{2.8in}
+\]
+\item Identify the parameter and describe it in words. \\[3em]
+\item Count the number of successes and failures.
+\[
+\#\text{ successes}=\blankline{1in}, \qquad \#\text{ failures}=\blankline{1in}.
+\]
+\item Write the likelihood as a function of $p$.
+\[
+L(p) = \blankline{4.5in}
+\]
+\item Write the log-likelihood, ignoring terms that do not depend on $p$.
+\[
+\ell(p) = \blankline{4.5in}
+\]
+\item Find the MLE and interpret it in context.
+\[
+\hat{p}_{\text{MLE}} = \blankline{2.2in}
+\]
+\vspace{2em}
+\end{enumerate}
+
+\subsection*{Part 3: A Normal Model}
+Suppose we observe four webpage loading times, in seconds:
+\[
+4.2,\quad 5.1,\quad 4.7,\quad 6.0.
+\]
+Assume $X_i \sim N(\mu,\sigma^2)$ independently.
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.75em]
+\item Compute $\hat\mu_{\text{MLE}}=\bar{x}$.
+\[
+\bar{x}=\blankline{3in}
+\]
+\item Compute the MLE of the variance. Remember: the MLE uses denominator $n$, not $n-1$.
+\[
+\hat\sigma^2_{\text{MLE}} = \frac{1}{n}\sum_{i=1}^n (x_i-\bar{x})^2 = \blankline{3in}
+\]
+\item In one sentence, what does $\sigma^2$ measure in this model? \\[3em]
+\end{enumerate}
+
+\end{document}

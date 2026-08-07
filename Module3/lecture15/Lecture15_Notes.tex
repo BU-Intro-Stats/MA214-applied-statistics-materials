@@ -1,0 +1,41 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{xcolor}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{amsmath}
+\usepackage{needspace}
+
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\rhead{Lecture 15}
+\lhead{MA 214: Applied Statistics}
+\renewcommand{\headrulewidth}{.4mm}
+
+% A key concept: bold heading, then open space to write, then a faint divider.
+\newcommand{\concept}[1]{%
+  \par\needspace{1.5in}\medskip\noindent{\large\bfseries #1}\par
+  \vspace{1.15in}%
+  \noindent{\color{black!15}\rule{\linewidth}{0.4pt}}\par\smallskip}
+
+\begin{document}
+
+\noindent\textbf{Name:}\underline{\hspace{2.25in}}\hfill\textbf{Date:}\underline{\hspace{1.4in}}
+
+\begin{center}
+ \Large Lecture 15 Notes: Prediction and Cross-Validation
+\end{center}
+
+\noindent\textit{Room to record each key idea from today's lecture in your own words --- a definition,
+an example, and any cautions. These pages are yours to keep.}
+\medskip
+
+\concept{Confidence interval for the mean vs.\ prediction interval}
+\concept{The two standard errors}
+\concept{Behavior as $n\to\infty$ (irreducible uncertainty)}
+\concept{Intervals after a transformation}
+\concept{Extrapolation}
+\concept{Polynomial regression}
+\concept{$k$-fold cross-validation}
+\end{document}

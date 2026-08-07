@@ -1,0 +1,89 @@
+\documentclass[12pt]{article}
+\usepackage{resource/shortex}
+\input{resource/teaching}
+
+%--------------------
+\begin{document}
+
+\begin{center}
+\textbf{\Large Deliverable 1 \\ Project 2 Outline} 
+\end{center}
+
+\subsection*{Overview}
+Your first Project 2 deliverable is due \textbf{Tuesday, March 17 at 10:00 PM}.  
+It should be submitted as a concise \textbf{2–3 page PDF file} outlining your project, written in 12-point font and single-spaced.  
+This outline should include the following sections:
+
+
+\subsection*{1. Project Title}
+\begin{itemize}
+    \item Provide a concise, descriptive, and informative title for your project.
+\end{itemize}
+
+\subsection*{2. Group Members}
+\begin{itemize}
+    \item List the names and student IDs of all group members.
+\end{itemize}
+
+\subsection*{3. Background and Motivation}
+\begin{itemize}
+    \item State why your group finds the two chosen violation types interesting or practically relevant.
+\end{itemize}
+
+\subsection*{4. Chosen Simulation Studies}
+\begin{itemize}
+    \item Identify which two studies (A–D) your group has selected for Part I and justify your choices.
+    \item For each chosen study, briefly describe the violation it investigates and your plan to simulate.
+\end{itemize}
+
+\subsection*{5. Research Questions and Objectives}
+\begin{itemize}
+    \item State the two core questions the project investigates:
+    \begin{enumerate}
+        \item How badly do classical 95\% CIs and p-values for $\beta_1$ fail under your chosen violations?
+        \item Does the bootstrap provide a reliable remedy?
+    \end{enumerate}
+    \item List any additional group-specific hypotheses (e.g., whether larger $n$ restores coverage, or whether bootstrap p-values outperform classical ones under a specific violation).
+\end{itemize}
+
+\subsection*{6. Data Source and Description (Part II)}
+\begin{itemize}
+    \item Name the dataset your group has chosen for the real data analysis and provide its source (with URL or R package).
+    \item Identify the response variable ($Y$) and the primary predictor ($X$), and give a brief justification for this choice.
+    \item Provide a short summary of the dataset: number of observations, relevant variable ranges, and any known data limitations or preprocessing needed.
+    \item Note which assumption violations you expect to find, and how they connect to your chosen simulation studies.
+\end{itemize}
+
+\subsection*{7. Timeline and Roles}
+\begin{itemize}
+    \item Provide a rough schedule for each major milestone.  
+    \item Assign clear tasks and responsibilities to group members.  
+
+    \item \textbf{Example Milestones:}
+    \begin{enumerate}
+        \item Project Outline Submission (Deliverable 1): Due \textbf{Tuesday Mar 17 at 10:00 PM}
+        \item Part I Simulation: error generation, coverage table, histograms, and p-value comparison — \textbf{Lab, Wednesday March 18}
+        \item Part II Real Data Analysis: EDA, OLS, bootstrap CI and p-value, diagnostics — \textbf{Lab, Wednesday March 25}
+        \item Progress Report — Draft slides + R code + dataset (Deliverable 2): Due \textbf{Monday March 30 at 10:00 PM}
+        \item Part III Reflection and report finalisation — \textbf{Lab, Wednesday April 1}
+        \item Final Written Report (PDF) + R script + dataset (Deliverable 3): Due \textbf{Tuesday April 7 at 10:00 PM}
+        \item Resubmission deadline (groups receiving R or N): \textbf{Wednesday April 29}
+    \end{enumerate}
+
+    \item \textbf{Example Tasks or Responsibilities:}
+    \item 4 group members:
+    \begin{enumerate}
+        \item Introduction + dataset selection and EDA (Part II)
+        \item Part I simulation — Study 1 (scenarios, coverage table, histograms)
+        \item Part I simulation — Study 2 (scenarios, coverage table, bootstrap p-values)
+        \item Diagnostics, Part III Reflection, Conclusion + report editing
+    \end{enumerate}
+    \item 3 group members:
+    \begin{enumerate}
+        \item Introduction + Part I simulation (first studies)
+        \item Part II real data analysis (EDA, OLS, bootstrap CI and p-value, diagnostics)
+        \item Part I simulation (second studies) + Conclusion + report editing
+    \end{enumerate}
+\end{itemize}
+
+\end{document}

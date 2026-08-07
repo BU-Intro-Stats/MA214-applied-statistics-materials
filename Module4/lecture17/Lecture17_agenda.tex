@@ -1,0 +1,54 @@
+% !TEX root =  Lecture17.tex
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Recap/Agenda
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Module 4: Bayesian Statistics}
+    \begin{itemize}
+        \item \hl{Previously:} logistic regression inference (Lecture 16), the last topic of Module 3. Everything so far has been \emph{frequentist}.
+        \item \hl{This time:} a new module, and a different way to reason about uncertainty.
+          \begin{itemize}
+              \item probability review: conditional probability and \hl{Bayes' rule};
+              \item putting a \hl{prior distribution} on an unknown parameter, and reading off the posterior;
+              \item \hl{sequential updating}, and why the order of the data doesn't matter;
+              \item how the Bayesian and frequentist answers differ, and why.
+          \end{itemize}
+        \item \hl{Reading:} Bayes Rules!\ Chapters 1, 2, and 4.
+        \item \hl{Homework:}
+    \end{itemize}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Learning objectives:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+    \frametitle{Lecture Objectives}
+    \goals{%
+    \begin{itemize}
+    \item compute a conditional probability and apply \hl{Bayes' rule} to reverse it, using the law of total probability for the denominator;
+    \item explain why a positive test for a \hl{rare} condition can still leave the condition unlikely, because the prior matters;
+    \item build a probability model for a \hl{discrete parameter}: put a prior on it, evaluate the likelihood, and normalize to get the posterior;
+    \item update \hl{sequentially} as data arrives, and explain why the final posterior does not depend on the order;
+    \item contrast the frequentist and Bayesian answers to the same question, and say which one each actually answers.
+    \end{itemize}}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+    \frametitle{Lecture Objectives}
+    \objectives{%
+    \begin{itemize}
+    \item \textbf{(M4, LO1)} Bayesian Inference
+    \item \textbf{(M4, LO2)} Comparing Bayesian and Frequentist Approaches
+    \end{itemize}}
+    \vspace{0.3em}
+    {\small Building on, and revisiting:}
+    \objectives{%
+    \begin{itemize}
+    \item \textbf{(M2, LO1)} Approaches to Inference: p-values and s-values from Lecture 8, now set against the Bayesian answer to the same question
+    \end{itemize}}
+\end{frame}

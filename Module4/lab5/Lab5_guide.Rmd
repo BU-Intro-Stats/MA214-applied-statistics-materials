@@ -1,0 +1,643 @@
+---
+title: "Lab 05: The Coffee Shop Oracle"
+subtitle: "MA214 Applied Statistics — Bayesian Linear Regression"
+author: ""
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
+    theme: flatly
+    highlight: tango
+    df_print: paged
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo       = TRUE,
+  warning    = FALSE,
+  message    = FALSE,
+  fig.width  = 10,
+  fig.height = 6,
+  fig.align  = "center",
+  out.width  = "95%"
+)
+library(tidyverse)   # ggplot2, dplyr, purrr, tidyr
+library(broom)       # tidy model outputs
+library(patchwork)   # combining ggplots
+library(coda)        # effectiveSize()
+```
+
+```{r helpers, include=FALSE}
+# ── Posterior summary ─────────────────────────────────────────────────
+# Takes a full MCMC chain, discards the first `burn` iterations,
+# and returns a one-row data frame with key posterior diagnostics.
+posterior_summary <- function(chain, burn = 1000, prob = 0.95) {
+  s  <- chain[-(1:burn)]                                   # discard burn-in
+  ci <- quantile(s, c((1 - prob) / 2, 1 - (1 - prob) / 2)) # equal-tail CrI
+  ci <- as.vector(ci)
+  data.frame(
+    Mean        = round(mean(s), 3),
+    SD          = round(sd(s),   3),
+    `CrI Lower` = round(ci[1],  3),
+    `CrI Upper` = round(ci[2],  3),
+    check.names = FALSE
+  )
+}
+
+# ── Shared theme ──────────────────────────────────────────────────────
+lab_theme <- function(base_size = 13) {
+  theme_minimal(base_size = base_size) %+replace%
+    theme(
+      plot.title       = element_text(face = "bold", hjust = 0.5,
+                                      size = base_size + 3),
+      plot.subtitle    = element_text(hjust = 0.5, size = base_size - 1,
+                                      colour = "grey40"),
+      panel.grid.minor = element_blank(),
+      strip.text       = element_text(face = "bold"),
+      legend.position  = "bottom"
+    )
+}
+```
+
+------------------------------------------------------------------------
+
+## The Scenario
+
+**BU Coffee Shop** wants to predict **daily revenue** from the number of
+customers. We model the relationship as:
+
+$$y_i = \beta_0 + \beta_1\,x_i + \varepsilon_i,
+\qquad \varepsilon_i \overset{iid}{\sim} N(0,\,\sigma^2)$$
+
+| Symbol     | Meaning                        |
+|------------|--------------------------------|
+| $y_i$      | Daily revenue (\$)             |
+| $x_i$      | Customers per day              |
+| $\beta_0$  | Baseline revenue (0 customers) |
+| $\beta_1$  | Marginal revenue per customer  |
+| $\sigma^2$ | Unexplained variance           |
+
+------------------------------------------------------------------------
+
+# Step 1: Simulate Data
+
+We generate synthetic data from a known truth so we can check later
+whether our Bayesian sampler recovers the correct parameter values.
+
+**Key ideas:**
+
+- `x ~ Uniform(0, 10)` plays the role of the number of customers on a
+  given day.
+- The noise `rnorm(n, 0, sigma_true)` adds realistic measurement scatter
+  around the true line.
+- We store everything in a `data.frame` called `coffee` for easy
+  reference later.
+
+```{r step1-simulate}
+set.seed(2026214)
+
+n          <- 100        # number of observed days
+x          <- runif(n, 0, 10)    # predictor: customers per day
+beta0_true <- 5         # true intercept ($5 baseline)
+beta1_true <- 2         # true slope ($2 per customer)
+sigma_true <- 1         # true residual SD
+
+y      <- beta0_true + beta1_true * x + rnorm(n, 0, sigma_true)
+coffee <- data.frame(revenue = y, customers = x)
+
+ggplot(coffee, aes(x = customers, y = revenue)) +
+  geom_point(colour = "#1f77b4", size = 2.5, alpha = 0.75) +
+  geom_smooth(method = "lm", se = TRUE,
+              colour = "#d62728", fill = "#d62728",
+              alpha = 0.15, linewidth = 1.1) +
+  geom_abline(intercept = beta0_true, slope = beta1_true,
+              colour = "#2ca02c", linewidth = 1, linetype = "dashed") +
+  annotate("text",
+           x = 0.3, y = beta0_true + beta1_true * 0.3 + 1.5,
+           label = "True line", colour = "#2ca02c",
+           size = 4, hjust = 0) +
+  labs(
+    title    = "Revenue vs Customers \u2014 Simulated Data",
+    subtitle = paste0("True: beta0 = ", beta0_true,
+                      ",  beta1 = ", beta1_true,
+                      ",  sigma = ", sigma_true),
+    x = "Customers per day",
+    y = "Revenue ($)"
+  ) +
+  lab_theme()
+```
+
+------------------------------------------------------------------------
+
+# Step 2: Bayesian Model
+
+## 2.1 Specification
+
+The Bayesian model has three layers:
+
+**Likelihood** — how the data arise given parameters:
+$$y_i \mid \beta_0, \beta_1, \sigma^2
+  \;\sim\; N\!\left(\beta_0 + \beta_1 x_i,\; \sigma^2\right)$$
+
+**Priors** — our beliefs about the parameters *before* seeing data:
+$$\beta_0 \sim N(5,\,2^2), \qquad
+\beta_1 \sim N(2,\,0.5^2), \qquad
+\sigma^2 \sim \text{Log-Normal}(\log 1,\,0.3^2)$$
+
+> **Informative vs. weakly informative priors — why it matters here:**
+>
+> In the original (weakly informative) version we used
+> $\beta_1 \sim N(0, 10^2)$ and $\sigma^2 \sim \text{LogNormal}(0, 1)$.
+> Both priors placed substantial probability mass over implausible
+> values (e.g., negative revenue-per-customer, or residual variance of
+> 100). Here we use **informative priors** that encode genuine domain
+> knowledge about a coffee shop:
+>
+> - $\beta_0 \sim N(5, 2^2)$: Baseline revenue near \$5 with SD \$2.
+>   Still moderately uncertain, but rules out values like −\$20 or
+>   \$100.
+> - $\beta_1 \sim N(2, 0.5^2)$: We believe each additional customer
+>   brings in roughly \$2, with a tight SD of \$0.50. For example, a
+>   prior 95% interval is approximately $2 \pm 1.96 \times 0.5 =
+>   [1.02,\; 2.98]$ — sensible for a café menu where average spend is a
+>   few dollars.
+> - $\sigma^2 \sim \text{LogNormal}(\log 1, 0.3^2)$: Prior median is
+>   $e^{\log 1} = 1$, and the tighter SD of 0.3 on the log scale gives a
+>   95% interval of roughly $[e^{\log 1 - 1.96 \times 0.3},\;
+>   e^{\log 1 + 1.96 \times 0.3}] \approx [0.55,\; 1.80]$ — we are
+>   fairly confident day-to-day revenue noise is within about \$1–\$2.
+>
+> **Effect on the posterior:** With $n = 100$ observations the
+> likelihood is dominant and both prior choices will give similar
+> posteriors. The benefit of informative priors shows most clearly when
+> (a) $n$ is small, (b) the chain needs fewer burn-in iterations to
+> reach the posterior mode (it starts closer), and (c) the posterior is
+> narrower and better-estimated.
+
+**Posterior** (by Bayes' theorem, up to a normalizing constant):
+$$\log p(\theta \mid y)
+  \propto \underbrace{\log p(y \mid \theta)}_{\text{log-likelihood}}
+  + \underbrace{\log p(\theta)}_{\text{log-prior}}$$
+
+We work in **log space** because:
+
+1.  Likelihoods are products of many small probabilities; on the natural
+    scale these underflow to zero. Logs turn products into sums, keeping
+    everything numerically stable.
+2.  The normalizing constant $p(y)$ is just an additive constant in log
+    space and cancels out in the MH acceptance ratio (Step 3).
+
+## 2.2 Log-Posterior Function
+
+The `log_posterior()` function below evaluates $\log p(\theta \mid y)$
+at any candidate parameter triple $(\beta_0, \beta_1, \sigma^2)$.
+
+**Breaking it down:**
+
+| Line | What it computes | Why |
+|------------------------|------------------------|------------------------|
+| Guard | Returns $-\infty$ if $\sigma^2 \le 0$ | Variance must be strictly positive; $-\infty$ in log space means probability 0, causing MH to always reject. |
+| `mu` | $\mu_i = \beta_0 + \beta_1 x_i$ for all $i$ | Vectorized mean prediction for each observation. |
+| `log_lik` | $\sum_i \log N(y_i; \mu_i, \sigma^2)$ | Sum of log normal densities — the log-likelihood. |
+| `log_p_beta0` | $\log N(\beta_0; 5, 4)$ | Log-prior for the intercept. |
+| `log_p_beta1` | $\log N(\beta_1; 2, 0.25)$ | Log-prior for the slope — informative: \$2 ± \$0.50 per customer. |
+| `log_p_sigma2` | $\log \text{LogNormal}(\sigma^2;\, \log 1, 0.3^2)$ | Log-prior for the variance — tighter than before; median 1, 95% range ≈ [0.55, 1.80]. |
+| Return | Sum of all six terms | Log-posterior up to a constant. |
+
+> **Why `dlnorm` for the** $\sigma^2$ prior? The Log-Normal distribution
+> is a natural prior for strictly positive quantities: if
+> $\sigma^2 \sim \text{LogNormal}(\mu_0, s_0^2)$, then
+> $\log\sigma^2 \sim N(\mu_0, s_0^2)$. Here $\mu_0 = \log 1 = 0$ sets
+> the prior median to exactly 1, and $s_0 = 0.3$ tightens the prior
+> substantially relative to the weakly informative $s_0 = 1$: the 95%
+> prior interval shrinks from $[0.14, 7.1]$ to approximately
+> $[0.55, 1.80]$. This encodes the belief that day-to-day revenue
+> scatter is on the order of \$1, not \$7. The code is simply
+> `dlnorm(sigma2, meanlog = 0, sdlog = 0.3, log = TRUE)`.
+
+```{r step2-logpost}
+log_posterior <- function(beta0, beta1, sigma2) {
+
+  # Guard: variance must be strictly positive
+  # Returning -Inf means this point has probability 0 —
+  # MH will always reject a proposal with sigma2 <= 0.
+  if (sigma2 <= 0) return(-Inf)
+
+  # ── Log-likelihood ────────────────────────────────────────────────
+  # mu is the vector of fitted values for all 100 observations.
+  # dnorm(..., log = TRUE) returns log densities; sum() gives the
+  # total log-likelihood (i.e., log of the product of 100 densities).
+  mu      <- beta0 + beta1 * x
+  log_lik <- sum(dnorm(y, mean = mu, sd = sqrt(sigma2), log = TRUE))
+
+  # ── Log-priors ────────────────────────────────────────────────────
+  # Each dnorm / dlnorm call returns the log density of ONE parameter
+  # under its prior distribution. We add these to the log-likelihood
+  # because log(AB) = log(A) + log(B).
+
+  log_p_beta0  <- dnorm(beta0,  mean = 5,  sd = 2,   log = TRUE)        # N(5, 2^2)
+  log_p_beta1  <- dnorm(beta1,  mean = 2,  sd = 0.5, log = TRUE)        # N(2, 0.5^2) — informative
+  log_p_sigma2 <- dlnorm(sigma2, meanlog = 0, sdlog = 0.3, log = TRUE)  # LogNormal(log1, 0.3^2)
+
+  # ── Return log-posterior ──────────────────────────────────────────
+  return_value = log_lik + log_p_beta0 + log_p_beta1 + log_p_sigma2
+  return(return_value)
+}
+
+# ── Sanity checks ─────────────────────────────────────────────────────
+# At the true parameter values the log-posterior should be finite.
+# At sigma2 = -1 (impossible) it should return -Inf.
+stopifnot(is.finite(log_posterior(5, 2, 1)))
+stopifnot(log_posterior(5, 2, -1) == -Inf)
+cat("log p(true params | y) =", round(log_posterior(5, 2, 1), 2), "\n")
+```
+
+------------------------------------------------------------------------
+
+# Step 3: Metropolis–Hastings MCMC
+
+## How MH Works
+
+Markov chain Monte Carlo (MCMC) is a family of algorithms that **draw
+samples from a target distribution** (here, the posterior) without
+needing to know its normalizing constant. The **Metropolis–Hastings
+(MH)** variant works as follows:
+
+1.  Start at some initial parameter value $\theta^{(1)}$.
+2.  At step $t$, **propose** a new value $\theta'$ from a proposal
+    distribution $q(\theta' \mid \theta^{(t)})$.
+3.  Compute the **log acceptance ratio**:
+    $$\log \alpha = \log p(\theta' \mid y) - \log p(\theta^{(t)} \mid y)$$
+4.  **Accept** $\theta^{(t+1)} = \theta'$ with probability
+    $\min(1, e^{\log\alpha})$; otherwise keep
+    $\theta^{(t+1)} = \theta^{(t)}$.
+5.  Repeat.
+
+> **Why log space for** $\alpha$? Computing
+> $e^{\log p(\theta')} / e^{\log p(\theta)}$ directly can produce
+> underflow/overflow. In log space, the ratio becomes a difference, and
+> we compare $\log(\text{Uniform}(0,1))$ to $\log\alpha$ — both safely
+> finite.
+
+> **Why propose** $\sigma^2$ on the log scale? $\sigma^2$ is constrained
+> to be positive. If we proposed on the natural scale with a symmetric
+> normal, we could easily draw a negative value and always get rejected.
+> Proposing $\log\sigma^2 \sim N(\log\sigma^2_\text{cur}, \tau^2)$
+> guarantees positivity and explores the right-skewed support of
+> $\sigma^2$ more efficiently. Note: this is an **asymmetric** proposal,
+> but for the random-walk version used here the Jacobian cancels in the
+> acceptance ratio.
+
+**Acceptance rate tuning:**
+
+| Rate   | Interpretation                              |
+|--------|---------------------------------------------|
+| \< 10% | Proposals too large — chain gets stuck      |
+| 25–45% | Healthy — good mixing                       |
+| \> 70% | Proposals too small — chain explores slowly |
+
+Tune `prop_sd` to hit the 25–45% target.
+
+```{r step3-mcmc}
+set.seed(2006214)
+
+n_iter <- 5000
+
+# ── Burn-in ────────────────
+
+burn <- 500   # initial placeholder;
+# ── Storage vectors ───────────────────────────────────────────────────
+# Pre-allocating with numeric(n_iter) is much faster than growing vectors.
+beta0_chain  <- numeric(n_iter)
+beta1_chain  <- numeric(n_iter)
+sigma2_chain <- numeric(n_iter)
+
+# ── Starting values ───────────────────────────────────────────────────
+# We initialize at the informative prior means. Because our priors are
+# centered close to the truth, the chain reaches the posterior mode
+# quickly — this is one concrete benefit of informative priors: fewer
+# burn-in iterations are needed.
+beta0_chain[1]  <- 5    # prior mean of beta0
+beta1_chain[1]  <- 2    # prior mean of beta1 (informative)
+sigma2_chain[1] <- 1    # prior median of sigma2
+
+# ── Proposal standard deviations ─────────────────────────────────────
+# These control how far we jump each iteration.
+# Smaller → higher acceptance, slower mixing.
+# Larger  → lower acceptance (many rejections), also slower mixing.
+# The values below were chosen to yield ~30% acceptance (see output).
+prop_sd <- c(beta0 = 0.15, beta1 = 0.10, log_sigma2 = 0.20)
+
+accept_count <- 0L
+
+# ── Main MCMC loop ────────────────────────────────────────────────────
+for (i in seq(2, n_iter)) {
+
+  # Current state
+  b0_cur <- beta0_chain[i - 1]
+  b1_cur <- beta1_chain[i - 1]
+  s2_cur <- sigma2_chain[i - 1]
+
+  # Propose new values.
+  # beta0 and beta1: symmetric normal random walk on natural scale.
+  # sigma2: random walk on log scale, then exponentiate to ensure > 0.
+  b0_prop <- rnorm(1, b0_cur, prop_sd["beta0"])
+  b1_prop <- rnorm(1, b1_cur, prop_sd["beta1"])
+  s2_prop <- exp(rnorm(1, log(s2_cur), prop_sd["log_sigma2"]))
+
+  # Log acceptance ratio: log p(proposed) - log p(current)
+  # If proposed is better (higher posterior), log_alpha > 0 → always accept.
+  # If proposed is worse, log_alpha < 0 → accept with probability e^log_alpha.
+  log_alpha <- log_posterior(b0_prop, b1_prop, s2_prop) -
+               log_posterior(b0_cur,  b1_cur,  s2_cur)
+
+  # Accept / reject
+  # log(runif(1)) is log of U(0,1); comparing to log_alpha is equivalent
+  # to comparing runif(1) < exp(log_alpha) but avoids overflow.
+  if (log(runif(1)) < log_alpha) {
+    beta0_chain[i]  <- b0_prop
+    beta1_chain[i]  <- b1_prop
+    sigma2_chain[i] <- s2_prop
+    accept_count    <- accept_count + 1L
+  } else {
+    # Rejection: stay at current state (duplicate the previous row)
+    beta0_chain[i]  <- b0_cur
+    beta1_chain[i]  <- b1_cur
+    sigma2_chain[i] <- s2_cur
+  }
+}
+
+accept_pct <- accept_count / (n_iter - 1) * 100
+cat(sprintf("Acceptance rate: %.1f%%  %s\n", accept_pct,
+            ifelse(accept_pct > 20 & accept_pct < 50,
+                   "\u2713 healthy", "\u26a0 consider tuning prop_sd")))
+```
+
+------------------------------------------------------------------------
+
+# Step 4: Convergence Diagnostics
+
+Before interpreting posterior summaries, we must verify that the chain
+has **converged** to the posterior and is **mixing well**.
+
+## 4.1 Trace Plots and Posterior Densities
+
+**What to look for in trace plots:**
+
+| Pattern | Meaning | Action |
+|------------------------|------------------------|------------------------|
+| "Hairy caterpillar" — noisy horizontal band | ✅ Well-mixed | None |
+| Visible trend or drift | ❌ Not yet converged | Increase burn-in |
+| Long horizontal runs (gets "stuck") | ❌ Poor mixing | Decrease `prop_sd` |
+| Sudden jumps between two levels | ❌ Bimodal posterior or bad proposal | Investigate |
+
+```{r step4-diagnostics, fig.height=9}
+# post_burn is the first iteration index in the post-burn-in phase.
+post_burn <- burn + 1
+
+# ── Tidy chains into long format for ggplot ────────────────────────────
+mcmc_df <- tibble(
+  iter   = 1:n_iter,
+  beta0  = beta0_chain,
+  beta1  = beta1_chain,
+  sigma2 = sigma2_chain
+) |>
+  pivot_longer(-iter, names_to = "param", values_to = "value") |>
+  mutate(
+    phase = if_else(iter <= burn, "Burn-in", "Post-burn-in"),
+    param = factor(param,
+                   levels = c("beta0", "beta1", "sigma2"),
+                   labels = c("beta[0]", "beta[1]", "sigma^2"))
+  )
+
+# ── Trace plots ────────────────────────────────────────────────────────
+p_trace <- ggplot(mcmc_df, aes(iter, value, colour = phase)) +
+  geom_line(linewidth = 0.35, alpha = 0.9) +
+  facet_wrap(~ param, scales = "free_y", ncol = 1,
+             labeller = label_parsed) +
+  scale_colour_manual(
+    values = c("Burn-in" = "#e05c5c", "Post-burn-in" = "#3a7abf")
+  ) +
+  labs(title = "Trace Plots",
+       subtitle = paste0("Red = burn-in (", burn, " iter, discarded)  |  Blue = post-burn-in (kept)"),
+       x = "Iteration", y = "Value", colour = NULL) +
+  lab_theme()
+
+# ── True-value reference lines ─────────────────────────────────────────
+true_vals <- tibble(
+  param = factor(c("beta[0]", "beta[1]", "sigma^2"),
+                 levels = c("beta[0]", "beta[1]", "sigma^2")),
+  truth = c(beta0_true, beta1_true, sigma_true^2)
+)
+
+# ── Prior vs Posterior overlay ─────────────────────────────────────────
+# For each parameter we draw the prior density curve alongside the
+# posterior histogram so students can see how the data updated our beliefs.
+prior_curves <- bind_rows(
+  tibble(
+    param = "beta[0]",
+    x     = seq(0, 10, length.out = 300),
+    dens  = dnorm(seq(0, 10, length.out = 300), mean = 5, sd = 2)
+  ),
+  tibble(
+    param = "beta[1]",
+    x     = seq(0.5, 3.5, length.out = 300),
+    dens  = dnorm(seq(0.5, 3.5, length.out = 300), mean = 2, sd = 0.5)
+  ),
+  tibble(
+    param = "sigma^2",
+    x     = seq(0.1, 3, length.out = 300),
+    dens  = dlnorm(seq(0.1, 3, length.out = 300), meanlog = 0, sdlog = 0.3)
+  )
+) |>
+  mutate(param = factor(param,
+                        levels = c("beta[0]", "beta[1]", "sigma^2")))
+
+p_dens <- mcmc_df |>
+  filter(phase == "Post-burn-in") |>
+  ggplot(aes(value)) +
+  geom_histogram(aes(y = after_stat(density)),
+                 bins = 40, fill = "#3a7abf", colour = "white", alpha = 0.5) +
+  geom_density(colour = "#3a7abf", linewidth = 0.9) +
+  geom_line(data = prior_curves,
+            aes(x = x, y = dens),
+            colour = "#e05c5c", linewidth = 1, linetype = "dashed",
+            inherit.aes = FALSE) +
+  geom_vline(data = true_vals,
+             aes(xintercept = truth),
+             colour = "black", linetype = "dotted", linewidth = 0.9) +
+  facet_wrap(~ param, scales = "free", labeller = label_parsed) +
+  labs(
+    title    = "Prior (red dashed) vs Posterior (blue)  |  True value (black dotted)",
+    subtitle = "Posterior should be narrower than prior and centered near the truth",
+    x = "Parameter value", y = "Density"
+  ) +
+  lab_theme()
+
+(p_trace / p_dens) +
+  plot_layout(heights = c(3, 2)) +
+  plot_annotation(
+    title = "MCMC Diagnostics",
+    theme = theme(plot.title = element_text(
+                    face = "bold", hjust = 0.5, size = 16))
+  )
+```
+
+------------------------------------------------------------------------
+
+# Step 5: Posterior Summaries
+
+The table below summarizes the **marginal posterior distribution** for
+each parameter using the post-burn-in draws.
+
+**Column guide:**
+
+| Column | Meaning |
+|------------------------------------|------------------------------------|
+| Mean | Posterior mean — our best single-number estimate |
+| SD | Posterior standard deviation — analogous to a standard error |
+| CrI Lower / Upper | 95% equal-tail credible interval — the central 95% of posterior mass |
+
+> **Credible interval vs. confidence interval:** A **95% Bayesian
+> credible interval** $[a, b]$ means: *Given the data, there is a 95%
+> probability that the true parameter lies in* $[a, b]$. A **95%
+> frequentist confidence interval** does NOT have this interpretation.
+> It means: if we repeated the experiment many times, 95% of the
+> resulting intervals would contain the true value.
+
+```{r step5-summaries}
+summary_tbl <- bind_rows(
+  posterior_summary(beta0_chain,  burn) |> mutate(Parameter = "\u03b2\u2080"),
+  posterior_summary(beta1_chain,  burn) |> mutate(Parameter = "\u03b2\u2081"),
+  posterior_summary(sigma2_chain, burn) |> mutate(Parameter = "\u03c3\u00b2")
+) |>
+  select(Parameter, everything())
+
+knitr::kable(
+  summary_tbl, align = "lrrrrr",
+  caption = "Posterior summaries \u2014 post-burn-in samples only"
+)
+```
+
+------------------------------------------------------------------------
+
+# Step 6: Posterior Predictive Distribution
+
+The **posterior predictive distribution** answers the question: *For a
+new day with* $x^* = 5$ customers, what revenue should we expect?
+
+Unlike OLS, which gives a single point prediction plus a standard error,
+the Bayesian approach gives a **full predictive distribution** that
+propagates *two* sources of uncertainty:
+
+1.  **Parameter uncertainty** — we don't know the exact values of
+    $\beta_0$, $\beta_1$, $\sigma^2$. We represent this by drawing
+    $(\beta_0^{(s)}, \beta_1^{(s)}, \sigma^{2(s)})$ from the posterior.
+2.  **Observation noise** — even if we knew the true parameters, future
+    revenues would still vary randomly. We capture this by adding
+    $\varepsilon^{(s)} \sim N(0, \sigma^{2(s)})$ to each prediction.
+
+The predictive draw is therefore:
+$$\tilde{y}^{(s)} = \beta_0^{(s)} + \beta_1^{(s)} x^* + \varepsilon^{(s)},
+\quad \varepsilon^{(s)} \sim N(0,\, \sigma^{2(s)})$$
+
+This is implemented by:
+
+1.  Sampling `n_samp = 1000` random indices from the post-burn-in chain
+    (with replacement, to handle any chain length).
+2.  Using those indexed draws of $(\beta_0, \beta_1, \sigma^2)$ as if
+    they were independent posterior samples.
+3.  Adding independent normal noise scaled by $\sqrt{\sigma^{2(s)}}$.
+
+```{r step6-predictive, fig.height=9}
+n_samp  <- 1000   # number of predictive samples
+x_star  <- 5      # new predictor value: 5 customers
+x_curve <- seq(0, 10, length.out = 100)   # grid for the ribbon plot
+
+# Sample indices from post-burn-in chain (with replacement)
+post_idx <- sample(post_burn:n_iter, n_samp, replace = TRUE)
+
+# ── Point prediction at x* = 5 ────────────────────────────────────────
+# For each posterior draw, compute:
+#   mean component  +  random noise
+y_star <- beta0_chain[post_idx] +
+          beta1_chain[post_idx] * x_star +
+          rnorm(n_samp, 0, sqrt(sigma2_chain[post_idx]))
+
+# 95% equal-tail credible interval for the prediction
+cri_95 <- round(quantile(y_star, c(0.025, 0.975)), 2)
+
+# ── Histogram of predictive distribution ──────────────────────────────
+p_hist <- ggplot(tibble(y_pred = y_star), aes(y_pred)) +
+  geom_histogram(aes(y = after_stat(density)),
+                 bins = 35, fill = "#667eea",
+                 colour = "white", alpha = 0.85) +
+  geom_density(colour = "#3a3a8c", linewidth = 1) +
+  geom_vline(xintercept = mean(y_star),
+             colour = "#d62728", linetype = "dashed", linewidth = 1) +
+  annotate("text",
+           x = mean(y_star) + 0.15, y = Inf,
+           label = paste0("mean = ", round(mean(y_star), 1)),
+           vjust = 2, hjust = 0, colour = "#d62728", size = 3.8) +
+  labs(
+    title    = paste0("Predictive distribution  |  x \u2217 = ", x_star),
+    subtitle = paste0("Mean: ", round(mean(y_star), 2),
+                      "   95% CrI: [", cri_95[1], ", ", cri_95[2], "]"),
+    x = "Predicted revenue ($)", y = "Density"
+  ) +
+  lab_theme()
+
+# ── Full predictive ribbon across x = 0 to 10 ─────────────────────────
+# For each x value on the grid, draw 1000 predictive samples and compute
+# the mean and 2.5th / 97.5th percentiles. This gives the "credible band."
+curve_df <- map_dfr(seq_along(x_curve), function(j) {
+  sims <- beta0_chain[post_idx] +
+          beta1_chain[post_idx] * x_curve[j] +
+          rnorm(n_samp, 0, sqrt(sigma2_chain[post_idx]))
+  tibble(
+    x    = x_curve[j],
+    mean = mean(sims),
+    lo   = quantile(sims, 0.025),
+    hi   = quantile(sims, 0.975)
+  )
+})
+
+p_ribbon <- ggplot() +
+  geom_ribbon(data = curve_df,
+              aes(x = x, ymin = lo, ymax = hi),
+              fill = "#4ECDC4", alpha = 0.35) +
+  geom_line(data = curve_df,
+            aes(x = x, y = mean),
+            colour = "#2E86AB", linewidth = 1.4) +
+  geom_point(data = coffee,
+             aes(x = customers, y = revenue),
+             colour = "#FF6B6B", size = 2.5, alpha = 0.80) +
+  geom_smooth(data = coffee,
+              aes(x = customers, y = revenue),
+              method = "lm", se = FALSE,
+              colour = "grey50", linewidth = 0.8, linetype = "dotted") +
+  # Highlight the x* = 5 prediction
+  geom_point(aes(x = x_star, y = mean(y_star)),
+             shape = 23, fill = "#f0e442",
+             colour = "black", size = 4) +
+  annotate("text",
+           x = x_star + 0.2, y = mean(y_star) + 1.2,
+           label = paste0("x \u2217 = ", x_star,
+                          "\n\u0233 = ", round(mean(y_star), 1)),
+           size = 3.6, hjust = 0) +
+  labs(
+    title    = "Posterior Predictive \u2014 Full Curve",
+    subtitle = "Teal ribbon: 95% credible band  |  Red: data  |  Grey dotted: OLS",
+    x = "Customers", y = "Revenue ($)"
+  ) +
+  lab_theme()
+
+p_hist / p_ribbon
+```
+
+------------------------------------------------------------------------

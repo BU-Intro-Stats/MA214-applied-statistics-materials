@@ -1,0 +1,128 @@
+\documentclass{article}
+\usepackage[margin=1.15in]{geometry}
+\usepackage{xcolor}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{tabularx}
+
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\rhead{Lecture 4}
+\lhead{MA 214: Applied Statistics (Spring 2026)}
+\renewcommand{\headrulewidth}{.4mm}
+
+\newcommand{\blankline}[1]{\underline{\hspace{#1}}}
+
+\begin{document}
+
+\noindent\textbf{Name:}\blankline{2.25in}\hfill\textbf{BUID:}\blankline{1.55in}\newline
+
+\begin{center}
+ \Large In-Class Worksheet: Using Regression Models
+\end{center}
+
+\subsection*{Scenario}
+Today we practice using a fitted regression model after it has been fit: interpreting correlation and $R^2$, making predictions, checking for extrapolation, and using a 0/1 indicator variable for a categorical predictor.
+
+\medskip
+\noindent\textbf{Goals:} \textbf{(1)} interpret $r$ and $R^2$, \textbf{(2)} compute predicted values and residuals, \textbf{(3)} identify interpolation vs. extrapolation, \textbf{(4)} interpret an indicator-variable model.
+
+\subsection*{Part 1: Correlation and $R^2$}
+Suppose a simple linear regression model uses high school graduation rate to predict poverty rate across states. The correlation between the two variables is $r=-0.75$.
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item Describe the direction and strength of the linear relationship. \\[2.5em]
+\item Compute $R^2$.
+\[
+R^2 = \blankline{2.2in}
+\]
+\item Interpret $R^2$ in context. \\[3.5em]
+\item Which statement is the best interpretation of $R^2=0.56$? Circle one.
+\begin{enumerate}[label=\arabic*.,itemsep=.2em]
+\item The model predicts 56\% of states exactly correctly.
+\item HS graduation rate causes 56\% of the poverty rate.
+\item 56\% of the variability in poverty rate is explained by the model.
+\item The correlation is 0.56.
+\end{enumerate}
+\end{enumerate}
+
+\subsection*{Part 2: Prediction Checklist}
+Use the fitted model
+\[
+\widehat{\text{poverty}} = 64.78 - 0.62(\text{HS grad}),
+\]
+where poverty rate and HS graduation rate are both measured in percent.
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item Predict the poverty rate when HS graduation rate is 90\%.
+\[
+\widehat{\text{poverty}} = \blankline{4in}
+\]
+\item Suppose the observed poverty rate is 7.5\%. Compute the residual.
+\[
+e = y - \hat y = \blankline{3.5in}
+\]
+\item Is the observed point above or below the fitted line? Explain using the sign of the residual. \\[3em]
+\item Should the actual poverty rate equal the predicted value exactly? Why or why not? \\[3em]
+\end{enumerate}
+
+\subsection*{Part 3: Interpolation or Extrapolation?}
+Suppose the observed HS graduation rates in the data range from 77\% to 92\%.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabularx}{\textwidth}{p{4.2cm}p{4.1cm}X}
+\toprule
+\textbf{Prediction at} & \textbf{Interpolation or extrapolation?} & \textbf{Main concern} \\
+\midrule
+85\% HS graduation rate & & \\[1.7em]
+93\% HS graduation rate & & \\[1.7em]
+65\% HS graduation rate & & \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item A fitted model uses house sizes from 800 to 3500 square feet. Which prediction is most risky? Circle one and explain briefly.
+\begin{center}
+1200 square feet \qquad 2600 square feet \qquad 9000 square feet
+\end{center}
+\vspace{3em}
+\end{enumerate}
+
+\subsection*{Part 4: A Categorical Predictor}
+Suppose we fit a model for poverty rate using region, where
+\[
+\text{south} =
+\begin{cases}
+1, & \text{Southern state},\\
+0, & \text{otherwise}.
+\end{cases}
+\]
+The fitted model is
+\[
+\widehat{\text{poverty}} = 10.19 + 3.47(\text{south}).
+\]
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item What is the reference group? \\[2.5em]
+\item What is the predicted poverty rate for a non-Southern state?
+\[
+\blankline{2.5in}
+\]
+\item What is the predicted poverty rate for a Southern state?
+\[
+\blankline{2.5in}
+\]
+\item Interpret the coefficient 3.47 in context. \\[3.5em]
+\end{enumerate}
+
+\subsection*{Wrap-Up}
+Write one sentence explaining why a prediction can be mathematically easy but statistically risky. \\[4em]
+
+\end{document}

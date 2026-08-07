@@ -1,0 +1,172 @@
+\documentclass{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{xcolor}
+\usepackage{parskip}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{listings}
+
+\definecolor{codegray}{gray}{0.97}
+\definecolor{huddleblue}{RGB}{214,234,255}
+\definecolor{predictionyellow}{RGB}{255,242,200}
+\definecolor{debatepink}{RGB}{255,225,225}
+
+\lstset{basicstyle=\ttfamily\small,columns=fullflexible,frame=single,framerule=0.4pt,backgroundcolor=\color{codegray},breaklines=true,showstringspaces=false,keepspaces=true}
+\newcommand{\coursenumber}{MA 214}
+\newcommand{\nameblank}{\rule{1.75in}{0.4pt}}
+\newcommand{\idblank}{\rule{1.55in}{0.4pt}}
+\newcommand{\shortblank}{\rule{1.6in}{0.4pt}}
+\newcommand{\longblank}{\rule{0.93\linewidth}{0.4pt}}
+\newcommand{\responsebox}[2]{\noindent\fbox{\begin{minipage}{0.95\linewidth}\textbf{#1} #2\vspace{0.55in}\end{minipage}}}
+\newcommand{\linedbox}[1]{\noindent\fbox{\begin{minipage}{0.95\linewidth}#1\vspace{0.18in}\par\longblank\par\vspace{0.18in}\longblank\par\vspace{0.18in}\longblank\end{minipage}}}
+\newcommand{\callout}[3]{\noindent\colorbox{#1}{\makebox[\dimexpr0.95\linewidth-2\fboxsep\relax][l]{\textbf{#2}}}\par\noindent\fbox{\begin{minipage}{0.93\linewidth}#3\end{minipage}}}
+
+\begin{document}
+
+\begin{center}
+  {\LARGE \coursenumber{} Week 2: Lab 2}\\
+  {\large Regression Models}
+\end{center}
+
+\begin{enumerate}[label=\arabic*.,leftmargin=*,itemsep=.7em]
+  \item \textbf{Your name:} \nameblank \hfill \textbf{BU ID:} \idblank
+  \item \textbf{Partner's name:} \nameblank \hfill \textbf{BU ID:} \idblank
+\end{enumerate}
+
+\textbf{Big idea:} Regression models describe how a response variable changes with one or more predictors, but the model must be interpreted and checked in context.
+\textbf{Do not use GenAI tools for this lab.} The point is to practice your own analysis work, coding skills, and statistical reasoning.
+
+\textbf{Files used:} \texttt{mtcars.csv}, \texttt{lab2\_data.csv}, \texttt{lab2\_data2.csv}, and \texttt{lab-starter.R}
+
+\textbf{Skills practiced:} \texttt{lm()}, \texttt{summary()}, \texttt{cor()}, residual plots, and $R^2$ comparisons.
+
+\textbf{Your mission:} Fit and compare regression models that predict fuel efficiency, then explain which model is most useful and why.
+
+\section*{Icebreaker}
+
+Before opening R: introduce yourself to your partner and answer the warm-up question below.
+
+\responsebox{Warm-up response:}{Name one variable that might predict a car's miles per gallon. Why do you expect it to matter?}
+
+\section*{Getting Started}
+
+Open \texttt{lab-starter.R}. Import \texttt{mtcars.csv} and inspect the response and candidate predictors.
+
+\begin{lstlisting}
+library(dplyr)
+library(ggplot2)
+
+mtcars_df <- read.csv("mtcars.csv")
+
+head(mtcars_df)
+str(mtcars_df)
+\end{lstlisting}
+
+\callout{huddleblue}{HUDDLE UP}{Which variable should be the response? Which predictors do you expect to be most strongly related to fuel efficiency?}
+
+\newpage
+
+\section*{Question 1. Explore the Data}
+
+Make a first scatter plot of \texttt{mpg} versus \texttt{wt}. Then compute the correlation.
+
+\begin{lstlisting}
+ggplot(mtcars_df, aes(x = wt, y = mpg)) +
+  geom_point()
+
+cor(mtcars_df$wt, mtcars_df$mpg)
+\end{lstlisting}
+
+\begin{center}
+\renewcommand{\arraystretch}{2.3}
+\begin{tabular}{|p{0.24\linewidth}|p{0.27\linewidth}|p{0.36\linewidth}|}
+\hline
+\textbf{Variable or data set} & \textbf{Type or role} & \textbf{What it means} \\
+\hline
+\texttt{mpg} & & \\
+\hline
+\texttt{wt} & & \\
+\hline
+\texttt{hp} or \texttt{qsec} & & \\
+\hline
+\end{tabular}
+\end{center}
+
+\linedbox{\textbf{Write 2-3 sentences describing the relationship you see before fitting a model.}}
+
+\section*{Question 2. Make a Prediction}
+
+Before fitting the model, predict the sign of the slope for \texttt{mpg} predicted by \texttt{wt}.
+
+\callout{predictionyellow}{PREDICTION TIME}{Will the slope be positive or negative? What would that sign mean in context?}
+
+\begin{lstlisting}
+model_wt <- lm(mpg ~ wt, data = mtcars_df)
+summary(model_wt)
+\end{lstlisting}
+
+\newpage
+
+\linedbox{\textbf{What did your team predict? What evidence did you check first?}}
+
+\section*{Question 3. Compute and Compare Models}
+
+Fit two more simple regression models and compare them to \texttt{model\_wt}.
+
+\begin{lstlisting}
+model_hp <- lm(mpg ~ hp, data = mtcars_df)
+model_qsec <- lm(mpg ~ qsec, data = mtcars_df)
+
+summary(model_wt)$r.squared
+summary(model_hp)$r.squared
+summary(model_qsec)$r.squared
+\end{lstlisting}
+
+\callout{huddleblue}{HUDDLE UP}{Does the model with the largest $R^2$ automatically tell the best statistical story? What else should you check?}
+
+\callout{huddleblue}{CLAIM, EVIDENCE, CONTEXT}{%
+The strongest simple model is \shortblank.\\[.6em]
+My evidence is \shortblank.\\[.6em]
+This matters because \shortblank.
+}
+
+\section*{Question 4. Interpret in Context}
+
+Use the model output and a diagnostic plot to explain what the regression says about cars.
+
+\begin{center}
+\renewcommand{\arraystretch}{2.25}
+\begin{tabular}{|p{0.42\linewidth}|p{0.50\linewidth}|}
+\hline
+\textbf{Question} & \textbf{Your answer} \\
+\hline
+What comparison did you make? & \\
+\hline
+What result is strongest? & \\
+\hline
+What limitation or caution should readers know? & \\
+\hline
+\end{tabular}
+\end{center}
+
+\newpage
+
+\callout{debatepink}{DEBATE CORNER}{If you and your partner disagree about the best model, write both arguments first. Then decide what claim the evidence actually supports.}
+
+\section*{Question 5. Close the Lab}
+
+Submit your completed \texttt{lab-starter.R}. Your file should include the fitted models and requested autograder objects.
+
+\linedbox{\textbf{Final response:} state your chosen model, cite one piece of evidence, and interpret the result in context.}
+
+\section*{Optional Challenge}
+
+Fit a multiple regression model using at least two predictors and compare it with your best simple regression model.
+
+\begin{lstlisting}
+model_multi <- lm(mpg ~ wt + hp, data = mtcars_df)
+summary(model_multi)
+\end{lstlisting}
+
+\end{document}

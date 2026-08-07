@@ -1,0 +1,434 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Slide options
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Option 1: Slides with solutions
+
+\documentclass[slidestop,compress,mathserif]{beamer}
+\usepackage{booktabs}
+\newcommand{\soln}[1]{\textit{#1}}
+\newcommand{\solnGr}[1]{#1}
+
+% Option 2: Handouts without solutions
+
+%\documentclass[11pt,containsverbatim,handout]{beamer}
+%\usepackage{pgfpages}
+%\pgfpagesuselayout{4 on 1}[letterpaper,landscape,border shrink=5mm]
+%\newcommand{\soln}[1]{ }
+%\newcommand{\solnGr}{ }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Style
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{../../common/lec_style.tex}
+\graphicspath{ {../../common/} }
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Preamble
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title[Lecture 4]{Lecture 4: Using Regression Models}
+\subtitle{Module 1: Modeling and Linear Regression}
+\author{Introduction to Modern Statistics, 2nd Edition}
+\institute{$\:$ \\ {\footnotesize  Based on slides developed by Mine \c{C}etinkaya-Rundel of OpenIntro.  \\
+The slides may be copied, edited, and/or shared via the \webLink{http://creativecommons.org/licenses/by-sa/3.0/us/}{CC BY-SA license.} \\
+Some images may be included under fair use guidelines (educational purposes).}}
+\date{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Begin document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Title page
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\maketitleframe
+
+\include{Lecture4_agenda}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Using $R^2$ and correlation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What does a good linear fit mean?}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{From fitting a line to using a line}
+
+Given a fitted line
+$$
+\widehat{y}=\widehat{\beta}_0+\widehat{\beta}_1 x,
+$$
+and variance estimate $\hat{\sigma}^{2}$, we want to use them to answer questions! 
+\begin{enumerate}
+\item How strong is the linear relationship?
+\item What prediction does the model make?
+\item Is the prediction reasonable for a particular value of $x$?
+\end{enumerate}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{A running example}
+
+A fresh dataset: across the 50 states, model \emph{poverty rate} from \emph{high-school graduation rate}.
+\[
+\widehat{\text{poverty}}=64.78-0.62(\text{HS grad}).
+\]
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+\begin{itemize}
+\item Response: poverty rate (\%).
+\item Predictor: HS graduation rate (\%).
+\item Slope: each extra point of HS graduation lowers predicted poverty by 0.62 points.
+\end{itemize}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{center}
+\includegraphics[width=0.9\textwidth]{figures/poverty-vs-hsgrad-line.png}
+\end{center}
+\end{column}
+\end{columns}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Correlation coefficient}
+
+The \textbf{correlation coefficient} $r$ measures the \textbf{direction} and \textbf{strength} of the \emph{linear} relationship between two numerical variables.
+
+\formula{Correlation coefficient $r$}{%
+$$
+r=\frac{1}{n-1}\sum_{i=1}^n\left(\frac{x_i-\bar{x}}{s_x}\right)\left(\frac{y_i-\bar{y}}{s_y}\right)
+$$
+$-1\le r\le 1$: the \textbf{sign} gives the direction, and the \textbf{distance from 0} gives the strength of the linear trend.}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Interpreting $r$}
+
+\begin{columns}[T]
+\begin{column}{0.46\textwidth}
+\begin{itemize}
+\item $r$ near $1$: strong positive linear trend.
+\item $r$ near $-1$: strong negative linear trend.
+\item $r$ near $0$: weak \emph{linear} trend.
+\end{itemize}
+
+\vspace{0.4em}
+Which panel has $r$ closest to $+1$? To $-1$? Near $0$?
+\end{column}
+\begin{column}{0.54\textwidth}
+\begin{center}
+\includegraphics[width=0.95\textwidth]{figures/correlation-gallery.png}
+\end{center}
+\end{column}
+\end{columns}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Coefficient of determination: $R^2$}
+$$
+R^2 = \frac{\text{variability explained by the model}}{\text{total variability in the response}}
+$$
+For simple regression, $R^2=r^2$, but we read $R^2$ off the model output rather than computing it from $r$.
+\pause 
+\begin{itemize}
+\item Always between $0$ and $1$ (that is, $0\%$ to $100\%$).
+\item Higher $R^2$ means the line accounts for more of the spread in $y$.
+\item The remaining variability is due to other variables or natural randomness such as measurement error.
+\end{itemize}
+\pause
+\keyidea[-- $R^2$]{$R^2$ is the \hl{percent of the variability in the response} that the linear model explains.}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{What different $R^2$ values look like}
+\begin{center}
+\includegraphics[width=\textwidth]{figures/r2-gallery.png}
+\end{center}
+For the poverty model, software reports $R^2=0.56$: about $56\%$ of the variability in poverty rate is explained by HS graduation rate.
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Same $R^2$, very different data}
+\begin{center}
+\includegraphics[width=\textwidth]{figures/anscombe.png}
+\end{center}
+All four data sets share the \hl{same fitted line} and the \hl{same $R^2=0.67$}, yet only the first is well described by a line.
+\caution{$R^2$ alone does not tell you a line is appropriate. Always plot the data: a model you \emph{can} fit is not always one you \emph{should}.}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Common mistakes with $R^2$}
+
+\activity[-- interpreting $R^2$]{%
+Which statement is the best interpretation of $R^2=0.56$?
+\begin{enumerate}
+\item The model predicts 56\% of states exactly correctly.
+\item HS graduation rate causes 56\% of the poverty rate.
+\item 56\% of the variability in poverty rate is explained by the model.
+\item The correlation is 0.56.
+\end{enumerate}}
+
+\pause
+\solnbox{Correct: (3). $R^2$ describes explained variability, not exact prediction accuracy or causation.}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Activity: comparing simple regression models}
+
+\activity[-- which model explains more?]{%
+Three candidate models for predicting a state's poverty rate:
+\begin{center}
+\scriptsize
+\begin{tabular}{llc}
+Model & Predictor & $R^2$\\
+\hline
+(a) & HS graduation rate & 0.56\\
+(b) & median household income & 0.71\\
+(c) & mean January temperature & 0.04
+\end{tabular}
+\end{center}
+\begin{enumerate}\setlength{\itemsep}{1pt}
+\item Rank the models by how much poverty variability they explain.
+\item Income and poverty move in opposite directions. What is the correlation $r$ for model (b)?
+\item Does model (b) show that raising incomes would lower poverty?
+\end{enumerate}}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Activity: comparing simple regression models}
+\solnbox{%
+\begin{enumerate}
+\item (b) $>$ (a) $>$ (c).
+\item $r=-\sqrt{0.71}\approx-0.84$; the sign comes from the direction of the relationship.
+\item No. These are observational data, so the model shows association, not the effect of changing incomes.
+\end{enumerate}}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Prediction and extrapolation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Using a fitted model}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Prediction: the four-step habit}
+
+When using a regression equation, write the steps explicitly.
+
+\begin{enumerate}
+\item Identify the value of the predictor $x$.
+\item Substitute $x$ into the fitted equation.
+\item Compute the predicted response $\widehat{y}$.
+\item Interpret $\widehat{y}$ in context and check whether the prediction is reasonable.
+\end{enumerate}
+$$\widehat{y}=\widehat{\beta}_0+\widehat{\beta}_1x$$
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Worked example: predicting poverty}
+\workedexample[predicting poverty]{%
+For Georgia, the HS graduation rate is $85.1\%$. What's the predicted poverty rate?
+\begin{align*}
+\widehat{\text{poverty}}
+&=64.78-0.62(85.1)\\
+&=64.78-52.762 = 12.018.
+\end{align*}
+The model predicts a poverty rate of about $12.0\%$ for that state.}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Residuals: how far off is a prediction?}
+
+Recall from last lecture: a \hl{residual} is the prediction error for one observation,
+$$e_i=y_i-\widehat{y}_i.$$
+\begin{itemize}
+\item Positive residual: observed value \emph{above} the line (model under-predicts).
+\item Negative residual: observed value \emph{below} the line (model over-predicts).
+\end{itemize}
+
+\NamedNote{Prediction $\ne$ truth}{$\widehat{y}$ is an average trend; real values scatter around the line, so we do not expect $y$ to equal $\widehat{y}$ exactly.}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Worked example: residual}
+
+A state has an observed poverty rate of $13.6\%$, and the model predicted $12.0\%$.
+
+\begin{enumerate}
+\item Identify the observed and fitted values: $y=13.6$, \; $\widehat{y}=12.0$.
+\pause
+\item Subtract:
+$$e = y-\widehat{y} = 13.6-12.0 = 1.6.$$
+\pause
+\item Read the sign: $e>0$, so the point lies \emph{above} the line.
+\end{enumerate}
+
+\pause
+\workedexample[residual]{The state's poverty rate is $1.6$ percentage points \emph{higher} than the model predicted --- the model under-predicts this state.}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Interpolation vs.\ extrapolation}
+
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{itemize}
+\item \textbf{Interpolation:} predict at an $x$ \emph{inside} the observed range.
+\item \textbf{Extrapolation:} predict at an $x$ \emph{outside} the observed range.
+\end{itemize}
+
+Observed HS graduation rates run about $77\%$ to $92\%$ (shaded).
+
+\smallskip
+{\small
+\begin{tabular}{c c}
+\toprule
+Predict at & Type \\
+\midrule
+$85\%$ & interpolation \\
+$93\%$ & mild extrapolation \\
+$65\%$ & extrapolation \\
+\bottomrule
+\end{tabular}}
+\end{column}
+\begin{column}{0.5\textwidth}
+\begin{center}
+\includegraphics[width=\textwidth]{figures/extrapolation.png}
+\end{center}
+\end{column}
+\end{columns}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Why extrapolation is risky}
+
+\caution{Outside the observed range, the data give no support for the line: the pattern may not continue, and predictions can be nonsensical.}
+
+\dq{A fitted model uses house sizes from $800$ to $3500$ square feet. How risky is the prediction for each of the following house sizes?\hspace{-1em}
+\begin{itemize}
+\item 700 square feet
+\item $1{,}200$ square feet
+\item $3{,}300$ square feet
+\item $4{,}000$ square feet 
+\end{itemize}}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Activity: prediction checklist}
+
+\activity[-- using the fitted model]{%
+For $\widehat{\text{poverty}}=64.78-0.62(\text{HS grad})$:
+\begin{enumerate}
+\item Predict poverty when the HS graduation rate is $90\%$.
+\item If the observed poverty rate is $7.5\%$, compute the residual.
+\item The data range from $77\%$ to $92\%$ --- is this prediction interpolation or extrapolation?
+\end{enumerate}}
+
+\pause
+\solnbox{Prediction: $64.78-0.62(90)=8.98$. Residual: $7.5-8.98=-1.48$. Interpolation ($90\%$ lies within $77$--$92\%$).}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Categorical predictors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Indicator variables}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Preview: a categorical predictor}
+
+So far $x$ has been numerical. We can also use a \emph{category} by coding it as a $0/1$ \hl{indicator} (dummy) variable:
+$$
+\text{south}=\begin{cases}
+1, & \text{Southern state},\\
+0, & \text{otherwise}.
+\end{cases}
+$$
+\keyidea[-- Indicator variable]{A $0/1$ indicator lets a regression use a categorical predictor. The category coded $0$ is the \hl{reference level}.}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Fitting poverty on region}
+
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+Fitted on the state data:
+$$\widehat{\text{poverty}}=10.19+3.47(\text{south}).$$
+{\small
+Intercept $=$ \hl{reference-group mean} (Not South). Coefficient $=$ \hl{difference} in group means: $13.66-10.19=3.47$.}
+
+\vspace{0.3em}
+\textbf{Interpret $3.47$ in one sentence.}
+
+\pause
+\soln{Southern states are predicted to have poverty about $3.5$ points higher.}
+\end{column}
+\begin{column}{0.52\textwidth}
+\begin{center}
+\includegraphics[width=0.86\textwidth]{figures/poverty-by-region.png}
+\end{center}
+\end{column}
+\end{columns}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Practice: identify the reference level}
+
+\activity[-- reference level]{A model reports coefficients for \texttt{region1} and \texttt{region2}, but none for \texttt{region3}. Which region is the reference level, and what does the intercept equal?}
+
+\pause
+\solnbox{\texttt{region3}: the reference category is the one omitted from the coefficient table, and the intercept is its predicted mean. In general, a $k$-level category needs $k-1$ indicators.}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Wrap-up}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Today's workflow}
+
+\begin{enumerate}
+\item \textbf{How strong?} Use $r$ for direction/strength and $R^2$ for the percent of variability explained.
+\item \textbf{What prediction?} Substitute $x$ into the fitted equation; the residual $y-\widehat{y}$ is the prediction error.
+\item \textbf{Is it reasonable?} Check whether $x$ is inside the observed range --- interpolation, not extrapolation.
+\item \emph{Preview:} a $0/1$ indicator lets a categorical predictor into the model, with the omitted level as reference.
+\end{enumerate}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Coming up next:}
+
+Today: using a fitted line --- $r$ and $R^2$, prediction and extrapolation, and a first look at indicator variables.
+
+\vspace{0.5em}
+\hl{Next class --- Multiple regression:} what changes when a model uses \emph{several} predictors at once?
+
+\begin{itemize}
+\item the multiple regression model, and reading each coefficient \emph{holding the others fixed}
+\item categorical predictors with more than two levels, through indicator variables
+\item comparing models with $R^2$ and \hl{adjusted $R^2$}
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% End document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}

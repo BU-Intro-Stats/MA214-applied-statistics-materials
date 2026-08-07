@@ -1,0 +1,55 @@
+% !TEX root =  Lecture20.tex
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Recap/Agenda
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Module 4: Bayesian Statistics}
+    \begin{itemize}
+        \item \hl{Previously:} grid approximation and MCMC, so we can now get a posterior for any model.
+        \item \hl{This time:} we \emph{use} it, for everything Lectures 18 and 19 deferred.
+          \begin{itemize}
+              \item \hl{point estimates} and \hl{credible intervals}: what ``95\%'' means;
+              \item \hl{hypothesis tests}: a claim's probability, read straight off the posterior;
+              \item \hl{model comparison}, applying Bayes' rule to models rather than parameters;
+              \item \hl{prediction} for a new observation, and \hl{predictive checking}.
+          \end{itemize}
+        \item \hl{Reading:} Bayes Rules!\ Chapter 8.
+        \item \hl{Homework:}
+    \end{itemize}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Learning objectives:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+    \frametitle{Lecture Objectives}
+    \goals{%
+    \begin{itemize}
+    \item \hl{estimate a parameter} from a posterior, and say how the posterior mean differs from the MLE;
+    \item construct a \hl{credible interval}, and say how it differs from a confidence interval;
+    \item test a hypothesis as a \hl{posterior tail probability}, summarized by a Bayesian $s$-value;
+    \item \hl{compare two models} by turning their priors into posterior probabilities;
+    \item build a \hl{posterior predictive} distribution, and see why averaging beats plugging in;
+    \item use \hl{predictive checking}: simulate data from the fitted model and compare.
+    \end{itemize}}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+    \frametitle{Lecture Objectives}
+    \objectives{%
+    \begin{itemize}
+    \item \textbf{(M4, LO4)} Inference and Prediction: estimate parameters, construct credible intervals, compare models, and make predictions from a posterior
+    \end{itemize}}
+    \vspace{0.3em}
+    {\small Building on, and revisiting:}
+    \objectives{%
+    \begin{itemize}
+    \item \textbf{(M4, LO3)} Conjugate Models: the Beta-Binomial, Normal-Normal, and Gamma-Poisson posteriors from Lecture 18
+    \item \textbf{(M4, LO5)} Markov chain Monte Carlo: the posterior draws from Lecture 19, reused here to predict
+    \end{itemize}}
+\end{frame}

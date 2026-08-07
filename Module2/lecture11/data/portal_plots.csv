@@ -1,0 +1,16 @@
+species_id,plot_type,n
+DM,Control,6760
+DM,Long-term Krat Exclosure,245
+DM,Rodent Exclosure,851
+DM,Short-term Krat Exclosure,1156
+DM,Spectab exclosure,1584
+DS,Control,1389
+DS,Long-term Krat Exclosure,26
+DS,Rodent Exclosure,104
+DS,Short-term Krat Exclosure,465
+DS,Spectab exclosure,520
+PP,Control,1108
+PP,Long-term Krat Exclosure,879
+PP,Rodent Exclosure,241
+PP,Short-term Krat Exclosure,573
+PP,Spectab exclosure,322

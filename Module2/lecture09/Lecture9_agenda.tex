@@ -1,0 +1,42 @@
+% !TEX root =  Lecture10.tex
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Recap/Agenda
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Module 2: Statistical Inference}
+    \begin{itemize}
+    	\item \hl{Previously:} testing with randomization --- \emph{is there an effect?}
+        \item \hl{This time:} \emph{how big is it?} Confidence intervals with bootstrapping.
+          \begin{itemize}
+              \item confidence intervals as statements about a \emph{procedure};
+              \item the bootstrap idea: resample your own data with replacement;
+              \item percentile and standard-error intervals, and what makes them narrow;
+              \item doing it in R --- and what the bootstrap cannot do.
+          \end{itemize}
+        \item \hl{Reading:} IMS Chapter 12.
+        \item \hl{Homework for today:}
+        \item \hl{Homework for next class:}
+    \end{itemize}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Learning objectives:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+    \frametitle{Lecture Objectives}
+    \goals{%
+    \begin{itemize}
+    \item say what population \emph{parameter} a scientific question is really asking about;
+    \item build a bootstrap distribution --- resample, recompute, repeat --- and read a confidence interval off it, by percentile or by standard error;
+    \item interpret a confidence interval correctly, and name the three standard misreadings;
+    \item carry the whole workflow out in R, and choose between randomization, bootstrapping, and a mathematical model.
+    \end{itemize}}
+    \objectives{%
+    \begin{itemize}
+    \item \textbf{(M2, LO1)} Approaches to Inference
+    \item \textbf{(M2, LO2)} Simulation-based Inference
+    \end{itemize}}
+\end{frame}

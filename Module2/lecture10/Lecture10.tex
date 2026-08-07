@@ -1,0 +1,670 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Slide options
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Option 1: Slides with solutions
+
+\documentclass[slidestop,compress,mathserif]{beamer}
+\usepackage{booktabs}
+\newcommand{\soln}[1]{\textit{#1}}
+\newcommand{\solnGr}[1]{#1}
+
+% Option 2: Handouts without solutions
+
+%\documentclass[11pt,containsverbatim,handout]{beamer}
+%\usepackage{pgfpages}
+%\pgfpagesuselayout{4 on 1}[letterpaper,landscape,border shrink=5mm]
+%\newcommand{\soln}[1]{ }
+%\newcommand{\solnGr}{ }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Style
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{../../common/lec_style.tex}
+% The "why do they keep coming out bell-shaped?" slide shows the Lecture 8 and
+% Lecture 9 figures side by side. Read them from those lectures' own figures/
+% directories, where their R scripts write them, rather than keeping copies
+% here that would silently fall out of date.
+\graphicspath{ {../../common/} {figures/} {../lecture08/figures/} {../lecture09/figures/} }
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Preamble
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title[Lecture 10]{Lecture 10: Inference with mathematical models}
+\subtitle{Module 2: Statistical Inference}
+\author{Introduction to Modern Statistics, 2nd Edition}
+\institute{$\:$ \\ {\footnotesize Based on slides developed by Mine \c{C}etinkaya-Rundel of OpenIntro.  \\
+The slides may be copied, edited, and/or shared via the \webLink{http://creativecommons.org/licenses/by-sa/3.0/us/}{CC BY-SA license.} \\
+Some images may be included under fair use guidelines (educational purposes).}}
+\date{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Begin document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Title page
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\maketitleframe
+
+\include{Lecture10_agenda}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{From simulation to formulas}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Two lectures of brute force}
+
+Every inference we have made so far came out of a simulation:
+
+\vspace{0.2em}
+{\footnotesize
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+& What we simulated & What it gave us \\
+\midrule
+\hl{Lecture 8} & shuffled labels, $10{,}000\times$ & a null distribution, then a p-value \\
+\hl{Lecture 9} & resampled the data, $2{,}000\times$ & a sampling distribution, then a CI \\
+\bottomrule
+\end{tabular}
+\end{center}}
+
+\vspace{0.4em}
+\keyidea[-- today]{For a long time nobody had a computer, and statistical inference worked anyway. For many statistics the sampling distribution has a \emph{known shape} --- so we can write it down instead of simulating it.}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Today's road}
+
+\begin{enumerate}
+\item \hl{Exact calculations:} the binomial and the normal model.
+\item \hl{The central limit theorem:} why $\bar{x}$ comes out bell-shaped almost whatever the data look like.
+\item Reading a \hl{p-value and a confidence interval off a formula}.
+\item What changes when $\sigma$ is unknown: the \hl{$t$ distribution}.
+\item \hl{Two-sample} and \hl{paired} data.
+\item When a formula is safe --- and when to go back to simulating.
+\end{enumerate}
+
+\vspace{0.5em}
+We check every formula against last lecture's kangaroo rats: \emph{if the two roads disagree, one of them is wrong.}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Exact calculations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The binomial model}
+
+We met this in Lecture 2 as a \emph{likelihood}. It is also a \emph{sampling distribution} --- and an exact one.
+
+\vspace{0.2em}
+\formula{Binomial model}{
+Run $n$ independent trials, each a success with the same probability $p$. The number of successes $X$ then satisfies
+\[
+P(X = k) \;=\; \binom{n}{k}\, p^{k}\, (1-p)^{\,n-k}, \qquad k = 0,1,\ldots,n .
+\]}
+
+\vspace{0.2em}
+No simulation, no approximation: this is the \hl{exact} probability of every outcome. What a randomization test estimates by counting, the binomial gives in closed form.
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{Exact beats simulated}
+
+Twenty coin flips. What is $P(X \ge 8)$ when $p = 0.5$?
+
+\begin{lstlisting}[language=R]
+1 - pbinom(7, size = 20, prob = 0.5)   #> 0.8684
+\end{lstlisting}
+
+\vspace{-0.3em}
+{\footnotesize
+\begin{center}
+\begin{tabular}{lccccc}
+\toprule
+Simulations $B$ & 100 & 1{,}000 & 10{,}000 & 100{,}000 & \textbf{exact} \\
+\midrule
+$\widehat{P}(X \ge 8)$ & 0.840 & 0.859 & 0.866 & 0.869 & \textbf{0.8684} \\
+\bottomrule
+\end{tabular}
+\end{center}}
+
+\vspace{-0.2em}
+\caution{A simulated probability wobbles: it carries Monte Carlo noise, and running it again gives a slightly different answer. A formula does not. \emph{When an exact formula exists, use it.}}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Activity: is the sex ratio 50/50?}
+
+We trap $10$ kangaroo rats. \hl{Eight of them are male.}
+
+\vspace{0.3em}
+\app{
+\begin{enumerate}
+\item What is the parameter, and what are $H_0$ and $H_A$?
+\item Which model gives the null distribution of the number of males --- \emph{exactly}?
+\item Eight out of ten looks lopsided. Before computing: how surprised should we be?
+\item Compute the two-sided p-value.
+\end{enumerate}}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Activity: is the sex ratio 50/50? --- solution}
+
+$p$ is the true proportion of males; $H_0: p = 0.5$ against $H_A: p \neq 0.5$. Under $H_0$ the count of males is exactly $\mathrm{Binom}(10,\, 0.5)$ --- no simulation needed.
+
+\solnbox{\small Add up the probability of every outcome at least as extreme as 8 males, i.e.\ $\{8,9,10\}$ and, by symmetry, $\{0,1,2\}$:
+$\;p\text{-value} = 2 \times P(X \ge 8) = 2 \times 0.0547 = \hl{0.109}$. Eight out of ten \emph{looks} lopsided, but with only ten rats a split this uneven turns up about \textbf{one time in nine} when the ratio really is 50/50. No evidence against $H_0$.}
+
+\vspace{0.3em}
+Same lesson as Lecture 8's decision errors: a small sample has little power --- here it cannot even rule out chance.
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The normal model}
+
+The binomial counts successes. For a \emph{continuous} measurement --- a weight, a price, a temperature --- the workhorse is the normal model.
+
+\vspace{0.2em}
+\formula{Normal model and the $z$-score}{
+$X \sim N(\mu, \sigma)$ is symmetric and bell-shaped, centered at $\mu$ with spread $\sigma$. The \hl{$z$-score}
+$\;z = (x - \mu)/\sigma\;$
+rewrites a value as \emph{how many standard deviations it sits from the center} --- which is what makes different variables comparable.}
+
+\vspace{0.2em}
+{\small About $68\%$ of a normal distribution lies within $1\sigma$ of $\mu$, $95\%$ within $2\sigma$, and $99.7\%$ within $3\sigma$. In R: \texttt{pnorm()} turns a value into a probability, \texttt{qnorm()} does the reverse.}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Is a 62-gram kangaroo rat unusual?}
+
+Our $348$ rats have $\bar{x} = 43.95$ g and $s = 6.56$ g. The heaviest we caught weighed $62$ g:
+\[
+z = \frac{62 - 43.95}{6.56} = 2.75
+\quad\Longrightarrow\quad
+P(X > 62) = 0.0030 .
+\]
+\vspace{-0.4em}
+{\small A rat that heavy should turn up about three times in a thousand. (Strictly $\mu$ and $\sigma$ are \emph{population} values; we have borrowed $\bar{x}$ and $s$ as stand-ins. What that costs is Section 5.)}
+
+\vspace{0.2em}
+\dq{Our sample \emph{contains} exactly such a rat. Does that mean the normal model is wrong here?}
+
+\pause
+\vspace{-0.3em}
+{\footnotesize
+\soln{No --- if anything it is a point in the model's favor. We caught $348$ rats, and $0.0030 \times 348 \approx 1$: the model predicts about one rat this heavy, and we found one. A rare event stops being surprising once you have looked enough times.}}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The central limit theorem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Why do they keep coming out bell-shaped?}
+
+\begin{columns}[T]
+\column{0.48\textwidth}
+\begin{center}
+{\scriptsize Lecture 8: shuffled labels}\\[0.2em]
+\includegraphics[width=\textwidth]{null-dist-permutation.png}
+\end{center}
+\column{0.48\textwidth}
+\begin{center}
+{\scriptsize Lecture 9: bootstrap resamples}\\[0.2em]
+\includegraphics[width=\textwidth]{dm1999_boot_mean.png}
+\end{center}
+\end{columns}
+
+\vspace{0.2em}
+{\small Different data, different question, different simulation --- and neither was \emph{designed} to be bell-shaped. One shuffled quiz scores; the other resampled a lumpy, left-skewed pile of rat weights.}
+
+\vspace{0.1em}
+\dq{Coincidence? Or is something forcing this shape?}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The central limit theorem}
+
+\keyidea[-- the CLT]{Take a sample of size $n$ from \emph{any} population with mean $\mu$ and standard deviation $\sigma$. Once $n$ is large enough, the sampling distribution of $\bar{x}$ is approximately normal, \textbf{whatever the population looks like}.}
+
+\vspace{0.2em}
+\formula{Standard errors from the CLT}{
+\[
+\bar{x} \;\approx\; N\!\left(\mu,\; \mathrm{SE}(\bar{x})\right),
+\qquad
+\mathrm{SE}(\bar{x}) \;=\; \frac{\sigma}{\sqrt{n}} \;\approx\; \frac{s}{\sqrt{n}} .
+\]
+A proportion is just the mean of a column of 0s and 1s, so the same theorem covers it: $\;\mathrm{SE}(\hat{p}) = \sqrt{p(1-p)/n}$.}
+
+\vspace{-0.2em}
+{\small Center, spread \emph{and} shape, with nothing resampled.}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{``No matter what the population looks like''}
+
+\begin{center}
+\includegraphics[width=0.99\textwidth]{clt_emerges.png}
+\end{center}
+
+\vspace{-0.4em}
+{\small The population (left) is every rodent trapped at the site: several species pooled, wildly right-skewed, from $4$ g to $280$ g. Nothing normal about it. Yet the mean of $100$ of them lands almost exactly on the curve the CLT predicts --- a curve drawn from $\mu$ and $\sigma$ alone, \emph{without looking at the histogram}.}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The formula reproduces last lecture's bootstrap}
+
+\vspace{-0.2em}
+\begin{center}
+\includegraphics[width=0.68\textwidth]{clt_vs_bootstrap.png}
+\end{center}
+
+\vspace{-0.5em}
+\keyidea[-- the point of today]{Two roads that share nothing: one resampled the data $2{,}000$ times, the other simply divided $s$ by $\sqrt{n}$. They land within $1\%$ of each other --- $0.355$ against $\hl{0.352}$.}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{When does the CLT apply?}
+
+\begin{itemize}
+\item \hl{Independence.} The observations must be independent --- a random sample, or a randomised experiment.
+\item \hl{Sample size.} ``Large enough'' depends on the population: the more skewed it is, the larger $n$ has to be. Look again at the $n=5$ panel --- the CLT curve did \emph{not} fit.
+\item \hl{For proportions,} the usual rule is $np \ge 10$ and $n(1-p) \ge 10$: enough successes \emph{and} enough failures.
+\end{itemize}
+
+\vspace{0.3em}
+\caution{The CLT is an \emph{approximation} that improves with $n$ --- not a licence to use a normal curve on any sample. With $n = 5$, or a statistic that is not a mean, it simply does not hold. That is exactly when we go back to bootstrapping.}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{P-values and intervals from a formula}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The confidence interval, without resampling}
+
+Write $\theta$ for whatever parameter we are after ($\mu$, $p$, $\mu_1 - \mu_2$, \ldots) and $\hat{\theta}$ for the estimate we computed from the sample. If its sampling distribution is normal, the middle $95\%$ sits within $1.96$ standard errors of the center:
+
+\vspace{0.1em}
+\formula{Confidence interval from the CLT}{
+\[
+\hat{\theta} \;\pm\; z^{*} \times \mathrm{SE},
+\qquad z^{*} = 1.96 \ (95\%), \; 1.645 \ (90\%), \; 2.576 \ (99\%) .
+\]}
+
+\vspace{0.2em}
+\hl{So that is where Lecture 9's ``$\pm\,2\,\mathrm{SE}$'' came from.} It was this formula all along, with $1.96$ rounded to $2$ --- and with $\mathrm{SE}$ estimated by resampling instead of computed.
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Three roads to the same interval}
+
+A 95\% confidence interval for the mean weight of a kangaroo rat, $n = 348$:
+
+\vspace{0.2em}
+{\small
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+Method & Where the SE came from & 95\% CI (g) \\
+\midrule
+Bootstrap percentile & 2000 resamples & $[43.27,\; 44.63]$ \\
+Bootstrap $\pm 2\,\mathrm{SE}$ & 2000 resamples & $[43.24,\; 44.65]$ \\
+\hl{CLT formula} & $s/\sqrt{n} = 6.56/\sqrt{348}$ & $\hl{[43.26,\; 44.63]}$ \\
+\bottomrule
+\end{tabular}
+\end{center}}
+
+\vspace{0.3em}
+The third row took no simulation at all --- and one of the $2{,}000$-resample rows agrees with it to the last decimal place shown.
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{The $z$-test: Lecture 8's office hours, redone}
+
+$29$ of $40$ students prefer online office hours. $H_0: p = 0.5$.
+
+\vspace{-0.2em}
+\begin{lstlisting}[language=R, basicstyle=\ttfamily\scriptsize]
+phat <- 29/40                     # 0.725
+se0  <- sqrt(0.5 * 0.5 / 40)      # SE *under H0* = 0.0791
+z    <- (phat - 0.5) / se0        # 2.85
+2 * pnorm(-abs(z))                #> 0.0044
+\end{lstlisting}
+
+\vspace{-0.2em}
+\formula{The $z$-test}{
+\[
+z \;=\; \frac{\hat{\theta} - \theta_0}{\mathrm{SE}}, \qquad
+p\text{-value} \;=\; 2\,P(Z > |z|) \quad\text{(two-sided)} .
+\]}
+
+\vspace{-0.1em}
+{\small Note $\mathrm{SE}$ is computed \emph{under $H_0$}: we use $p_0 = 0.5$, not $\hat{p}$ --- the null world is the one we are testing.}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Three methods, one conclusion}
+
+{\small
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+Method & p-value & Cost \\
+\midrule
+Randomization (Lecture 8) & $0.005$ & $10{,}000$ simulations \\
+$z$-test (today) & $0.0044$ & one line, but an approximation \\
+\hl{Exact binomial} & $\hl{0.0064}$ & one line, and exact \\
+\bottomrule
+\end{tabular}
+\end{center}}
+
+\vspace{0.3em}
+Look back at Lecture 8's table of ``how many simulations is enough''. Its last column was headed \textbf{exact}, and read $0.0064$ --- we never said where that number came from.
+
+\vspace{0.2em}
+\keyidea[-- the loop closes]{It came from the binomial. Simulation was \emph{approximating} a number the formula gives outright.}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{When sigma is unknown: the $t$ distribution}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{We used $\sigma$. We only have $s$.}
+
+The CLT says $\bar{x} \approx N(\mu, \sigma/\sqrt{n})$ --- but $\sigma$ is a \emph{population} quantity. We never have it. We plug in the sample $s$ instead.
+
+\vspace{0.4em}
+\keyidea[-- what that costs]{Replacing $\sigma$ by an \emph{estimate} adds a second source of uncertainty on top of the sampling variability. The result is no longer normal: it has \textbf{heavier tails}. That distribution is the \hl{$t$ distribution}, with $n-1$ degrees of freedom.}
+
+\vspace{0.4em}
+Everything else is unchanged. The interval is still $\hat{\theta} \pm (\text{critical value}) \times \mathrm{SE}$ --- we just take the critical value from $t_{n-1}$ rather than from the normal.
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{How much heavier?}
+
+\vspace{-0.2em}
+\begin{center}
+\includegraphics[width=0.62\textwidth]{t_vs_normal.png}
+\end{center}
+
+\vspace{-0.5em}
+{\footnotesize
+\begin{center}
+\begin{tabular}{lccccc}
+\toprule
+& $df=2$ & $df=5$ & $df=30$ & $df=347$ & normal \\
+\midrule
+95\% critical value & 4.303 & 2.571 & 2.042 & \hl{1.967} & \hl{1.960} \\
+\bottomrule
+\end{tabular}
+\end{center}}
+
+\vspace{-0.2em}
+{\small Strictly, the earlier interval should have used $1.967$, not $1.960$. With $n = 348$ that moves it by less than a thousandth of a gram. With $n = 5$ it would more than double it.}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{So when does it matter?}
+
+\begin{itemize}
+\item \hl{Large $n$:} $t$ and $z$ are practically the same. Use either.
+\item \hl{Small $n$:} the $t$ interval is genuinely wider --- and the honest one, because with a handful of observations $s$ is a poor estimate of $\sigma$.
+\item In practice: \textbf{if you estimated the standard deviation from the data, use $t$.} R's \texttt{t.test()} does this by default.
+\end{itemize}
+
+\vspace{0.4em}
+\keyidea[-- coming back in Lecture 13]{The same $t$ turns up in regression. To test whether a slope is zero we will compute $T = \hat{\beta}_1/\mathrm{SE}(\hat{\beta}_1)$ and compare it against $t_{n-2}$ --- the same idea, with two coefficients estimated instead of one.}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Two samples and paired data}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Comparing two independent groups}
+
+The statistic is $\bar{x}_1 - \bar{x}_2$. It has its own standard error, and the CLT applies to it too.
+
+\vspace{0.2em}
+\formula{Standard error of a difference}{
+\[
+\mathrm{SE}(\bar{x}_1 - \bar{x}_2) \;=\; \sqrt{\frac{s_1^2}{n_1} + \frac{s_2^2}{n_2}} .
+\]}
+
+\vspace{0.2em}
+{\small Variances add; standard errors do not. Note what this says: comparing two groups is \emph{harder} than estimating one, because both groups contribute noise.}
+
+\vspace{0.2em}
+The interval and the test are then exactly as before: $(\bar{x}_1 - \bar{x}_2) \pm t^{*}\,\mathrm{SE}$, and $t = (\bar{x}_1 - \bar{x}_2)/\mathrm{SE}$.
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Do male and female kangaroo rats differ in weight?}
+
+\vspace{-0.2em}
+\begin{center}
+\includegraphics[width=0.60\textwidth]{two_sample_sex.png}
+\end{center}
+
+\vspace{-0.5em}
+{\small
+Males average $44.15$ g ($n=204$), females $43.66$ g ($n=144$): a difference of $0.49$ g with $\mathrm{SE} = 0.65$.
+\[
+t = \frac{0.49}{0.65} = 0.75 \;\;(df \approx 319), \qquad p = 0.45, \qquad \text{95\% CI} = [-0.78,\; 1.76] .
+\]
+The interval contains zero. \hl{No evidence of a difference} --- the gap between the groups is swamped by the variation within them.}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Paired data is not two samples}
+
+A bookshop and Amazon both stock the same $73$ textbooks. We have two prices for \emph{each book}.
+
+\vspace{0.4em}
+\keyidea[-- the move]{When every observation in one group has a natural partner in the other, the data are \hl{paired}. Take the difference \emph{within each pair} --- and a two-sample problem collapses into a \textbf{one-sample} problem about the mean difference.}
+
+\vspace{0.4em}
+Why bother? Because a $\$200$ physics text and a $\$15$ paperback differ from each other far more than either differs between the two shops. Pairing subtracts that irrelevant variation away.
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The same data, paired or not}
+
+\vspace{-0.3em}
+\begin{center}
+\includegraphics[width=0.42\textwidth]{paired_textbooks.png}
+\end{center}
+
+\vspace{-0.5em}
+{\footnotesize
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+Analysis & p-value & 95\% CI for the difference \\
+\midrule
+\hl{Paired} (correct) & $7 \times 10^{-11}$ & $[\$9.44,\; \$16.09]$ \\
+Two independent samples & $0.16$ & --- \\
+\bottomrule
+\end{tabular}
+\end{center}}
+
+\vspace{-0.2em}
+\caution{Same $73$ books, same two prices. Ignore the pairing and the \$12.76 difference vanishes into the noise --- \emph{opposite conclusions from identical data.}}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Activity: paired or two-sample?}
+
+\app{
+For each study, say whether the data are paired or two independent samples --- and what the statistic would be.
+
+\begin{enumerate}
+\item Blood pressure of $30$ patients, measured before and after a drug.
+\item Weights of the $204$ male and $144$ female rats we trapped.
+\item Exam scores of two different discussion sections.
+\item The same $50$ runners' times in April and in September.
+\item Yields from $12$ farms, each split into a treated half and an untreated half.
+\end{enumerate}}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Activity: paired or two-sample? --- solution}
+
+\solnbox{\small \textbf{Paired:} (1) each patient is their own control; (4) each runner appears twice; (5) the two halves of a farm share its soil and weather. In all three, compute the \emph{difference within each pair} and do a one-sample analysis of those differences. \textbf{Two independent samples:} (2) and (3) --- no rat is both male and female, no student sits in both sections, so there is nothing to pair up. Use $\bar{x}_1 - \bar{x}_2$ with $\mathrm{SE} = \sqrt{s_1^2/n_1 + s_2^2/n_2}$.}
+
+\vspace{0.4em}
+The test to apply: \hl{can you draw a line between one observation in group A and exactly one in group B?} If yes, pair them. If the two groups even have different sizes, they cannot be paired.
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Formula versus simulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Three ways to get a sampling distribution --- completed}
+
+{\scriptsize
+\begin{center}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{p{0.13\textwidth}p{0.22\textwidth}p{0.22\textwidth}p{0.27\textwidth}}
+\toprule
+& \textbf{Randomization} \newline (Lecture 8) & \textbf{Bootstrap} \newline (Lecture 9) & \textbf{Mathematical model} \newline (today) \\
+\midrule
+Starts from & a null hypothesis & the observed sample & a probability model \\
+Builds & a null distribution & a sampling distribution & a \emph{formula} for it \\
+Gives you & a p-value & a confidence interval & both, instantly \\
+Needs & a computer & a computer & the conditions to hold \\
+Works for & any statistic & any statistic & means, proportions, differences \\
+\bottomrule
+\end{tabular}
+\end{center}}
+
+\vspace{0.2em}
+{\small The three agree whenever they are all valid --- we have now checked that twice, on the rats and on the office hours.}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{So which one should I use?}
+
+\begin{itemize}
+\item \hl{A formula exists and its conditions hold} $\Rightarrow$ use it. Exact or nearly so, instant, and free of simulation noise.
+\item \hl{An unusual statistic} --- a median, a 90th percentile, a maximum $\Rightarrow$ no formula exists. Bootstrap it.
+\item \hl{A null you can simulate but not solve} $\Rightarrow$ randomization.
+\end{itemize}
+
+\vspace{0.4em}
+\caution{These are two routes to the \emph{same} sampling distribution --- not ``the truth'' and ``an approximation to it''. Each one fails in situations where the other works.}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{And when $n$ is small?}
+
+Neither road is free.
+
+\begin{itemize}
+\item The \hl{CLT has not kicked in}, so a $t$ interval is valid only if the \emph{population itself} is roughly normal --- an assumption you now have to argue for, not one the theorem hands you.
+\item And \hl{the bootstrap cannot rescue a tiny sample} either: with $n=5$ every resample reuses the same five numbers (Lecture 9).
+\end{itemize}
+
+\vspace{0.4em}
+\keyidea[-- the honest answer]{With $n = 6$, no arithmetic manufactures information the data do not contain. The right move is to say so --- and, if it matters, to go and catch more rats.}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Wrap-up}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Summary}
+
+\begin{itemize}
+\item Some sampling distributions are known \emph{exactly}: the \hl{binomial} for counts of successes.
+\item The \hl{central limit theorem}: for large enough $n$, $\bar{x} \approx N(\mu,\, \sigma/\sqrt{n})$ whatever the population looks like. This is why our simulated distributions kept coming out bell-shaped.
+\item From it: $\;\hat{\theta} \pm z^{*}\mathrm{SE}\;$ for intervals, $\;z = (\hat{\theta}-\theta_0)/\mathrm{SE}\;$ for tests.
+\item $\sigma$ is never known. Using $s$ instead gives the \hl{$t$ distribution}: heavier tails, same recipe.
+\item Two groups: $\mathrm{SE} = \sqrt{s_1^2/n_1 + s_2^2/n_2}$. \hl{Paired data is not two samples}: difference the pairs first.
+\item Formulas are instant but conditional; simulation is general but needs a computer. \emph{Neither} rescues a sample that is too small.
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Coming up next}
+
+\hl{Next class, testing for independence:} what if both variables are \emph{categorical}? Is a student's class year related to whether they prefer online office hours?
+
+\begin{itemize}
+\item \hl{two-way tables} and what ``independent'' would predict for their cells;
+\item the same two roads again: shuffle the labels, or use a mathematical model;
+\item and the model, this time, is the \hl{chi-square distribution}.
+\end{itemize}
+
+\vspace{0.3em}
+\emph{To think about:} three ways to build a sampling distribution keep agreeing. What would it mean if they disagreed?
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% End document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}

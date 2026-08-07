@@ -1,0 +1,605 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Slide options
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Option 1: Slides with solutions
+
+\documentclass[slidestop,compress,mathserif]{beamer}
+\usepackage{booktabs}
+\newcommand{\soln}[1]{\textit{#1}}
+\newcommand{\solnGr}[1]{#1}
+
+% Option 2: Handouts without solutions
+
+%\documentclass[11pt,containsverbatim,handout]{beamer}
+%\usepackage{pgfpages}
+%\pgfpagesuselayout{4 on 1}[letterpaper,landscape,border shrink=5mm]
+%\newcommand{\soln}[1]{ }
+%\newcommand{\solnGr}{ }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Style
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{../../common/lec_style.tex}
+\graphicspath{ {../../common/} }
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Preamble
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title[Lecture 5]{Lecture 5: Multiple Regression}
+\subtitle{Module 1: Modeling and Linear Regression}
+\author{Introduction to Modern Statistics, 2nd Edition}
+\institute{$\:$ \\ {\footnotesize Based on slides developed by Mine \c{C}etinkaya-Rundel of OpenIntro.  \\
+The slides may be copied, edited, and/or shared via the \webLink{http://creativecommons.org/licenses/by-sa/3.0/us/}{CC BY-SA license.} \\
+Some images may be included under fair use guidelines (educational purposes).}}
+\date{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Begin document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Title page
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\maketitleframe
+
+\include{Lecture5_agenda}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction to multiple regression}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Why multiple regression?}
+
+Simple regression uses one predictor:
+$$
+\widehat{y}=\widehat{\beta}_0+\widehat{\beta}_1x.
+$$
+Multiple regression uses several predictors at once:
+$$
+\widehat{y}=\widehat{\beta}_0+\widehat{\beta}_1x_1+\widehat{\beta}_2x_2+\cdots+\widehat{\beta}_px_p.
+$$
+\begin{itemize}
+\item A response is rarely explained by a single variable.
+\item Several predictors are often related to each other, so we want the association with \emph{one} predictor after accounting for the others.
+\end{itemize}
+
+The main new idea is \hl{conditional} interpretation.
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The key phrase: holding the other predictors fixed}
+
+For the model $\widehat{y}=\widehat{\beta}_0+\widehat{\beta}_1x_1+\widehat{\beta}_2x_2$:
+
+\begin{itemize}
+\item $\widehat{\beta}_1$: predicted change in $y$ for a one-unit increase in $x_1$, \hl{holding $x_2$ fixed}.
+\item $\widehat{\beta}_2$: predicted change in $y$ for a one-unit increase in $x_2$, \hl{holding $x_1$ fixed}.
+\end{itemize}
+
+\keyidea[-- Conditional interpretation]{Multiple regression separates the association with \emph{one} predictor from the associations with all the others. So every coefficient is read \emph{one at a time}, with the rest held constant.}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Step-by-step: interpreting a coefficient}
+
+Use the same template every time. To interpret $\widehat{\beta}_j$:
+
+\begin{enumerate}
+\item Identify the \textbf{response} variable and its units.
+\item Identify the \textbf{predictor} $x_j$ and its units.
+\item State the \textbf{one-unit change} in $x_j$.
+\item Add the conditional phrase: \hl{holding all other predictors fixed}.
+\item Give the \textbf{direction} (up or down) and the \textbf{units} of the change in $\widehat{y}$.
+\end{enumerate}
+
+\formula{The template}{%
+\emph{``A one-unit increase in $x_j$ is associated with a $\widehat{\beta}_j$ unit change in the predicted response, holding all other predictors fixed.''}}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Categorical and indicator variables}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Categorical predictors}
+
+\keyidea[-- Indicator variables]{%
+\begin{itemize}
+\item A categorical variable enters the model through \hl{indicator} (dummy) variables, each taking the value $0$ or $1$.
+\item A categorical variable with $k$ levels needs $k-1$ indicators.
+\item The omitted level is the \hl{reference level}. Each coefficient is the difference \emph{from the reference level}.
+\end{itemize}}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Interest rate vs.\ bankruptcy}
+
+Using the \texttt{loans} data, we model the interest rate on a loan from whether the borrower has a past bankruptcy:
+\[ \widehat{\text{rate}} = 12.33 + 0.74 \times \text{bankruptcy} \]
+\begin{itemize}
+\item Response: interest rate (percent). Predictor: \texttt{bankruptcy} ($0/1$); \hl{reference level:} no bankruptcy.
+\pause
+\item \hl{Intercept:} plug in $\orange{0}$ --- the estimated average rate for borrowers with \emph{no} bankruptcy is $12.33\%$.
+\pause
+\item \hl{Slope:} plug in $\orange{1}$ --- borrowers with a past bankruptcy average $0.74$ points higher, i.e.\ $12.33+0.74=13.07\%$.
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{A categorical predictor with three levels}
+
+\texttt{income\_ver} has levels \texttt{not}, \texttt{source\_only}, \texttt{verified} --- software reports only $k-1=2$:
+
+{\scriptsize
+\begin{center}
+\begin{tabular}{l rrr r}
+\toprule
+ & Estimate & Std. Error & t value & Pr($>$$|$t$|$) \\
+\midrule
+(Intercept) & 11.0995 & 0.0809 & 137.18 & $<$0.0001 \\
+\texttt{source\_only} & 1.4160 & 0.1107 & 12.79 & $<$0.0001 \\
+\texttt{verified} & 3.2543 & 0.1297 & 25.09 & $<$0.0001 \\
+\bottomrule
+\end{tabular}
+\end{center}}
+
+\pq{Which level is the reference --- and which has the \emph{lowest} predicted rate?}
+
+\pause
+\soln{\texttt{not} --- the level \emph{missing} from the table. Its predicted rate is the intercept, $11.10\%$; both other coefficients are positive, so it is also the lowest.}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Activity 1}
+\activity[-- reading software output]{%
+\textbf{Worksheet Part 1:} interest rates are modeled from \texttt{income\_ver} (three levels, two rows of output).
+\begin{enumerate}
+\item Why do only two levels appear in the table?
+\item Identify the reference level.
+\item Predict the rate for a \texttt{verified} borrower.
+\item Which level has the lowest predicted rate?
+\end{enumerate}}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Worked example: weights of books}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{A running example: weights of books}
+
+\examplehead{Weights of books}
+
+$15$ books, recording weight, volume, and cover type:
+
+{\footnotesize
+\begin{center}
+\begin{tabular}{r r c}
+\toprule
+weight (g) & volume (cm$^3$) & cover \\
+\midrule
+800 & 885 & hardcover \\
+950 & 1016 & hardcover \\
+350 & 239 & hardcover \\
+250 & 412 & paperback \\
+700 & 953 & paperback \\
+975 & 1492 & paperback \\ 
+\vdots~ & \vdots~ & \vdots \\
+\bottomrule
+\end{tabular}
+\end{center}}
+
+\vspace{-0.3em}
+Response: book weight. Predictors: volume (numerical) \emph{and} cover type (categorical).
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Model 1: volume only}
+
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+Ignoring cover type gives a simple linear model:
+\[ \widehat{\text{weight}}=107.68+0.71(\text{volume}). \]
+\begin{itemize}
+\item Each extra $1$ cm$^3$ of volume is associated with about $0.71$ g more predicted weight.
+\item $R^2=0.803$, adjusted $R^2=0.787$.
+\end{itemize}
+\end{column}
+\begin{column}{0.5\textwidth}
+\begin{center}
+\includegraphics[width=\textwidth]{figures/weight_volume.pdf}
+\end{center}
+\end{column}
+\end{columns}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{But cover type matters}
+
+Coloring the same scatterplot by cover type shows the line is missing something.
+
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{center}
+\includegraphics[width=0.92\textwidth]{figures/weight_volume_cover.pdf}
+\end{center}
+\end{column}
+\begin{column}{0.5\textwidth}
+\dq{At the same volume, which cover type tends to weigh more?}
+\end{column}
+\end{columns}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Model 2: adding cover type}
+
+Define an indicator, with hardcover as the reference level:
+$$
+\text{cover:pb}=\begin{cases}
+1, & \text{paperback book},\\
+0, & \text{hardcover book}.
+\end{cases}
+$$
+Fitting \texttt{weight $\sim$ volume + cover} gives:
+
+{\small
+\begin{center}
+\begin{tabular}{l rrr r}
+\toprule
+ & Estimate & Std. Error & t value & Pr($>$$|$t$|$) \\
+\midrule
+(Intercept) & 197.96 & 59.19 & 3.34 & 0.01 \\
+volume & 0.72 & 0.06 & 11.67 & 0.00 \\
+cover:pb & $-184.05$ & 40.49 & $-4.55$ & 0.00 \\
+\bottomrule
+\end{tabular}
+\end{center}}
+
+\pause
+\[ \widehat{\text{weight}} = 197.96 + 0.72\,\text{volume} - 184.05\,\text{cover:pb} \]
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Same model, two lines}
+
+Plug the indicator in and the single model splits into one line per group.
+
+\hl{Hardcover:} plug in $\orange{0}$
+\begin{align*}
+\widehat{\text{weight}} &= 197.96 + 0.72\,\text{volume} - 184.05\times \orange{0}\\
+&= 197.96 + 0.72\,\text{volume}
+\end{align*}
+\pause
+\hl{Paperback:} plug in $\orange{1}$
+\begin{align*}
+\widehat{\text{weight}} &= 197.96 + 0.72\,\text{volume} - 184.05\times \orange{1}\\
+&= 13.91 + 0.72\,\text{volume}
+\end{align*}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Visualizing the model: parallel slopes}
+
+\begin{columns}[T]
+\begin{column}{0.55\textwidth}
+\begin{center}
+\includegraphics[width=\textwidth]{figures/weight_volume_cover_lines.pdf}
+\end{center}
+\end{column}
+\begin{column}{0.45\textwidth}
+\keyidea[-- Parallel slopes]{The indicator shifts the \emph{intercept} but not the \emph{slope}: both lines rise at $0.72$ g per cm$^3$, and the paperback line sits $184$ g lower.}
+
+The vertical gap between the lines is equal to the cover coefficient.
+\end{column}
+\end{columns}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Applying the template: the volume coefficient}
+\[ \widehat{\text{weight}} = 197.96 + 0.72\,\text{volume} - 184.05\,\text{cover:pb} \]
+Run the five steps on $\widehat{\beta}_1=0.72$:
+
+\vspace{-0.3em}
+{\footnotesize
+\begin{enumerate}
+\item Response: \textbf{weight}, in grams.
+\pause
+\item Predictor: \textbf{volume}, in cm$^3$.
+\pause
+\item One-unit change: a book $1$ cm$^3$ larger.
+\pause
+\item Conditional phrase: \hl{holding cover type fixed}.
+\pause
+\item Direction and units: weight goes \textbf{up} by $0.72$ \textbf{grams}.
+\end{enumerate}}
+
+\pause
+\vspace{-0.4em}
+\workedexample[volume]{Among books with the same cover type, a book $1$ cm$^3$ larger is predicted to weigh about $0.72$ g more.}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The other two coefficients}
+\[ \widehat{\text{weight}} = 197.96 + 0.72\,\text{volume} - 184.05\,\text{cover:pb} \]
+\begin{itemize}
+\item \hl{Cover ($-184.05$):} the ``one-unit change'' is switching the indicator from $0$ to $1$. Holding volume fixed, a paperback is predicted to weigh about $184$ g \emph{less} than a hardcover.
+\pause
+\item \hl{Intercept ($197.96$):} set every predictor to $0$ --- a hardcover book of zero volume, predicted to weigh $198$ g.
+\end{itemize}
+
+\pause
+\caution{The intercept is not meaningful here: no book has zero volume. It only sets the height of the two lines.}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Activity 2}
+\activity[-- interpreting coefficients]{%
+\textbf{Worksheet Part 2:} for the fitted book model
+\[ \widehat{\text{weight}} = 197.96 + 0.72\,\text{volume} - 184.05\,\text{paperback}, \]
+\begin{enumerate}
+\item name the response, predictors, and reference level;
+\item interpret $0.72$ and $-184.05$ in context, with ``holding fixed'' language;
+\item decide whether the intercept is practically meaningful.
+\end{enumerate}}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Prediction}
+
+\pq{Which is the correct calculation for the predicted weight of a \emph{paperback} book with volume $600$ cm$^3$?
+\begin{enumerate}
+\item $197.96 + 0.72\times 600 - 184.05\times 1$
+\item $184.05 + 0.72\times 600 - 197.96\times 1$
+\item $197.96 + 0.72\times 600 - 184.05\times 0$
+\item $197.96 + 0.72\times 1 - 184.05\times 600$
+\end{enumerate}}
+
+\pause
+\solnbox{(1). A paperback has $\text{cover:pb}=1$, so
+$\widehat{\text{weight}} = 197.96 + 432 - 184.05 = 445.91$ grams.}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Activity 3}
+\activity[-- one model, two lines]{%
+\textbf{Worksheet Part 3:} using the same book model,
+\begin{enumerate}
+\item write the fitted equation for each cover type;
+\item predict the weight of a hardcover and of a paperback book with volume $900$ cm$^3$.
+\end{enumerate}}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{$R^2$ and adjusted $R^2$}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{$R^2$ with several predictors}
+
+In simple regression we used $R^2=r^2$. With several predictors there is no single correlation between ``$x$'' and $y$, so we fall back on the definition:
+
+\formula{Coefficient of determination}{%
+\[ R^2 = \frac{\text{explained variability in }y}{\text{total variability in }y} \]}
+
+We get these two quantities by splitting the total variability in $y$ into a part the model explains and a part it does not (an \hl{analysis of variance}).
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Sum of squares}
+
+The \hl{state poverty data} (Lecture 4): predicting poverty from \% female householder.
+
+{\footnotesize
+\begin{center}
+\begin{tabular}{lrrrrr}
+\toprule
+ & Df & Sum Sq & Mean Sq & F value & Pr($>$F) \\
+\midrule
+female\_house & 1 & 132.57 & 132.57 & 18.68 & 0.00 \\
+Residuals & 49 & 347.68 & 7.10 &  &  \\
+\midrule
+Total & 50 & 480.25 & & & \\
+\bottomrule
+\end{tabular}
+\end{center}}
+
+\pause
+\vspace{-0.8em}
+{\footnotesize
+\begin{align*}
+SS_{Total} &= \textstyle\sum(y-\bar{y})^2 = 480.25 &&\orange{\text{total}}\\
+SS_{Error} &= \textstyle\sum e_i^2 = 347.68 &&\orange{\text{unexplained}}\\
+SS_{Model} &= SS_{Total}-SS_{Error} = 132.57 &&\orange{\text{explained}}
+\end{align*}}
+
+\pause
+\vspace{-1.0em}
+\[ R^2 = \frac{SS_{Model}}{SS_{Total}} = \frac{132.57}{480.25} = 0.28 \]
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Why $R^2$ alone is not enough}
+
+Now add \% white as a second predictor:
+
+{\small
+\begin{center}
+\begin{tabular}{l c}
+\toprule
+ & $R^2$ \\
+\midrule
+Model 1: female\_house & 0.28 \\
+Model 2: female\_house + white & 0.29 \\
+\bottomrule
+\end{tabular}
+\end{center}}
+
+$R^2$ went \emph{up}. Does that mean \% white belongs in the model?
+
+\pause
+\caution{Adding \emph{any} predictor --- even a useless one --- can only push $R^2$ up. So $R^2$ always favors the bigger model, and on its own it can never tell us whether a predictor earns its place.}
+
+\pause
+We need a measure that \hl{charges a price} for each extra predictor.
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Adjusted $R^2$}
+
+\formula{Adjusted $R^2$}{%
+\[ R^2_{adj} = 1 - \pr{ \frac{SS_{Error}}{SS_{Total}} \times \frac{n-1}{n-p-1} } \]
+where $n$ is the number of cases and $p$ the number of predictors.}
+
+\begin{itemize}
+\item The factor $\frac{n-1}{n-p-1}$ is a \hl{penalty} that grows with $p$.
+\item $R^2_{adj}$ is always smaller than $R^2$.
+\item A predictor only raises $R^2_{adj}$ if it improves the fit \emph{enough to pay for the penalty}.
+\item So we prefer models with the higher $R^2_{adj}$.
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Calculating adjusted $R^2$}
+
+Model 2 (\% female householder $+$ \% white), with $n=51$ and $p=2$:
+
+{\small
+\begin{center}
+\begin{tabular}{lrrrrr}
+\toprule
+ & Df & Sum Sq & Mean Sq & F value & Pr($>$F) \\
+\midrule
+female\_house & 1 & 132.57 & 132.57 & 18.74 & 0.0001 \\
+white & 1 & 8.21 & 8.21 & 1.16 & 0.2868 \\
+Residuals & 48 & 339.47 & 7.07 &  &  \\
+\midrule
+Total & 50 & 480.25 & & & \\
+\bottomrule
+\end{tabular}
+\end{center}}
+
+\pause
+\vspace{-0.4em}
+{\small
+\begin{align*}
+R^2_{adj} &= 1 - \pr{ \frac{339.47}{480.25} \times \frac{51-1}{51-2-1} }
+= 1 - \pr{ \frac{339.47}{480.25} \times \frac{50}{48} } = 0.26
+\end{align*}}
+
+\pause
+\vspace{-0.4em}
+Model 1 also had $R^2_{adj}=0.26$. So adding \% white pushed $R^2$ up ($0.28\to0.29$) but left $R^2_{adj}$ \emph{unchanged}, so it did not improve predictive performance. 
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{What if we just keep adding predictors?}
+
+An experiment, starting from Model 1 (\% female householder, $R^2_{adj}=0.26$):
+
+\begin{itemize}
+\item One at a time, add predictors of \emph{pure noise}: random numbers with no connection to poverty.
+\item Refit the model after each addition and record $R^2$ and $R^2_{adj}$.
+\end{itemize}
+
+\pause
+\dq{What will happen to $R^2$? What \emph{should} a good measure of fit do?}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{What if we just keep adding predictors?}
+
+\begin{center}
+\includegraphics[width=0.6\textwidth]{figures/r2-vs-adjr2.png}
+\end{center}
+
+\vspace{-0.4em}
+\begin{itemize}
+\item $R^2$ climbs to $0.41$ on noise alone: each added predictor lets least squares fit the sample a little better.
+\item $R^2_{adj}$ never leaves $\approx0.26$: the penalty absorbs the fake improvement.
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Did cover type improve the model?}
+
+\begin{center}
+\renewcommand\arraystretch{1.2}
+\begin{tabular}{l l c c}
+\toprule
+Model & Predictors & $R^2$ & Adjusted $R^2$ \\
+\midrule
+Model 1 & volume & 0.803 & 0.787 \\
+Model 2 & volume + cover & 0.927 & 0.915 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\pause
+Both $R^2$ \emph{and} adjusted $R^2$ jump sharply, so cover type adds real explanatory information.
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Activity 4}
+
+\activity[-- comparing models]{%
+\textbf{Worksheet Part 4:} three models predict apartment rent.
+
+{\small
+\begin{center}
+\begin{tabular}{l l c c}
+\toprule
+Model & Predictors & $R^2$ & Adj.\ $R^2$ \\
+\midrule
+A & size & 0.61 & 0.60 \\
+B & size + bedrooms & 0.64 & 0.62 \\
+C & size + bedrooms + random ID & 0.65 & 0.60 \\
+\bottomrule
+\end{tabular}
+\end{center}}
+
+Which model would you choose, and what does model C tell you about $R^2$?}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Activity 4}
+\solnbox{Model B: highest adjusted $R^2$ with meaningful predictors. Model C has the highest $R^2$ of all, yet its extra predictor is a \emph{random ID code}. That is exactly why $R^2$ alone cannot choose a model.}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Wrap-up}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Key takeaways}
+
+\begin{itemize}
+\item Read every coefficient \emph{conditionally}: holding the other predictors fixed.
+\item A categorical predictor enters through $k-1$ indicators; the omitted level is the reference.
+\item A single indicator gives \hl{parallel slopes}: same slope, shifted intercept.
+\item Compare models with \hl{adjusted $R^2$}: unlike $R^2$, it penalizes useless predictors.
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% End document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}

@@ -1,0 +1,808 @@
+---
+title: "MA214 Applied Statistics - Project 1 Week 3 Activity"
+subtitle: "Modeling, Model Selection, and Diagnostics"
+author: "Section ___  |  Group ___"
+date: "`r Sys.Date()`"
+output: 
+  pdf_document:
+    toc: true
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: show
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(broom)
+library(car)  # For VIF and diagnostic plots
+```
+
+## Overview
+
+**Today's Focus:** Fitting regression models, selecting the best model,
+and validating model assumptions.
+
+**Important:** This worksheet covers BOTH linear regression and logistic
+regression. **Choose the section that matches your project's response
+variable:**
+
+-   **Section A (Linear Regression):** For continuous/numeric response
+    variables (e.g., price, temperature, age)
+-   **Section B (Logistic Regression):** For binary response variables
+    (e.g., yes/no, success/failure, 0/1)
+
+**What you should have ready:** - Your cleaned dataset - Summary
+statistics and EDA from Week 2 - Initial ideas about which variables to
+include
+
+**By the end of today, you should have:** - Fitted at least 2-3
+regression models - Selected your best model with justification -
+Checked model diagnostics - Identified any problems and potential
+solutions
+
+------------------------------------------------------------------------
+
+## Part 0: Load Your Data
+
+```{r load-data}
+# Load your dataset here
+# Example: data <- read.csv("your_dataset.csv")
+
+# Display the first few rows
+# head(data)
+
+# Check structure
+# str(data)
+```
+
+**Group Discussion:**
+
+\- What is your response variable?
+
+\- Is it continuous (use Section A) or binary (use Section B)?
+
+\- What predictors are you considering?
+
+\- Are all variables in the correct format (numeric, factor, etc.)?
+
+**☐ Check here which section you'll use:**
+
+-   [ ] Section A: Linear Regression
+
+-   [ ] Section B: Logistic Regression
+
+------------------------------------------------------------------------
+
+# SECTION A: LINEAR REGRESSION
+
+**Use this section if your response variable is continuous (numeric).**
+
+**Skip to Section B if you have a binary response variable.**
+
+------------------------------------------------------------------------
+
+## A1: Fitting Linear Regression Models
+
+### Model 1: Simple Linear Regression
+
+**Objective:** Start with a simple model using your most important
+predictor.
+
+```{r a-model1}
+# Fit a simple linear regression
+# Replace 'response' and 'predictor1' with your actual variable names
+
+# model1 <- lm(response ~ predictor1, data = data)
+
+# View summary
+# summary(model1)
+
+
+```
+
+\*\*Questions to answer:
+
+1\. What is the adj R² value? What does it mean? -
+
+-   **Your answer:**
+
+2.  How do you interpret the slope coefficient?
+    -   **Your answer:**
+
+**Visualize the model:**
+
+```{r a-model1-plot}
+# Scatterplot with regression line
+# ggplot(data, aes(x = predictor1, y = response)) +
+#   geom_point(alpha = 0.6) +
+#   geom_smooth(method = "lm", se = TRUE, color = "blue") +
+#   labs(title = "Model 1: Simple Linear Regression",
+#        x = "Predictor 1",
+#        y = "Response Variable") +
+#   theme_minimal()
+```
+
+------------------------------------------------------------------------
+
+### Model 2: Multiple Linear Regression (Main Effects)
+
+**Objective:** Add more predictors to improve the model.
+
+```{r a-model2}
+# Fit a multiple regression model with main effects only
+# model2 <- lm(response ~ predictor1 + predictor2 + predictor3, data = data)
+
+# View summary
+# summary(model2)
+
+```
+
+**Questions to answer:**
+
+1.  What is the R² value? How does it compare to Model 1?
+
+    -   **Your answer:**
+
+2.  What is the Adjusted R² value? Why is this important?
+
+    -   **Your answer:**
+
+------------------------------------------------------------------------
+
+### Model 3: Model with Interactions
+
+**Objective:** Test if relationships between variables depend on each
+other.
+
+```{r a-model3}
+# Fit a model with an interaction term
+# model3 <- lm(response ~ predictor1 * predictor2 + predictor3, data = data)
+
+# View summary
+# summary(model3)
+```
+
+**Visualize the interaction:**
+
+```{r a-interaction-plot}
+# Create interaction plot
+# data %>%
+#   mutate(predictor2_group = cut(predictor2, breaks = 3, 
+#                                  labels = c("Low", "Medium", "High"))) %>%
+#   ggplot(aes(x = predictor1, y = response, color = predictor2_group)) +
+#   geom_point(alpha = 0.5) +
+#   geom_smooth(method = "lm", se = TRUE) +
+#   labs(title = "Interaction Effect") +
+#   theme_minimal()
+```
+
+------------------------------------------------------------------------
+
+### Model 4: Additional model to compare
+
+**Objective:** Test if additional model can be used
+
+```{r a-model4}
+# Fit an additional model 
+# model4 <- lm(response ~ predictor1 * predictor2 + predictor3 + ... , data = data)
+
+# View summary
+# summary(model4)
+```
+
+**Visualize the model:**
+
+```{r model-4-visual}
+# Create interaction plot
+# data %>%
+#   mutate(predictor2_group = cut(predictor2, breaks = 3, 
+#                                  labels = c("Low", "Medium", "High"))) %>%
+#   ggplot(aes(x = predictor1, y = response, color = predictor2_group)) +
+#   geom_point(alpha = 0.5) +
+#   geom_smooth(method = "lm", se = TRUE) +
+#   labs(title = "Interaction Effect") +
+#   theme_minimal()
+```
+
+------------------------------------------------------------------------
+
+## A2: Model Selection (Linear)
+
+```{r a-model-comparison}
+# Create comparison using broom::glance
+# library(broom)
+# bind_rows(
+#   glance(model1) %>% mutate(model = "Model 1"),
+#   glance(model2) %>% mutate(model = "Model 2"),
+#   glance(model3) %>% mutate(model = "Model 3")
+# ) %>%
+#   select(model, r.squared, adj.r.squared, AIC)
+```
+
+**Model Selection Table:**
+
+| Criterion       | Best Model | Value |
+|-----------------|------------|-------|
+| Highest Adj. R² |            |       |
+| R²              |            |       |
+| AIC             |            |       |
+
+**Your chosen model and justification:**
+
+------------------------------------------------------------------------
+
+## A3: Model Diagnostics (Linear)
+
+**The four key assumptions:** 1. **Linearity** 2. **Independence** 3.
+**Normality** of residuals 4. **Equal Variance**
+
+### All diagnostic plots at once:
+
+```{r a-diagnostics-all}
+# Create all 4 diagnostic plots
+# par(mfrow = c(2, 2))
+# plot(model2)  # Replace with your chosen model
+# par(mfrow = c(1, 1))
+```
+
+### Diagnostic Plot 1: Residuals vs Fitted
+
+```{r a-resid-fitted}
+# plot(model2, which = 1)
+
+# Or using ggplot2
+# augment(model2) %>%
+#   ggplot(aes(x = .fitted, y = .resid)) +
+#   geom_point(alpha = 0.6) +
+#   geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+#   geom_smooth(se = TRUE, color = "blue") +
+#   labs(title = "Residuals vs Fitted Values") +
+#   theme_minimal()
+```
+
+**What to look for:**
+
+\- ✓ **Good:** Random scatter around zero
+
+\- ✗ **Bad:** Curved pattern (non-linearity), funnel shape (unequal
+variance)
+
+**Your observations:**
+
+------------------------------------------------------------------------
+
+### Diagnostic Plot 2: Normal Q-Q Plot
+
+```{r a-qq-plot}
+# plot(model2, which = 2)
+```
+
+**Your observations:**
+
+------------------------------------------------------------------------
+
+## A4: Addressing Issues (Linear)
+
+### If you found non-linearity:
+
+```{r a-fix-nonlinearity}
+# Add polynomial term
+# model_poly <- lm(response ~ predictor1 + I(predictor1^2), data = data)
+
+# Or log transformation
+# model_log <- lm(log(response) ~ predictor1, data = data)
+```
+
+### If you found unequal variance:
+
+```{r a-fix-heteroscedasticity}
+# Log transformation often helps
+# model_log_y <- lm(log(response) ~ predictor1 + predictor2, data = data)
+```
+
+------------------------------------------------------------------------
+
+## A5: Final Linear Model
+
+```{r a-final-model}
+# Your final model
+# final_model <- lm(...)
+
+# summary(final_model)
+```
+
+**Model equation:**
+
+$$\hat{y} = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + ...$$
+
+**Your equation:**
+
+**Performance:**
+
+\- R² =
+
+\- Adjusted R² =
+
+\- RMSE =
+
+\- AIC =
+
+**Diagnostics checklist:**
+
+\- ☐ Linearity
+
+\- ☐ Normality
+
+\- ☐ Independence
+
+\- ☐ Equal variance
+
+------------------------------------------------------------------------
+
+# SECTION B: LOGISTIC REGRESSION
+
+**Use this section if your response variable is binary (0/1, Yes/No,
+Success/Failure).**
+
+**Skip this if you're using linear regression (Section A).**
+
+------------------------------------------------------------------------
+
+## B1: Preparing Binary Response Variable
+
+```{r b-prepare}
+# Make sure your response is binary (0/1 or factor)
+# If it's character (e.g., "Yes"/"No"), convert to factor or 0/1
+
+# Option 1: Keep as factor
+# data$response <- factor(data$response, levels = c("No", "Yes"))
+
+# Option 2: Convert to 0/1
+# data$response_binary <- ifelse(data$response == "Yes", 1, 0)
+
+# Check the distribution
+# table(data$response)
+# prop.table(table(data$response))
+```
+
+**What is your "success" category (the 1 or "Yes")?** - **Your answer:**
+
+**What proportion of observations are "success"?** - **Your answer:**
+
+------------------------------------------------------------------------
+
+## B2: Fitting Logistic Regression Models
+
+### Model 1: Simple Logistic Regression
+
+```{r b-model1}
+# Fit a simple logistic regression
+# model1 <- glm(response ~ predictor1, data = data, family = binomial)
+
+# View summary
+# summary(model1)
+
+# Tidy output
+# tidy(model1)
+# glance(model1)
+```
+
+**Questions to answer:**
+
+1.  What is the coefficient? (Remember: this is on the log-odds scale)
+    -   **Your answer:**
+2.  Calculate the odds ratio: exp(coefficient)
+    -   **Your answer:**
+
+**Interpret the odds ratio:**
+
+```{r b-odds-ratio-1}
+# Calculate odds ratio
+# exp(coef(model1))
+
+# With confidence intervals
+# exp(confint(model1))
+```
+
+**Interpretation:** For every one-unit increase in [predictor], the odds
+of [success] multiply by \_\_\_.
+
+------------------------------------------------------------------------
+
+**Visualize the model:**
+
+```{r b-model1-plot}
+# Create predicted probabilities
+# data_with_pred <- data %>%
+#   mutate(pred_prob = predict(model1, type = "response"))
+
+# Plot
+# ggplot(data, aes(x = predictor1, y = as.numeric(response) - 1)) +
+#   geom_point(alpha = 0.3) +
+#   geom_line(data = data_with_pred, aes(y = pred_prob), color = "blue", size = 1) +
+#   labs(title = "Logistic Regression: Model 1",
+#        x = "Predictor 1",
+#        y = "Probability of Success") +
+#   theme_minimal()
+```
+
+------------------------------------------------------------------------
+
+### Model 2: Multiple Logistic Regression
+
+```{r b-model2}
+# Fit multiple logistic regression
+# model2 <- glm(response ~ predictor1 + predictor2 + predictor3, 
+#               data = data, family = binomial)
+
+# View summary
+# summary(model2)
+
+# Tidy output
+# tidy(model2)
+# glance(model2)
+```
+
+**Calculate odds ratios for all predictors:**
+
+```{r b-odds-ratios-2}
+# Odds ratios
+# exp(coef(model2))
+
+# With confidence intervals
+# exp(confint(model2))
+
+# Or use tidy
+# tidy(model2, exponentiate = TRUE, conf.int = TRUE)
+```
+
+**Interpret key odds ratios:**
+
+1.  **Predictor 1:**
+
+2.  **Predictor 2:**
+
+------------------------------------------------------------------------
+
+### Model 3: Additional predictor model
+
+```{r b-model3}
+# Fit model with interaction
+# model3 <- glm(response ~ predictor1 + predictor2 + predictor3, 
+#               data = data, family = binomial)
+
+# View summary
+# summary(model3)
+
+# Odds ratios
+# tidy(model3, exponentiate = TRUE, conf.int = TRUE)
+```
+
+**Visualize interaction:**
+
+```{r b-interaction-plot}
+# Create test data
+# test_data <- expand_grid(
+#   predictor1 = seq(min(data$predictor1), max(data$predictor1), length.out = 100),
+#   predictor2 = quantile(data$predictor2, c(0.25, 0.5, 0.75)),
+#   predictor3 = mean(data$predictor3)
+# )
+
+# Get predictions
+# test_data$pred_prob <- predict(model3, newdata = test_data, type = "response")
+
+# Plot
+# ggplot(test_data, aes(x = predictor1, y = pred_prob, 
+#                       color = factor(predictor2))) +
+#   geom_line(size = 1) +
+#   labs(title = "Interaction Effect in Logistic Regression",
+#        y = "Predicted Probability",
+#        color = "Predictor 2") +
+#   theme_minimal()
+```
+
+------------------------------------------------------------------------
+
+## B3: Model Selection (Logistic)
+
+**Compare models using:**
+
+\- AIC (lower is better)
+
+```{r b-model-comparison}
+# Comparison table
+# library(broom)
+# bind_rows(
+#   glance(model1) %>% mutate(model = "Model 1"),
+#   glance(model2) %>% mutate(model = "Model 2"),
+#   glance(model3) %>% mutate(model = "Model 3")
+# ) %>%
+#   select(model, AIC)
+
+```
+
+**Model Selection Table:**
+
+| Model  | Model description | AIC Value |
+|--------|-------------------|-----------|
+| model1 |                   |           |
+|        |                   |           |
+|        |                   |           |
+
+**Your chosen model and justification:**
+
+------------------------------------------------------------------------
+
+## B4: Model Diagnostics (Logistic)
+
+**Key diagnostic checks for logistic regression:**
+
+1\. Linearity in the logit (for continuous predictors)
+
+2\. No multicollinearity
+
+3\. No influential observations
+
+4\. Model fit (goodness of fit tests)
+
+### Check 1: Linearity in the Logit
+
+**For continuous predictors:** The relationship between the predictor
+and log-odds should be linear.
+
+```{r b-linearity-logit}
+# Create logit of predicted probabilities
+# data_augment <- augment(model2, type.predict = "link")  # Gets log-odds
+
+# For each continuous predictor, plot predictor vs logit
+# ggplot(data_augment, aes(x = predictor1, y = .fitted)) +
+#   geom_point(alpha = 0.3) +
+#   geom_smooth(color = "blue") +
+#   labs(title = "Linearity in Logit Check",
+#        x = "Predictor 1",
+#        y = "Log-odds") +
+#   theme_minimal()
+
+# Should see roughly linear relationship
+```
+
+**Your observations:**
+
+------------------------------------------------------------------------
+
+### Check 2: Binned Residual Plot
+
+```{r b-binned-residuals}
+# Create binned residual plot
+# library(arm)  # For binnedplot
+# binnedplot(fitted(model2), residuals(model2, type = "response"))
+
+# Or manually:
+# data_with_resid <- data %>%
+#   mutate(
+#     fitted = fitted(model2),
+#     resid = residuals(model2, type = "response"),
+#     bin = ntile(fitted, 20)
+#   ) %>%
+#   group_by(bin) %>%
+#   summarise(
+#     mean_fitted = mean(fitted),
+#     mean_resid = mean(resid)
+#   )
+
+# ggplot(data_with_resid, aes(x = mean_fitted, y = mean_resid)) +
+#   geom_point() +
+#   geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+#   labs(title = "Binned Residual Plot",
+#        x = "Average Fitted Probability",
+#        y = "Average Residual") +
+#   theme_minimal()
+```
+
+**What to look for:** - Points should scatter randomly around 0 - No
+systematic patterns
+
+**Your observations:**
+
+------------------------------------------------------------------------
+
+### Check 3: Calibration Plot
+
+**Check if predicted probabilities match observed frequencies:**
+
+```{r b-calibration}
+# Create calibration plot
+# data %>%
+#   mutate(
+#     pred_prob = predict(model2, type = "response"),
+#     bin = ntile(pred_prob, 10)
+#   ) %>%
+#   group_by(bin) %>%
+#   summarise(
+#     mean_pred = mean(pred_prob),
+#     observed = mean(as.numeric(response) - 1),  # Adjust if needed
+#     n = n()
+#   ) %>%
+#   ggplot(aes(x = mean_pred, y = observed)) +
+#   geom_point(aes(size = n)) +
+#   geom_abline(slope = 1, intercept = 0, color = "red", linetype = "dashed") +
+#   labs(title = "Calibration Plot",
+#        x = "Mean Predicted Probability",
+#        y = "Observed Proportion",
+#        size = "Count") +
+#   theme_minimal()
+```
+
+**What to look for:** - Points should fall near the diagonal line - Good
+calibration = predictions match reality
+
+**Your observations:**
+
+------------------------------------------------------------------------
+
+## B6: Addressing Issues (Logistic)
+
+### If you found non-linearity in logit:
+
+```{r b-fix-nonlinearity}
+# Add polynomial or spline terms
+# model_poly <- glm(response ~ predictor1 + I(predictor1^2), 
+#                   data = data, family = binomial)
+
+# Or categorize continuous predictors
+# data$predictor1_cat <- cut(data$predictor1, breaks = 3)
+# model_cat <- glm(response ~ predictor1_cat, data = data, family = binomial)
+```
+
+### If you have separation issues:
+
+```{r b-separation}
+# Check for complete/quasi-complete separation
+# Look for very large coefficients or standard errors
+
+# Use penalized regression if needed
+# library(brglm2)
+# model_penalized <- glm(response ~ predictors, data = data, 
+#                        family = binomial, method = "brglmFit")
+```
+
+------------------------------------------------------------------------
+
+## B7: Final Logistic Model
+
+```{r b-final-model}
+# Your final model
+# final_model <- glm(...)
+
+# summary(final_model)
+```
+
+**Model equation (log-odds):**
+
+$$\log\left(\frac{p}{1-p}\right) = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + ...$$
+
+**Your equation:**
+
+**Odds ratios with interpretation:**
+
+```{r b-final-odds-ratios}
+# tidy(final_model, exponentiate = TRUE, conf.int = TRUE)
+```
+
+1.  **Predictor 1:** OR = ***, meaning***
+
+2.  **Predictor 2:** OR = ***, meaning***
+
+**Performance:**
+
+\- AIC =
+
+**Diagnostics checklist:**
+
+\- ☐ Linearity in logit
+
+\- ☐ No severe multicollinearity
+
+\- ☐ No overly influential points
+
+\- ☐ Good calibration
+
+------------------------------------------------------------------------
+
+## Checklist for Today
+
+Before you leave, make sure you have:
+
+-   [ ] Identified whether you're using linear or logistic regression
+-   [ ] Fitted at least 2-3 different models
+-   [ ] Compared models using appropriate criteria
+-   [ ] Selected your best model with clear justification
+-   [ ] Created all relevant diagnostic plots
+-   [ ] Checked and interpreted diagnostic results
+-   [ ] Calculated performance metrics (R²/RMSE )
+-   [ ] Addressed any major issues (or documented why you can't)
+-   [ ] Written out your final model equation
+-   [ ] Interpreted at least 2 key coefficients/odds ratios
+
+------------------------------------------------------------------------
+
+## Resources and Tips
+
+### For Linear Regression:
+
+**Interpreting Coefficients:** - Continuous predictor: "A one-unit
+increase in X is associated with a β-unit change in Y" - Categorical
+predictor: "Compared to [reference], this category has β units
+higher/lower Y" - Log-transformed Y: "A one-unit increase in X is
+associated with approximately 100×β% change in Y"
+
+**Model Selection:** - Don't just pick highest R²! - Use Adjusted R² for
+comparing models with different numbers of predictors - Lower AIC/BIC is
+better - Consider interpretability
+
+### For Logistic Regression:
+
+**Interpreting Odds Ratios:** - OR = 1: No association - OR \> 1:
+Positive association (predictor increases odds of success) - OR \< 1:
+Negative association (predictor decreases odds of success) - Example: OR
+= 2.5 means "the odds of success are 2.5 times higher"
+
+**Model Selection:** - Lower AIC is better
+
+**Common Issues:** - Separation: Some predictors perfectly predict
+outcome → use penalized regression
+
+\- Non-linearity in logit: Add polynomial terms or categorize continuous
+predictors
+
+\- Poor calibration: Model may discriminate well but probabilities are
+off
+
+------------------------------------------------------------------------
+
+## Submission
+
+**Submit the following to Blackboard:**
+
+1\. This R Markdown file (`.Rmd`)
+
+2\. Knitted PDF
+
+3\. Your dataset
+
+4\. Any additional R scripts if needed
+
+**One submission per group.**
+
+\+
+
+**Individual submission.**
+
+------------------------------------------------------------------------
+
+## Group Information
+
+| Name | BUID | Present/Absent |
+|------|------|----------------|
+|      |      |                |
+|      |      |                |
+|      |      |                |
+|      |      |                |
+
+**Which section did you use?**
+
+-   [ ] Section A: Linear Regression
+
+-   [ ] Section B: Logistic Regression
+
+**Group Notes:**
+
+(Use this space for any additional notes or decisions made during the
+lab)

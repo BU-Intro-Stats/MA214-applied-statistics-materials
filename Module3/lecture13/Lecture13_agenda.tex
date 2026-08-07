@@ -1,0 +1,41 @@
+% !TEX root =  Lecture13.tex
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Recap/Agenda
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Module 3: Regression Inference}
+    \begin{itemize}
+        \item \hl{Previously:} inference about \emph{group means}: ANOVA, and the two roads for the $F$-statistic. That closed Module 2.
+        \item \hl{This time:} a new statistic, the \hl{regression slope} $\hat\beta_1$. We can fit a line (Lectures 3--7); now we ask whether its tilt is \emph{real}.
+          \begin{itemize}
+              \item the same two roads: shuffle the pairing, or a $t$ formula;
+              \item a bootstrap confidence interval for the slope;
+              \item the conditions (\hl{LINE}) and how to check them;
+              \item the intercept, and testing a slope against a value other than zero.
+          \end{itemize}
+        \item \hl{Reading:} IMS Chapter 24.
+        \item \hl{Homework:} the assigned reading.
+    \end{itemize}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Learning objectives:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+    \frametitle{Lecture Objectives}
+    \goals{%
+    \begin{itemize}
+    \item test $H_0: \beta_1 = 0$ by \emph{shuffling the pairing} and with $t_{n-2}$, and say why they agree;
+    \item build a slope CI by \emph{bootstrapping the pairs} and with $\hat\beta_1 \pm t^\ast\,\mathrm{SE}$;
+    \item check the \hl{LINE} conditions on residual and Q--Q plots, and know which road survives failure;
+    \item read an \texttt{lm()}/\texttt{tidy()} table, and interpret the intercept and a test of $\beta_1 = c$.
+    \end{itemize}}
+    \objectives{%
+    \begin{itemize}
+    \item \textbf{(M3, LO1)} Randomization Tests and Bootstrap Confidence Intervals in Regression
+    \item \textbf{(M3, LO2)} Model Checking and Remedial Measures in Linear Regression
+    \end{itemize}}
+\end{frame}

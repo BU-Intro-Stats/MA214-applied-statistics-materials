@@ -1,0 +1,95 @@
+\documentclass{article}
+\usepackage[margin=1.15in]{geometry}
+\usepackage{xcolor}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{tabularx}
+
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\rhead{Lecture 8}
+\lhead{MA 214: Applied Statistics (Spring 2026)}
+\renewcommand{\headrulewidth}{.4mm}
+
+\newcommand{\blankline}[1]{\underline{\hspace{#1}}}
+
+\begin{document}
+
+\noindent\textbf{Name:}\blankline{2.25in}\hfill\textbf{BUID:}\blankline{1.55in}\newline
+
+\begin{center}
+ \Large In-Class Worksheet: Hypothesis Testing with Randomization
+\end{center}
+
+\subsection*{Scenario}
+Today we practice designing a hypothesis test before running it. A randomization test approximates what results would look like if the null hypothesis were true.
+
+\medskip
+\noindent\textbf{Goals:} \textbf{(1)} write hypotheses in context, \textbf{(2)} choose a test statistic, \textbf{(3)} decide what to randomize, \textbf{(4)} interpret a p-value and possible decision errors.
+
+\subsection*{Part 1: Statistic, Sampling Distribution, Null Distribution}
+Classify each quantity below.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabularx}{\textwidth}{Xcc}
+\toprule
+\textbf{Description} & \textbf{Statistic?} & \textbf{Distribution?} \\
+\midrule
+The sample proportion $\hat p$ from one survey & & \\[1.6em]
+The values of $\hat p$ across many repeated samples & & \\[1.6em]
+The values of a test statistic simulated assuming $H_0$ is true & & \\[1.6em]
+The observed difference in two sample means, $\bar{x}_A-\bar{x}_B$ & & \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item In one sentence, what is the difference between a sampling distribution and a null distribution? \\[4em]
+\end{enumerate}
+
+\subsection*{Part 2: Hypotheses and Test Statistics}
+For each research question, write hypotheses and choose a reasonable test statistic.
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=1em]
+\item \textbf{One mean.} Is the average wait time different from 10 minutes?
+\[
+H_0: \blankline{2.3in} \qquad H_A: \blankline{2.3in}
+\]
+A reasonable statistic: \blankline{2.8in}
+
+\item \textbf{One proportion.} In a sample of 80 students, 50 prefer online office hours. Is the true preference rate above 50\%?
+\[
+H_0: \blankline{2.3in} \qquad H_A: \blankline{2.3in}
+\]
+A reasonable statistic: \blankline{2.8in}
+\end{enumerate}
+
+\subsection*{Part 3: Reading a Randomization Result}
+Suppose the observed statistic is $T_{obs}=4.2$, and only 3.1\% of simulated null statistics are at least as extreme as $T_{obs}$.
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item What is the approximate p-value? \hfill \blankline{1.5in}
+\item Write one sentence interpreting this p-value in context. Use this structure: ``If $H_0$ were true, a statistic this extreme or more extreme would occur about \underline{\hspace{.5in}} of the time by random chance.'' \\[5em]
+\item If $\alpha=0.05$, would you reject $H_0$? \hfill \blankline{1.5in}
+\item What is one thing the p-value does \textbf{not} tell us? \\[3em]
+\end{enumerate}
+
+\subsection*{Part 4: Decision Errors in Context}
+A new spam filter flags an email as spam when the test rejects
+\[
+H_0: \text{``the email is not spam.''}
+\]
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item In plain language, what is a Type I error here? \\[3em]
+\item In plain language, what is a Type II error here? \\[3em]
+\item Which error might be more costly for a personal email account? Which might be more costly for a corporate security system? \\[4em]
+\end{enumerate}
+
+\end{document}

@@ -1,0 +1,764 @@
+---
+title: "Lab 04: Conjugate Families — Beta-Binomial"
+subtitle: ""
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: flatly
+    highlight: tango
+    df_print: paged
+editor_options:
+  markdown:
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(tidyverse)
+```
+
+------------------------------------------------------------------------
+
+# The Coin Estimation Game
+
+In Lab 3, we used Bayes' Rule with a **discrete** set of five candidate
+coin types. Today we go further: we treat the true probability of heads
+$\pi$ as a **continuous** unknown on $[0, 1]$, and use the
+**Beta-Binomial conjugate family** to compute the posterior analytically
+
+Your job is to estimate $\pi$ for your coin as precisely as possible and
+report a credible interval for it.
+
+Setup :
+
+1\. Download all the csv files into working directory
+
+2\. Set Rmd mode to `Visual` (from `Source` mode)
+
+3.  Find your paired member
+
+# Paired Lab
+
+| Name | BUID |
+|------|------|
+|      |      |
+|      |      |
+
+------------------------------------------------------------------------
+
+## Step 0.1: Choose Your Coin
+
+```{r choose-coin}
+data_types <- seq(1, 10)
+your_study <- sample(data_types, 1)
+cat("Your coin file: lab4_coin_", sprintf("%02d", your_study), ".csv",
+    sep = "")
+```
+
+> **Note:** Load the file matching your assigned number, e.g.,
+> `lab4_coin_03.csv`. Files run from `lab4_coin_01.csv` to
+> `lab4_coin_10.csv`.
+
+------------------------------------------------------------------------
+
+## Step 0.2: Theory Review — The Beta-Binomial Model
+
+### Why Conjugacy?
+
+In Lab 3, we computed the posterior by multiplying the prior by the
+likelihood for each discrete candidate and normalizing. With a
+**continuous** $\pi \in [0,1]$, the normalizing integral
+$\int_0^\infty f(\text{data} \mid \pi)\, f(\pi)\, d\pi$ is generally
+hard to compute.
+
+$$
+f(\pi \mid \text{data}) = \frac{f(\text{data} \mid \pi)\, f(\pi)}
+{\int_0^\infty f(\text{data} \mid \pi)\, f(\pi)\, d\pi}
+$$
+
+A **conjugate prior** is a special prior such that the posterior stays
+in the **same distributional family** — making the update a simple
+formula with no integration needed.
+
+### The Beta Distribution — Prior for $\pi$
+
+$$\pi \sim \text{Beta}(\alpha, \beta)$$
+
+$$f(\pi) = \frac{\pi^{\alpha-1}(1-\pi)^{\beta-1}}{B(\alpha,\beta)},
+\quad \pi \in [0,1]$$
+
+where
+$B(\alpha,\beta))= \frac{\Gamma(\alpha+\beta)}{\Gamma(\alpha) \Gamma(\beta)}$
+with $$
+\Gamma(Z) = \int_{0}^{\infty} x^{z-1} e^{-x} dx 
+$$
+
+Key facts:
+
+$$E[\pi] = \frac{\alpha}{\alpha + \beta} \qquad
+\text{Var}(\pi) =
+\frac{\alpha\beta}{(\alpha+\beta)^2(\alpha+\beta+1)}$$
+
+The parameters $\alpha$ and $\beta$ act like **pseudo-observations**:
+
+$\alpha-1$ : imaginary heads
+
+$\beta-1$ : imaginary tails
+
+$\alpha + \beta$ : how confident you were before the experiment
+
+### The Binomial Likelihood
+
+For $n$ flips with $x$ heads:
+
+$$P(X = x \mid \pi) = \binom{n}{x} \pi^x (1-\pi)^{n-x}$$
+
+The likelihood depends on the data only through the $x$
+
+### The Beta-Binomial Posterior (Conjugate Update)
+
+$$\pi \mid x \sim \text{Beta}(\alpha + x,\ \beta + n - x)$$
+
+**Add** $x$ to $\alpha$, add $n - x$ to $\beta$. No integration, no
+normalizing constant.
+
+|   | Prior | Posterior |
+|------------------------|:----------------------:|:----------------------:|
+| Distribution | Beta$(\alpha, \beta)$ | Beta$(\alpha + x,\ \beta + n - x)$ |
+| Mean | $\dfrac{\alpha}{\alpha+\beta}$ | $\dfrac{\alpha+x}{\alpha+\beta+n}$ |
+| Pseudo-observations | $\alpha + \beta$ | $\alpha + \beta + n$ |
+
+### Why? A Worked Example
+
+Suppose you start with a **Beta(2, 2)** prior and observe $n = 40$ flips
+with $x = 15$ heads (and 25 tails).
+
+$$\pi \sim \text{Beta}(\alpha, \beta) = \text{Beta}(2,\ 2)$$
+
+The prior mean is
+
+$$E[\pi] = \frac{\alpha}{\alpha + \beta} = \frac{2}{2 + 2} = 0.50$$
+
+This says: before seeing any data, we mildly believe the coin is fair,
+with $\alpha + \beta = 4$ total pseudo-observations.
+
+**The likelihood**
+
+For $x = 15$ heads in $n = 40$ flips, the Binomial likelihood is
+
+$$P(X = 15 \mid \pi) = \binom{40}{15}\, \pi^{15}\, (1 - \pi)^{25}$$
+
+The key pieces are $\pi^{15}$ (15 heads) and $(1 - \pi)^{25}$ (25
+tails). The binomial coefficient $\binom{40}{15}$ does not depend on
+$\pi$, so it is just a constant in the update.
+
+**The posterior construction: Multiply prior** $\times$ likelihood
+
+$$f(\pi \mid x)  
+  = \frac{ 
+    \overbrace{\frac{\Gamma(\alpha+\beta)}{\Gamma(\alpha)\,\Gamma(\beta)} 
+    \pi^{\alpha-1}(1-\pi)^{\beta-1}}^{\text{prior}}
+  \times 
+    \overbrace{\binom{n}{x} \pi^{x}(1-\pi)^{n-x}}^{\text{likelihood}} 
+  }
+  {\displaystyle\int_0^{1} 
+    \frac{\Gamma(\alpha+\beta)}{\Gamma(\alpha)\,\Gamma(\beta)} 
+    \pi^{\alpha-1}(1-\pi)^{\beta-1} 
+    \cdot\binom{n}{x} \pi^{x}(1-\pi)^{n-x}\, d\pi}$$
+
+Drop constants that do not depend on $\pi$ — they appear in both
+numerator and denominator and cancel:
+
+$$\propto \pi^{\alpha-1}(1-\pi)^{\beta-1} 
+  \times \pi^{x}(1-\pi)^{n-x}$$
+
+Collect the powers of $\pi$ and $(1-\pi)$:
+
+$$\propto \pi^{(\alpha+x)-1}(1-\pi)^{(\beta+n-x)-1}$$
+
+Plug in $\alpha = 2,\ \beta = 2,\ x = 15,\ n = 40$:
+
+$$= \pi^{(2+15)-1}(1-\pi)^{(2+25)-1} 
+  = \pi^{16}(1-\pi)^{26}$$
+
+This is the **kernel** of a Beta distribution with updated parameters
+$\alpha^* = \alpha + x$ and $\beta^* = \beta + n - x$. Since any valid
+density must integrate to 1, the normalizing constant must be
+$B(\alpha^*, \beta^*)$, giving the **exact closed-form posterior**:
+
+$$\boxed{f(\pi \mid x) 
+  = \frac{\pi^{(\alpha+x)-1}(1-\pi)^{(\beta+n-x)-1}}
+         {B(\alpha+x,\ \beta+n-x)} 
+  \sim \text{Beta}(\alpha + x,\ \beta + n - x)}$$
+
+In our example:
+
+$$f(\pi \mid x) 
+  = \frac{\pi^{16}(1-\pi)^{26}}{B(17,\ 27)} 
+  \sim \text{Beta}(17,\ 27)$$
+
+> **Why does this work?** The Beta prior and Binomial likelihood share
+> the same functional form in $\pi$ — both involve powers of $\pi$ and
+> $(1 - \pi)$. Multiplying them together simply **adds the exponents**,
+> producing another Beta kernel. This is exactly what it means for the
+> Beta to be the **conjugate prior** for the Binomial likelihood: the
+> posterior stays in the Beta family and the normalizing integral never
+> needs to be computed explicitly.
+
+**The posterior**
+
+$$\pi \mid \text{data} \sim 
+  \text{Beta}(\alpha + x,\ \beta + n - x) = 
+  \text{Beta}(2 + 15,\ 2 + 25) = 
+  \text{Beta}(17,\ 27)$$
+
+No integration needed — the conjugate structure means the normalizing
+constant works out automatically.
+
+**Step 5: Compute posterior summaries**
+
+$$\text{Posterior mean} 
+  = \frac{\alpha + x}{\alpha + \beta + n} 
+  = \frac{17}{17 + 27} 
+  = \frac{17}{44} 
+  \approx 0.386$$
+
+$$\text{Sample proportion} = \frac{x}{n} = \frac{15}{40} = 0.375$$
+
+$$\text{Prior mean} = 0.50$$
+
+The posterior mean ($\approx 0.386$) sits **between** the prior mean
+(0.50) and the sample proportion (0.375), pulled slightly toward 0.50
+because the prior contributes $\alpha + \beta = 4$ pseudo-observations
+out of $\alpha + \beta + n = 44$ total. As $n$ grows, the posterior mean
+converges to the sample proportion.
+
+**Step 6: Verify in R**
+
+```{r worked-example}
+# known values
+alpha_0 <- 2
+beta_0  <- 2
+x       <- 15
+n       <- 40
+
+# conjugate update
+alpha_new <- alpha_0 + x
+beta_new  <- beta_0  + (n - x)
+
+# summaries
+prior_mean <- alpha_0  / (alpha_0  + beta_0)
+post_mean  <- alpha_new / (alpha_new + beta_new)
+samp_prop  <- x / n
+
+cat("Prior:             Beta(", alpha_0,   ",", beta_0,    ")\n")
+cat("Posterior:         Beta(", alpha_new, ",", beta_new,  ")\n")
+cat("Prior mean:        ",      round(prior_mean, 4),      "\n")
+cat("Sample proportion: ",      round(samp_prop,  4),      "\n")
+cat("Posterior mean:    ",      round(post_mean,  4),      "\n")
+cat("Prior weight:      ",
+    round((alpha_0 + beta_0) / (alpha_0 + beta_0 + n) * 100, 1),
+    "%\n")
+```
+
+```{r worked-example-plot, fig.height=4, fig.width=7}
+pi_grid <- seq(0, 1, length.out = 500)
+
+tibble(
+  pi   = rep(pi_grid, 2),
+  dens = c(dbeta(pi_grid, alpha_0,   beta_0),
+           dbeta(pi_grid, alpha_new, beta_new)),
+  dist = rep(
+    c(paste0("Prior: Beta(",      alpha_0,   ", ", beta_0,   ")"),
+      paste0("Posterior: Beta(",  alpha_new, ", ", beta_new, ")")),
+    each = 500)
+) |>
+  mutate(dist = factor(dist, levels = unique(dist))) |>
+  ggplot(aes(x = pi, y = dens, color = dist, fill = dist)) +
+  geom_line(linewidth = 1.2) +
+  geom_area(alpha = 0.10, position = "identity") +
+  geom_vline(xintercept = prior_mean, linetype = "dashed",
+             color = "steelblue", linewidth = 0.8) +
+  geom_vline(xintercept = samp_prop,  linetype = "dashed",
+             color = "tomato",    linewidth = 0.8) +
+  geom_vline(xintercept = post_mean,  linetype = "solid",
+             color = "darkgreen", linewidth = 0.8) +
+  annotate("text", x = prior_mean - 0.01, y = 6.5,
+           label = "Prior mean\n0.50",   color = "steelblue",
+           hjust = 1, size = 3.2) +
+  annotate("text", x = samp_prop  - 0.01, y = 5.5,
+           label = "Sample prop\n0.375", color = "tomato",
+           hjust = 1, size = 3.2) +
+  annotate("text", x = post_mean  + 0.01, y = 6.0,
+           label = "Post mean\n0.386",   color = "darkgreen",
+           hjust = 0, size = 3.2) +
+  scale_color_manual(values = c("steelblue", "tomato")) +
+  scale_fill_manual( values = c("steelblue", "tomato")) +
+  labs(title    = "Prior vs. Posterior — Worked Example",
+       subtitle = "n = 40 flips  |  x = 15 heads",
+       x = expression(pi ~ "(P(Heads))"),
+       y = "Density", color = NULL, fill = NULL) +
+  theme_minimal(base_size = 13) +
+  theme(legend.position = "bottom")
+```
+
+**Summary table**
+
+|                     |   Prior    |   Posterior   |
+|---------------------|:----------:|:-------------:|
+| Distribution        | Beta(2, 2) | Beta(17, 27)  |
+| $\alpha$            |     2      | 17 $= 2 + 15$ |
+| $\beta$             |     2      | 27 $= 2 + 25$ |
+| Mean                |   0.500    |     0.386     |
+| Pseudo-observations |     4      | 44 $= 4 + 40$ |
+
+> **Key intuition:** Adding $x = 15$ to $\alpha$ records the observed
+> heads; adding $n - x = 25$ to $\beta$ records the observed tails. The
+> total pseudo-observation count grows from 4 to 44, reflecting the
+> information gained from 40 real flips. The prior's influence shrinks
+> from $4/44 \approx 9\%$ of the total weight — nearly negligible — and
+> the posterior mean is pulled strongly toward the sample proportion.
+
+------------------------------------------------------------------------
+
+## Step 0.3: Load Data
+
+```{r load-data}
+my_coin_file <- "lab4_coin_01.csv"   # TODO: change to your assigned file
+coin_df      <- read.csv(my_coin_file)
+head(coin_df, 10)
+```
+
+```{r data-summary}
+n_flips     <- nrow(coin_df) 
+n_heads     <- sum(coin_df$result)
+n_tails     <- n_flips - n_heads
+sample_prop <- round(n_heads / n_flips, 3)
+
+cat("File:             ", my_coin_file, "\n")
+cat("Total flips:      ", n_flips,      "\n")
+cat("Heads:            ", n_heads,      "\n")
+cat("Tails:            ", n_tails,      "\n")
+cat("Sample proportion:", sample_prop,  "\n")
+```
+
+------------------------------------------------------------------------
+
+## Step 0.4: Setting Up the Notation
+
+The unknown is the **continuous** probability of heads:
+
+$$\pi \in [0, 1]$$
+
+Unlike Lab 3, $\pi$ is not restricted to five values — it can be
+anything in $[0,1]$. We model uncertainty about $\pi$ with a **Beta
+distribution** as the prior.
+
+------------------------------------------------------------------------
+
+## Step 1: First Approach — Using All 50 Flips at Once
+
+### Exercise 1. Choose Your Prior
+
+We use a **Beta** prior —
+
+```{r prior-setup}
+# Decide your initial alpha and beta values
+alpha_prior <- # TODO
+beta_prior  <- # TODO
+
+prior_mean <- alpha_prior / (alpha_prior + beta_prior)
+prior_var  <- (alpha_prior * beta_prior) /
+              ((alpha_prior + beta_prior)^2 * (alpha_prior + beta_prior + 1))
+prior_sd   <- sqrt(prior_var)
+
+cat("Prior: Beta(", alpha_prior, ",", beta_prior, ")\n")
+cat("Prior mean:      ", round(prior_mean, 4), "\n")
+cat("Prior SD:        ", round(prior_sd,   4), "\n")
+cat("Pseudo-obs total:", alpha_prior + beta_prior, "\n")
+```
+
+```{r prior-plot, fig.height=3.5, fig.width=6}
+pi_grid <- seq(0, 1, length.out = 500)
+
+tibble(pi      = pi_grid,
+       density = dbeta(pi_grid, alpha_prior, beta_prior)) |>
+  ggplot(aes(x = pi, y = density)) +
+  geom_line(color = "steelblue", linewidth = 1.2) +
+  geom_area(fill = "steelblue", alpha = 0.15) +
+  geom_vline(xintercept = 0.5, linetype = "dashed",
+             color = "gray50", linewidth = 0.8) +
+  labs(title    = paste0("Prior: Beta(", alpha_prior, ", ", beta_prior, ")"),
+       subtitle = paste0("Mean = ", round(prior_mean, 3),
+                         "  |  SD = ", round(prior_sd, 3),
+                         "  |  Pseudo-obs = ", alpha_prior + beta_prior),
+       x = expression(pi ~ "(P(Heads))"), y = "Density") +
+  theme_minimal(base_size = 13)
+```
+
+> **Exercise 1.2 Why did you choose the values for** $\alpha$ and
+> $\beta$ **?**
+>
+> answer :
+
+------------------------------------------------------------------------
+
+### Exercise 2. Compute the Posterior (Using the full data)
+
+Using the conjugate update rule:
+$\alpha' = \alpha + x \qquad \beta' = \beta + (n - x)$
+
+```{r posterior-batch}
+alpha_post <- #TODO: alpha for posterior 
+beta_post  <- #TODO: beta for posterior 
+
+post_mean <- #TODO
+post_var  <- #TODO
+post_sd   <- sqrt(post_var)
+post_mode <- (alpha_post - 1) / (alpha_post + beta_post - 2)
+
+cat("Posterior: Beta(", alpha_post, ",", beta_post, ")\n")
+cat("Posterior mean:   ", round(post_mean, 4), "\n")
+cat("Posterior mode:   ", round(post_mode, 4), "\n")
+cat("Posterior SD:     ", round(post_sd,   4), "\n")
+cat("Sample proportion:", sample_prop,          "\n")
+```
+
+------------------------------------------------------------------------
+
+### Exercise 3. Visualize Prior vs. Posterior
+
+```{r prior-posterior-plot, fig.height=4, fig.width=7}
+tibble(
+  pi   = rep(pi_grid, 2),
+  dens = c(dbeta(pi_grid, alpha_prior, beta_prior),
+           dbeta(pi_grid, alpha_post,  beta_post)),
+  dist = rep(
+    c(paste0("Prior: Beta(", alpha_prior, ", ", beta_prior, ")"),
+      paste0("Posterior: Beta(", alpha_post, ", ", beta_post, ")")),
+    each = 500)
+) |>
+  mutate(dist = factor(dist, levels = unique(dist))) |>
+  ggplot(aes(x = pi, y = dens, color = dist, fill = dist)) +
+  geom_line(linewidth = 1.2) +
+  geom_area(alpha = 0.10, position = "identity") +
+  geom_vline(xintercept = sample_prop, linetype = "dashed",
+             color = "gray40", linewidth = 0.9) +
+  annotate("text", x = sample_prop + 0.02,
+           y = max(dbeta(pi_grid, alpha_post, beta_post)) * 0.25,
+           label = paste0("x/n = ", sample_prop),
+           color = "gray40", hjust = 0, size = 3.5) +
+  scale_color_manual(values = c("steelblue", "tomato")) +
+  scale_fill_manual(values  = c("steelblue", "tomato")) +
+  labs(title    = paste0("Prior vs. Posterior — ", my_coin_file),
+       subtitle = paste0(n_heads, " heads out of ", n_flips, " flips"),
+       x = expression(pi ~ "(P(Heads))"),
+       y = "Density", color = NULL, fill = NULL) +
+  theme_minimal(base_size = 13) +
+  theme(legend.position = "bottom")
+```
+
+**Exercise 3.2 :** Describe how the posterior differs from the prior.
+Why does the posterior concentrate around the sample proportion?
+
+**Answer:**
+
+------------------------------------------------------------------------
+
+## Step 2: Sequential Updating — (Flip by Flip)
+
+Instead of using all 50 flips at once, we can update the Beta
+distribution **one flip at a time**:
+
+-   Observing one trial at a time with success $s \in {0,1}$
+
+-   Prior : Beta(alpha, beta)
+
+-   Posterior : Beta(alpha+s, beta+(1-s))
+
+    Updates $\alpha → \alpha + s$ and $\beta → \beta + (1 − s)$
+
+### Step 2.1: Manual Table — First 3 Flips
+
+```{r manual-3-flips 0}
+flips <- coin_df$result   # 1 = Heads, 0 = Tails
+
+cat("First 3 flips:", flips[1], flips[2], flips[3],
+    "(1=H, 0=T)\n\n")
+
+# --- Flip 0: Prior ---
+a1 <- #TODO
+b1 <- #TODO
+cat("alpha0 at flip 0:", a1, "\n")
+cat("beta0 at flip 0:", b1)
+```
+
+```{r manual-3-flips 1}
+# --- Flip 1 ---
+a2 <- #TODO
+b2 <-  #TODO
+cat("alpha0 at flip 1:", a2, "\n")
+cat("beta0 at flip 1:", b2)
+```
+
+```{r manual-3-flips 2}
+# --- Flip 2 ---
+a3 <-  #TODO
+b3 <-  #TODO
+cat("alpha0 at flip 2:", a3, "\n")
+cat("beta0 at flip 2:", b3)
+```
+
+```{r manual-3-flips 3}
+# --- Flip 3 ---
+a4 <-  #TODO
+b4 <-  #TODO
+cat("alpha0 at flip 3:", a4, "\n")
+cat("beta0 at flip 3:", b4)
+```
+
+```{r manual-3-flips}
+flips <- coin_df$result
+
+cat("First 3 flips:", flips[1], flips[2], flips[3], "(1=H, 0=T)\n\n")
+
+tibble(
+  Stage       = c("Prior", "After flip 1", "After flip 2", "After flip 3"),
+  Flip_result = c(NA, flips[1], flips[2], flips[3]),
+  alpha       = c(a1, a2, a3, a4),
+  beta        = c(b1, b2, b3, b4),
+  Mean        = round(c(a1,a2,a3,a4) /
+                      (c(a1,a2,a3,a4) + c(b1,b2,b3,b4)), 4),
+  SD          = round(sqrt(
+    c(a1,a2,a3,a4) * c(b1,b2,b3,b4) /
+    ((c(a1,a2,a3,a4)+c(b1,b2,b3,b4))^2 *
+     (c(a1,a2,a3,a4)+c(b1,b2,b3,b4)+1))
+  ), 4)
+)
+```
+
+------------------------------------------------------------------------
+
+### Step 2.2: Full Sequential Updating (using the logic above)
+
+```{r sequential-update}
+n <- n_flips
+a_seq <- rep(0, n + 1)
+b_seq <- rep(0, n + 1)
+a_seq[1] <- alpha_prior
+b_seq[1] <- beta_prior
+
+for (i in 1:n) {
+  a_seq[i + 1] <-  #TODO
+  b_seq[i + 1] <-  #TODO
+}
+
+post_mean_seq <- a_seq / (a_seq + b_seq)
+post_sd_seq   <- sqrt((a_seq * b_seq) /
+                      ((a_seq + b_seq)^2 * (a_seq + b_seq + 1)))
+
+cat("Sequential updating complete.\n")
+cat("Final posterior: Beta(",
+    tail(a_seq,1), ",", tail(b_seq,1), ")\n")
+cat("Final mean:", round(tail(post_mean_seq,1), 4),
+    "| Final SD:", round(tail(post_sd_seq,1), 4), "\n")
+```
+
+```{r snapshot-table}
+snapshots <- c(0, 5, 10, 20, 50)
+
+map_dfr(snapshots, function(k) {
+  tibble(
+    `After flips` = k,
+    alpha         = a_seq[k + 1],
+    beta          = b_seq[k + 1],
+    Mean          = round(post_mean_seq[k + 1], 4),
+    SD            = round(post_sd_seq[k + 1],   4)
+  )
+})
+```
+
+```{r trajectory-plot, fig.height=4, fig.width=8}
+tibble(flip = 0:n,
+       mean = post_mean_seq,
+       lo   = post_mean_seq - 2 * post_sd_seq,
+       hi   = post_mean_seq + 2 * post_sd_seq) |>
+  ggplot(aes(x = flip, y = mean)) +
+  geom_ribbon(aes(ymin = lo, ymax = hi),
+              fill = "steelblue", alpha = 0.2) +
+  geom_line(color = "steelblue", linewidth = 1.1) +
+  geom_point(data = ~ filter(., flip %in% snapshots),
+             color = "tomato", size = 3) +
+  geom_hline(yintercept = 0.5, linetype = "dashed",
+             color = "gray50", linewidth = 0.8) +
+  annotate("text", x = 43, y = 0.52,
+           label = "Fair coin (0.50)", color = "gray50", size = 3.5) +
+  labs(title    = "Posterior Mean ± 2 SD After Each Flip",
+       subtitle = "Shaded band = ±2 posterior SDs  |  Red dots = snapshots",
+       x = "Number of flips",
+       y = expression("Posterior mean of " ~ pi)) +
+  ylim(0, 1) +
+  theme_minimal(base_size = 13)
+```
+
+```{r posterior-snapshots-plot, fig.height=5, fig.width=10}
+map_dfr(snapshots, function(k) {
+  tibble(
+    pi    = pi_grid,
+    dens  = dbeta(pi_grid, a_seq[k+1], b_seq[k+1]),
+    label = paste0("After ", k, " flips — Beta(",
+                   a_seq[k+1], ",", b_seq[k+1], ")")
+  )
+}) |>
+  mutate(label = factor(label, levels = unique(label))) |>
+  ggplot(aes(x = pi, y = dens, color = label)) +
+  geom_line(linewidth = 1.1) +
+  scale_color_brewer(palette = "RdYlBu", direction = -1) +
+  labs(title  = "Posterior Beta Distribution at Each Snapshot",
+       x      = expression(pi ~ "(P(Heads))"),
+       y      = "Density", color = NULL) +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "bottom")
+```
+
+------------------------------------------------------------------------
+
+## Exercise 4. Are the Posteriors the Same?
+
+Compare the batch update (all 50 flips at once) to the sequential update
+(flip by flip). Do they agree?
+
+**Answer:**
+
+## Exercise 5. Credible Interval
+
+Obtain A **95% credible interval** $[L, U]$ satisfies
+$P(L \leq \pi \leq U \mid \text{data}) = 0.95$.
+
+Obtain A **90% credible interval** $[L, U]$ satisfies
+$P(L \leq \pi \leq U \mid \text{data}) = 0.90$. Unlike a frequentist
+confidence interval, this is a direct probability statement about $\pi$.
+
+```{r credible-interval}
+ci_95 <- #TODO: get 95% credible interval for pi, hint;use qbeta()
+ci_90 <- #TODO: get 90% credible interval for pi, hint;type ?qbeta
+
+cat("Posterior: Beta(", alpha_post, ",", beta_post, ")\n")
+cat("95% Credible Interval: [",
+    round(ci_95[1], 4), ",", round(ci_95[2], 4), "]\n")
+cat("90% Credible Interval: [",
+    round(ci_90[1], 4), ",", round(ci_90[2], 4), "]\n")
+```
+
+```{r ci-plot, fig.height=4, fig.width=7}
+shade_df <- tibble(pi   = pi_grid,
+                   dens = dbeta(pi_grid, alpha_post, beta_post)) |>
+  filter(pi >= ci_95[1], pi <= ci_95[2])
+
+peak_dens <- max(dbeta(pi_grid, alpha_post, beta_post))
+
+tibble(pi = pi_grid, dens = dbeta(pi_grid, alpha_post, beta_post)) |>
+  ggplot(aes(x = pi, y = dens)) +
+  geom_line(color = "steelblue", linewidth = 1.2) +
+  geom_area(data = shade_df, fill = "steelblue", alpha = 0.35) +
+  geom_vline(xintercept = ci_95, linetype = "dashed",
+             color = "tomato", linewidth = 0.9) +
+  annotate("text", x = ci_95[1] - 0.01, y = peak_dens * 0.55,
+           label = round(ci_95[1], 3), color = "tomato",
+           hjust = 1, size = 3.5) +
+  annotate("text", x = ci_95[2] + 0.01, y = peak_dens * 0.55,
+           label = round(ci_95[2], 3), color = "tomato",
+           hjust = 0, size = 3.5) +
+  labs(title    = paste0("Posterior Beta(", alpha_post, ", ", beta_post,
+                          ") with 95% Credible Interval"),
+       subtitle = "Shaded region contains 95% of posterior probability",
+       x = expression(pi ~ "(P(Heads))"), y = "Density") +
+  theme_minimal(base_size = 13)
+```
+
+## Exercise 5.2. Interpret the credible intervals.
+
+**Answer:**
+
+------------------------------------------------------------------------
+
+## Exercise 6. What Is Your Final Estimate and what do you see?
+
+**Answer:**
+
+------------------------------------------------------------------------
+
+## Exercise 7. How Would the Frequentist Approach This?
+
+```{r frequentist}
+p_hat      <- n_heads / n_flips
+se         <- sqrt(p_hat * (1 - p_hat) / n_flips)
+ci_freq_95 <- p_hat + c(-1, 1) * qnorm(0.975) * se
+
+cat("Sample proportion:       ", round(p_hat, 4),       "\n")
+cat("Standard error:          ", round(se,    4),        "\n")
+cat("95% Confidence Interval: [",
+    round(ci_freq_95[1], 4), ",", round(ci_freq_95[2], 4), "]\n")
+
+
+
+```
+
+------------------------------------------------------------------------
+
+## Post Lab Activity
+
+A casino is testing a new roulette-style coin for a promotional game.
+They claim the coin is **fair** ($\pi = 0.50$). A player suspects it may
+be biased toward heads.
+
+Your data are in `lab4a_post_data.csv` — 60 flips of this coin.
+
+Update a Beta posterior **in three batches of 20 flips** and report the
+posterior after each batch, then make a final decision.
+
+> **AutoGrader requirements:**
+>
+> -   `post_alpha1`, `post_beta1` — posterior parameters after batch 1
+>     (flips 1–20)
+> -   `post_alpha2`, `post_beta2` — posterior parameters after batch 2
+>     (flips 1–40)
+> -   `post_alpha3`, `post_beta3` — posterior parameters after batch 3
+>     (all 60 flips)
+> -   `ci_lower`, `ci_upper` — bounds of 95% credible interval after all
+>     60 flips
+> -   `biased` — logical: `TRUE` if you conclude the coin is biased?
+
+------------------------------------------------------------------------
+
+```{r postlab activity}
+# Please read !
+# Submit lab4.R to GradeScope
+# You don't submit this Rmd file. 
+# Don't setup your working directory. 
+# Don't import libraries unless listed here.
+# Please run your lab4.R file before you submit. 
+# You should read the message from the autograder. Wait until you pass. 
+# Pass means 5/5 
+
+library(dplyr)
+library(ggplot2)
+library(readr)
+
+post_df    <- read.csv("lab4_post_data.csv")
+post_flips <- post_df$result
+n_post     <- length(post_flips)
+
+a0_post <- 2
+b0_post <- 2
+
+cat("Starting prior: Beta(", a0_post, ",", b0_post, ")\n")
+cat("Prior mean:", a0_post / (a0_post + b0_post), "\n")
+
+
+
+
+
+```

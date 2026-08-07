@@ -1,0 +1,53 @@
+% !TEX root =  Lecture19.tex
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Recap/Agenda
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Module 4: Bayesian Statistics}
+    \begin{itemize}
+        \item \hl{Previously:} conjugate models: the posterior in closed form, its mean a weighted average of prior and data.
+        \item \hl{This time:} what to do when there is \emph{no} closed form (the usual case), so we must \hl{approximate} the posterior.
+          \begin{itemize}
+              \item why the normalizing constant is the obstacle;
+              \item \hl{grid approximation}, turning the integral into a sum;
+              \item \hl{Markov chain Monte Carlo}, sampling from the posterior instead;
+              \item reading the output: \hl{trace plots}, burn-in, step size, diagnostics.
+          \end{itemize}
+        \item \hl{Reading:} Bayes Rules!\ Chapters 6 and 7.
+        \item \hl{Homework:}
+    \end{itemize}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Learning objectives:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+    \frametitle{Lecture Objectives}
+    \goals{%
+    \begin{itemize}
+    \item explain why a non-conjugate model has \hl{no closed-form posterior}, and identify the normalizing constant as the obstacle;
+    \item use \hl{grid approximation} to turn the posterior integral into a sum, and say why it breaks down as the number of parameters grows;
+    \item describe how \hl{Metropolis--Hastings} MCMC draws posterior samples via propose / accept-or-reject, and read an \hl{acceptance probability};
+    \item diagnose a chain from its \hl{trace plot}: estimate the \hl{burn-in}, spot a \hl{step size} that is too large or too small;
+    \item say what \hl{R-hat}, \hl{ESS}, and \hl{MCSE} each tell you about whether to trust the output.
+    \end{itemize}}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+    \frametitle{Lecture Objectives}
+    \objectives{%
+    \begin{itemize}
+    \item \textbf{(M4, LO5)} Using Markov chain Monte Carlo
+    \end{itemize}}
+    \vspace{0.3em}
+    {\small Building on, and revisiting:}
+    \objectives{%
+    \begin{itemize}
+    \item \textbf{(M4, LO3)} Conjugate Models: the whale-sightings posterior from Lecture 18, now recomputed \emph{without} conjugacy
+    \end{itemize}}
+\end{frame}

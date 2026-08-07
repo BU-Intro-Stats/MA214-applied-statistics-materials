@@ -1,0 +1,150 @@
+\documentclass{article}
+\usepackage[margin=1.15in]{geometry}
+\usepackage{xcolor}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{tabularx}
+\usepackage{listings}
+
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\rhead{Lecture 16}
+\lhead{MA 214: Applied Statistics (Spring 2026)}
+\renewcommand{\headrulewidth}{.4mm}
+
+\newcommand{\blankline}[1]{\underline{\hspace{#1}}}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  frame=single,
+  framerule=0.4pt,
+  breaklines=true,
+  showstringspaces=false
+}
+
+\begin{document}
+
+\noindent\textbf{Name:}\blankline{2.25in}\hfill\textbf{BUID:}\blankline{1.55in}
+
+\medskip
+
+\noindent\textbf{Name:}\blankline{2.25in}\hfill\textbf{BUID:}\blankline{1.55in}\newline
+
+\begin{center}
+ \Large In-Class Worksheet: Logistic Regression Inference
+\end{center}
+
+\subsection*{Scenario}
+The \emph{Cleveland heart-disease} study (Detrano et al., 1989) records $n = 208$ patients. The predictors are \texttt{age}, \texttt{sex}, \texttt{cholesterol}, \texttt{resting\_bp}, \texttt{max\_heart\_rate}, \texttt{exercise\_angina} and \texttt{fasting\_blood\_sugar}; the outcome is a binary \texttt{heart\_disease} diagnosis. You will fit a logistic model, do inference on the coefficients, check the conditions, and compare models by cross-validation. Data (\texttt{heart\_disease.csv}) is on Blackboard.
+
+\subsection*{Part 1: Explore}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.7em]
+\item Load the data and record: \; number of patients \blankline{0.9in}; \; proportion with heart disease \blankline{0.9in}; \; mean age \blankline{0.9in}. \\[0.5em]
+\item Plot \texttt{heart\_disease} (jittered $0/1$) against \texttt{age} with a fitted logistic curve:
+\begin{lstlisting}[language=R]
+geom_smooth(method = "glm", method.args = list(family = "binomial"))
+\end{lstlisting}
+Does the probability of heart disease rise or fall with age? \\[3em]
+\end{enumerate}
+
+\subsection*{Part 2: Fit and read the output}
+
+Fit the model:
+\begin{lstlisting}[language=R]
+glm(heart_disease ~ age + resting_bp + cholesterol + max_heart_rate,
+    family = binomial)
+\end{lstlisting}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.7em]
+\item From \texttt{tidy()}, record the coefficient table:
+\vspace{0.2em}
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{term} & \textbf{estimate} & \textbf{std.error} & \textbf{$z$} & \textbf{p.value} \\
+\midrule
+(Intercept)    & & & & \\
+age            & & & & \\
+resting\_bp    & & & & \\
+cholesterol    & & & & \\
+max\_heart\_rate & & & & \\
+\bottomrule
+\end{tabular}
+\end{center}
+\item Which predictors show strong evidence of association ($p < 0.05$)? Interpret the \texttt{age} coefficient on the \emph{log-odds} scale. \\[3.5em]
+\item Run \texttt{tidy(conf.int = TRUE, exponentiate = TRUE)}. Interpret the \texttt{resting\_bp} odds ratio \emph{in context} --- and per a meaningful step (say, $10$ mmHg), not per single unit. \\[4em]
+\end{enumerate}
+
+\subsection*{Part 3: Confidence intervals and diagnostics}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.7em]
+\item Does the $95\%$ CI for the \texttt{age} odds ratio include $1$? What does that say about the evidence for age? \\[3em]
+\item Does the CI for \texttt{max\_heart\_rate} include $1$? What does that say? \\[3em]
+\item Make the predicted-probability histogram colored by outcome. Do the two groups separate? \\[3em]
+\item Make a binned-residual plot. Are any bins outside the $\pm 2\,\mathrm{SE}$ band? What would that indicate? \\[3.5em]
+\end{enumerate}
+
+\subsection*{Part 4: Prediction and cross-validation}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.7em]
+\item Classify at $c = 0.5$ and fill in the confusion matrix; then the misclassification rate.
+\vspace{0.2em}
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+& \textbf{Predicted 1} & \textbf{Predicted 0} \\
+\midrule
+\textbf{Actual 1} & TP = \blankline{1.4cm} & FN = \blankline{1.4cm} \\[0.3em]
+\textbf{Actual 0} & FP = \blankline{1.4cm} & TN = \blankline{1.4cm} \\
+\bottomrule
+\end{tabular}
+\end{center}
+Misclassification rate $= \blankline{2cm}$
+\item Compute the Brier score \blankline{1.3in} and log-loss \blankline{1.3in} on the full data. In one sentence, how do the two penalise a confident wrong prediction differently? \\[3em]
+\item \textbf{Cross-validate.} Run $5$-fold CV (repeat a few times and average) on the four models below, scoring by misclassification, Brier, and log-loss.
+\vspace{0.2em}
+
+\begin{center}\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}cl ccc@{}}
+\toprule
+\textbf{\#} & \textbf{Model (predictors)} & \textbf{Misclass} & \textbf{Brier} & \textbf{LogLoss} \\
+\midrule
+1 & age + resting\_bp + cholesterol + max\_hr & \blankline{0.8cm} & \blankline{0.8cm} & \blankline{0.8cm} \\
+2 & Model 1 $+$ fasting\_blood\_sugar & \blankline{0.8cm} & \blankline{0.8cm} & \blankline{0.8cm} \\
+3 & Model 1 $+$ exercise\_angina & \blankline{0.8cm} & \blankline{0.8cm} & \blankline{0.8cm} \\
+4 & Model 1 $+$ both & \blankline{0.8cm} & \blankline{0.8cm} & \blankline{0.8cm} \\
+\bottomrule
+\end{tabular}
+\end{center}
+\vspace{0.4em}
+
+Do the three losses agree on the best model? \blankline{1.5in} \; Which would you choose, and why? \\[3.5em]
+\item \textbf{Threshold.} Sweep the threshold from $0.1$ to $0.9$. \\[0.3em] Where is misclassification lowest? \blankline{1in} \\[0.3em] For a heart-disease \emph{screen}, would a doctor want a higher or lower one? Why? \\[3.5em]
+\end{enumerate}
+
+\newpage
+
+\subsection*{Part 5: Wrap-up}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item Name two ways inference in logistic regression differs from inference in linear regression. \\[4em]
+\item Why might cross-validation with the Brier score or log-loss rank the models differently from AIC or the misclassification rate? \\[4em]
+\end{enumerate}
+
+\subsection*{Compare with the groups around you}
+
+\noindent\fbox{\parbox{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}{%
+Compare your final model with at least two neighboring pairs. Did everyone read the cholesterol odds ratio the same way --- per unit, or per meaningful step? For a screening test, would you set the threshold above or below $0.5$? Having heard them, would you change your model or your threshold?
+\\[5em]
+}}
+
+\end{document}

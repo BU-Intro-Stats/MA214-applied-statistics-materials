@@ -1,0 +1,174 @@
+---
+title: "MA214 Applied Statistics - Lecture 8 Guide"
+output:
+  html_document:
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(tidyverse)
+library(broom)
+library(scales)
+```
+
+## Quick Reference
+
+```{r quick-ref, eval=FALSE}
+# glm function
+model_temp <- glm(
+  y ~ x1 + x2 + x3,
+  data = df,
+  family = binomial
+)
+
+# Get predictions for new data
+augment(model, newdata = test_data, type.predict = "response")
+
+# Interaction term in formula
+# Use * for interaction: A * B expands to A + B + A:B
+# Use : for just the interaction: A:B
+
+# Filter data
+data %>% filter(variable == "value")
+
+# Group and summarize
+data %>%
+  group_by(grouping_var) %>%
+  summarise(mean_val = mean(numeric_var))
+
+# Create bins
+ntile(variable, number_of_bins)
+```
+
+## Student Data
+
+```{r}
+df_student <- read.csv("df_student.csv")
+
+# Check the data
+glimpse(df_student)
+table(df_student$passed)
+```
+
+------------------------------------------------------------------------
+
+## Baseline Model
+
+```{r baseline-model}
+# Load data (if starting fresh)
+df_student <- read.csv("df_student.csv")
+
+# Fit baseline model
+mod_student <- glm(
+  passed ~ study_hours + attendance_pct + previous_gpa + study_group + major,
+  data = df_student,
+  family = binomial
+)
+
+print(mod_student)
+
+```
+
+------------------------------------------------------------------------
+
+## 1. Get Predictions for New Data using `augment()`
+
+```{r augment-example}
+# Create test data for new students
+test_students <- tibble(
+  study_hours = c(10, 15, 20),
+  attendance_pct = c(70, 85, 95),
+  previous_gpa = c(2.5, 3.0, 3.5),
+  study_group = c("No", "Yes", "Yes"),
+  major = c("Arts", "Business", "STEM")
+)
+
+# Get predictions using augment
+predictions <- augment(mod_student, newdata = test_students, type.predict = "response")
+predictions %>%
+  select(study_hours, attendance_pct, previous_gpa, study_group, major, .fitted)
+```
+
+**Example: Vary study hours, hold others constant**
+
+```{r augment-vary-hours}
+# Test effect of study hours for a Business major with 3.0 GPA
+test_hours <- tibble(
+  study_hours = seq(0, 30, by = 2),  # Vary from 0 to 30
+  attendance_pct = 80,
+  previous_gpa = 3.0,
+  study_group = "No",
+  major = "Business"
+)
+
+preds_hours <- augment(mod_student, newdata = test_hours, type.predict = "response")
+
+# Visualize
+ggplot(preds_hours, aes(x = study_hours, y = .fitted)) +
+  geom_line(color = "steelblue", size = 1) +
+  geom_point(size = 3) +
+  scale_y_continuous(labels = percent, limits = c(0, 1)) +
+  labs(title = "Predicted Pass Probability vs Study Hours",
+       subtitle = "Business major, 80% attendance, 3.0 GPA, No study group",
+       x = "Study Hours per Week", y = "Predicted Pass Probability") +
+  theme_minimal()
+```
+
+**Example: Effect of attendance**
+
+```{r augment-attendance}
+# Test effect of attendance for different previous GPAs
+test_attendance <- expand_grid(
+  study_hours = 15,
+  attendance_pct = seq(40, 100, by = 5),
+  previous_gpa = c(2.0, 3.0, 4.0),
+  study_group = "No",
+  major = "Business"
+)
+
+preds_attendance <- augment(mod_student, newdata = test_attendance, type.predict = "response")
+
+ggplot(preds_attendance, aes(x = attendance_pct, y = .fitted, color = factor(previous_gpa))) +
+  geom_line(size = 1) +
+  scale_y_continuous(labels = percent) +
+  labs(title = "Predicted Pass Probability vs Attendance",
+       subtitle = "Business major, 15 hrs/week study, No study group",
+       x = "Attendance %", y = "Predicted Pass Probability",
+       color = "Previous GPA") +
+  theme_minimal()
+```
+
+------------------------------------------------------------------------
+
+## 2. Interaction Terms in Formulas
+
+### Using `*` (includes main effects + interaction)
+
+```{r interaction-star}
+# Hypothesis: Study groups help more for students with lower GPAs
+# study_hours * previous_gpa expands to: study_hours + previous_gpa + study_hours:previous_gpa
+mod_int1 <- glm(
+  passed ~ study_hours * previous_gpa + attendance_pct + study_group + major,
+  data = df_student,
+  family = binomial
+)
+
+```
+
+------------------------------------------------------------------------
+
+## Create Bins using `ntile()`
+
+```{r ntile-examples}
+# Create 10 bins (deciles) for study hours
+df_student %>%
+  mutate(hours_bin = ntile(study_hours, 10)) %>%
+  select(study_hours, hours_bin) %>%
+  head(10)
+
+# Create 4 bins (quartiles) for GPA
+df_student %>%
+  mutate(gpa_quartile = ntile(previous_gpa, 4)) %>%
+  select(previous_gpa, gpa_quartile) %>%
+  head(10)
+```

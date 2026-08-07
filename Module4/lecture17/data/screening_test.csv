@@ -1,0 +1,4 @@
+"parameter","value","meaning"
+"prevalence",0.001,"P(D)"
+"sensitivity",0.99,"P(+ | D)"
+"specificity",0.95,"P(- | D^c)"

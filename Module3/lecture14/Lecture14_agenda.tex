@@ -1,0 +1,55 @@
+% !TEX root =  Lecture14.tex
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Recap/Agenda
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Module 3: Regression Inference}
+    \begin{itemize}
+        \item \hl{Previously:} inference about \emph{one} slope: the two roads, a bootstrap interval, LINE (Lecture 13).
+        \item \hl{This time:} \hl{many predictors at once}. That slope test becomes one \emph{row} of an \texttt{lm()} table.
+          \begin{itemize}
+              \item reading the output: $\mathrm{df} = n-p-1$, every slope \emph{holding the others fixed};
+              \item what \hl{multicollinearity} does to those SEs, $p$-values and intervals;
+              \item when the conditions fail: \hl{transformations}, and reading a log model;
+              \item \hl{interaction} terms.
+          \end{itemize}
+        \item \hl{Reading:} IMS Ch.\ 25.1--25.2, plus the non-linear and interaction supplements.
+        \item \hl{Homework:} the assigned reading.
+    \end{itemize}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Learning objectives:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+    \frametitle{Lecture Objectives}
+    \goals{%
+    \begin{itemize}
+    \item read a multiple regression coefficient table, and test $H_0:\beta_j=0$ against $t_{n-p-1}$;
+    \item interpret each $\hat\beta_j$ \emph{holding the other predictors fixed}, and say why every row is conditional on the rest of the model;
+    \item explain what \hl{collinear} predictors do to the inference, and why they leave prediction untouched;
+    \item diagnose a failing model, \hl{transform} it, and interpret a $\log(y)$, $\log(x)$ or log--log coefficient;
+    \item fit and read an \hl{interaction}: what $\hat\beta_3$ means when one slope depends on another predictor.
+    \end{itemize}}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+    \frametitle{Lecture Objectives}
+    \objectives{%
+    \begin{itemize}
+    \item \textbf{(M3, LO3)} Interpreting Software Output for Multiple Regression
+    \item \textbf{(M3, LO4)} Building and Interpreting Non-linear and Interaction Models
+    \end{itemize}}
+    \vspace{0.3em}
+    {\small Also revisited, in the light of \emph{inference}:}
+    \objectives{%
+    \begin{itemize}
+    \item \textbf{(M3, LO2)} Model Checking and Remedial Measures: the transformations of Lecture 13, now as model \emph{building}
+    \item \textbf{(M1, LO3)} Using Regression Models: multicollinearity, from Lecture 7
+    \end{itemize}}
+\end{frame}

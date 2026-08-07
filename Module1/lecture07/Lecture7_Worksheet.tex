@@ -1,0 +1,130 @@
+\documentclass{article}
+\usepackage[margin=1.15in]{geometry}
+\usepackage{xcolor}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{tabularx}
+
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\rhead{Lecture 7}
+\lhead{MA 214: Applied Statistics (Spring 2026)}
+\renewcommand{\headrulewidth}{.4mm}
+
+\newcommand{\blankline}[1]{\underline{\hspace{#1}}}
+
+\begin{document}
+
+\noindent\textbf{Name:}\blankline{2.25in}\hfill\textbf{BUID:}\blankline{1.55in}\newline
+
+\begin{center}
+ \Large In-Class Worksheet: Model Selection
+\end{center}
+
+\subsection*{Scenario}
+Today we practice choosing among candidate models. A larger model may fit the observed data better, but model selection asks whether the improvement is worth the added complexity.
+
+\medskip
+\noindent\textbf{Goals:} \textbf{(1)} compare $R^2$, adjusted $R^2$, and AIC, \textbf{(2)} explain why complexity penalties are useful, \textbf{(3)} recognize multicollinearity, \textbf{(4)} choose a model using context and diagnostics.
+
+\subsection*{Part 1: Why Not Just Add Everything?}
+A researcher is predicting course evaluation score. They are considering the following models.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Model} & \textbf{Adjusted }\boldmath$R^2$ & \textbf{AIC} \\
+\midrule
+M1: beauty + age & 0.071 & 720.4 \\
+M2: M1 + gender & 0.083 & 714.1 \\
+M3: M2 + native language & 0.084 & 713.8 \\
+M4: M3 + random noise variable & 0.083 & 715.9 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item Based only on adjusted $R^2$, which model looks best? \hfill \blankline{1.3in}
+\item Based only on AIC, which model looks best? \hfill \blankline{1.3in}
+\item Does M4 improve the model? Explain using both adjusted $R^2$ and AIC. \\[3.5em]
+\item Which model would you choose for a first report? Briefly explain. \\[4em]
+\end{enumerate}
+
+\subsection*{Part 2: $R^2$ vs. Adjusted $R^2$}
+Suppose four linear models are fit to the same response and same dataset.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabularx}{\textwidth}{lXcc}
+\toprule
+\textbf{Model} & \textbf{Predictors} & \boldmath$R^2$ & \textbf{Adjusted }\boldmath$R^2$ \\
+\midrule
+A & $x_1$ & 0.40 & 0.38 \\
+B & $x_1+x_2$ & 0.45 & 0.41 \\
+C & $x_1+x_2+x_3$ & 0.46 & 0.39 \\
+D & $x_1+x_2+x_3+x_4$ & 0.47 & 0.36 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item Why does $R^2$ keep increasing as predictors are added? \\[3em]
+\item Which model would adjusted $R^2$ favor? \hfill \blankline{1.2in}
+\item In one sentence, explain why adjusted $R^2$ is more useful than $R^2$ for comparing these models. \\[4em]
+\end{enumerate}
+
+\subsection*{Part 3: AIC for Logistic Regression}
+Two logistic regression models are fit to predict Donner Party survival.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Model} & \textbf{Predictors} & \textbf{AIC} \\
+\midrule
+Simple logistic & Age & 60.291 \\
+Multiple logistic & Age + Sex & 57.256 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item Which model is favored by AIC? \hfill \blankline{1.8in}
+\item Does lower AIC prove that the model is true? Explain briefly. \\[3em]
+
+\end{enumerate}
+
+\subsection*{Part 4: Multicollinearity}
+A model predicts poverty rate using two demographic predictors: \texttt{female\_house} and \texttt{white}. The predictors are strongly associated with each other.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{llcc}
+\toprule
+\textbf{Model} & \textbf{Term} & \textbf{Estimate} & \textbf{p-value} \\
+\midrule
+One predictor & female\_house & 0.69 & 0.00 \\
+Two predictors & female\_house & 0.89 & 0.00 \\
+Two predictors & white & 0.04 & 0.29 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.8em]
+\item What does it mean to interpret the coefficient of \texttt{female\_house} while holding \texttt{white} fixed? \\[3.5em]
+\item Why can strong association among predictors make coefficient interpretation difficult? \\[4em]
+\item Name one way to notice possible multicollinearity. \hfill \blankline{2.2in}
+\end{enumerate}
+
+\subsection*{Wrap-Up}
+Complete the sentence: \emph{A good model-selection decision should balance}
+
+\noindent\blankline{6in}. \\[3em]
+
+\end{document}

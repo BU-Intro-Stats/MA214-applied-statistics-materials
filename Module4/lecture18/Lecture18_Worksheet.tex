@@ -1,0 +1,209 @@
+\documentclass{article}
+\usepackage[margin=1.15in]{geometry}
+\usepackage{xcolor}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{tabularx}
+\usepackage{listings}
+
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\rhead{Lecture 18}
+\lhead{MA 214: Applied Statistics (Spring 2026)}
+\renewcommand{\headrulewidth}{.4mm}
+
+\newcommand{\blankline}[1]{\underline{\hspace{#1}}}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  frame=single,
+  framerule=0.4pt,
+  breaklines=true,
+  showstringspaces=false
+}
+
+\begin{document}
+
+\noindent\textbf{Name:}\blankline{2.25in}\hfill\textbf{BUID:}\blankline{1.55in}
+
+\medskip
+
+\noindent\textbf{Name:}\blankline{2.25in}\hfill\textbf{BUID:}\blankline{1.55in}\newline
+
+\begin{center}
+ \Large In-Class Worksheet: Conjugate Models
+\end{center}
+
+\subsection*{Scenario}
+A \textbf{community health clinic} is reviewing its adult patient population. The director wants to combine what published studies already say with what the clinic actually sees, and has three questions --- one about a \textbf{proportion}, one about a \textbf{mean}, one about a \textbf{rate}:
+
+\begin{enumerate}[label={\bfseries \arabic*.},topsep=2pt,itemsep=2pt]
+	\item What fraction of adult patients have \emph{uncontrolled hypertension}?
+	\item What is the \emph{mean systolic blood pressure} (SBP, mmHg) among adult patients?
+	\item How many \emph{walk-in patients} arrive per hour on the afternoon shift?
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Goals:}
+\textbf{(1)} apply each of the three conjugate update rules,
+\textbf{(2)} identify the prior sample size $n_0$ in each,
+\textbf{(3)} verify that the posterior mean really is the weighted average the lecture promised, and
+\textbf{(4)} say which side --- prior or data --- each answer leans toward, and why.
+
+\medskip
+\noindent\textbf{Setup.} You will work in PAIRS. One person is the \textbf{analyst} (writes the code), the other is the \textbf{guide} (reads the questions and fills out the worksheet). Open RStudio and start a new script --- you will write the code yourself.
+
+\subsection*{Part 1: A Proportion --- the Beta-Binomial}
+\textbf{\color{red} Do not use Gen AI when completing this part!}
+
+Published studies of similar clinics suggest an uncontrolled-hypertension rate around \textbf{10\%}. The director is not very confident, so she wants a prior worth about \textbf{10 observations}.
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.6em]
+	\item \textbf{Choose the prior.} Using $E(p) = \frac{\alpha}{\alpha+\beta}$ and the reading of $\alpha + \beta$ as the prior sample size, find $\alpha$ and $\beta$ giving prior mean $0.10$ and $n_0 = 10$. Show your reasoning. \\[4em]
+
+	$\alpha = $ \blankline{2cm} \hspace{1cm} $\beta = $ \blankline{2cm} \hspace{1cm} $n_0 = $ \blankline{2cm}
+
+	\item \textbf{Update.} The clinic reviews $n = 50$ adult charts; $x = 8$ show uncontrolled hypertension. Apply the Beta-Binomial rule.
+
+	\vspace{0.3em}
+	$\alpha_{\text{post}} = \alpha + x = $ \blankline{2cm} \hspace{1cm} $\beta_{\text{post}} = \beta + n - x = $ \blankline{2cm}
+
+	\vspace{0.5em}
+	Posterior mean $= \dfrac{\alpha_{\text{post}}}{\alpha_{\text{post}} + \beta_{\text{post}}} = $ \blankline{3cm} \hspace{1cm} MLE $= x/n = $ \blankline{2cm}
+
+	\item \textbf{Check the pattern.} Compute the two weights and verify the posterior mean by hand:
+	\[
+	\underbrace{\tfrac{n_0}{n_0+n}}_{=\;\blankline{1.5cm}} \times \underbrace{(\text{prior mean})}_{=\;\blankline{1.5cm}}
+	\;+\;
+	\underbrace{\tfrac{n}{n_0+n}}_{=\;\blankline{1.5cm}} \times \underbrace{(\text{MLE})}_{=\;\blankline{1.5cm}}
+	\;=\; \blankline{2.5cm}
+	\]
+
+	Does it match your answer to (B)? \\[2em]
+
+	\item Which side does the posterior lean toward, and why? \\[3em]
+
+\end{enumerate}
+
+\newpage
+
+\subsection*{Part 2: A Mean --- the Normal-Normal}
+
+Published studies put the mean SBP for adults in primary care at about \textbf{120 mmHg}; the director's confidence corresponds to a prior SD of $\sigma_0 = 10$ mmHg. The clinic records SBP for $n = 20$ patients and finds $\bar{x} = 126$ mmHg. Take the population SD as known: $\sigma = 15$ mmHg.
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.6em]
+	\item \textbf{The prior.} \qquad $\mu \sim N\left(\blankline{1.5cm},\ \blankline{1.5cm}^2\right)$
+
+	\item \textbf{Prior sample size.} A different family, so a different recipe for $n_0$:
+	\[
+	n_0 = \frac{\sigma^2}{\sigma_0^2} = \frac{\blankline{1.2cm}^2}{\blankline{1.2cm}^2} = \blankline{2cm}
+	\]
+
+	In plain words: this prior is worth about \blankline{2cm} patient measurements.
+
+	\item \textbf{The posterior.}
+	\[
+	n_0 + n = \blankline{2.5cm}, \qquad \sigma_n = \frac{\sigma}{\sqrt{n_0+n}} = \blankline{2.5cm}
+	\]
+	\[
+	\mu_n = \frac{n_0}{n_0+n}\,\mu_0 + \frac{n}{n_0+n}\,\bar{x} = \hspace{6cm}
+	\]
+
+	\item \textbf{Interval.} The posterior is Normal, so an interval reads straight off it. Use \texttt{qnorm()} (or $\mu_n \pm 1.96\,\sigma_n$):
+
+	95\% credible interval: [\blankline{2cm}, \blankline{2cm}]
+
+	\vspace{0.3em}
+	Interpret it in one sentence, in context. \\[3em]
+
+	\item \textbf{Compare with Part 1.} There, $n_0 = 10$ against $n = 50$. Here, $n_0 = 2.25$ against $n = 20$. In which of the two analyzes does the prior have more say? Justify with the weights, not intuition. \\[4em]
+
+\end{enumerate}
+
+\newpage
+
+\subsection*{Part 3: A Rate --- the Gamma-Poisson}
+
+Afternoon walk-ins have historically averaged about \textbf{4 per hour}. The director encodes that as a $\text{Gamma}(8, 2)$ prior. Over six afternoon hours the clinic counts:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lcccccc}
+\toprule
+Hour & 1 & 2 & 3 & 4 & 5 & 6 \\
+\midrule
+Walk-ins & 6 & 4 & 7 & 5 & 8 & 3 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.6em]
+	\item \textbf{Summarize the data.} The Poisson likelihood only needs two numbers from the sample --- which two?
+
+	\vspace{0.3em}
+	$n = $ \blankline{1.5cm} \hspace{1cm} $\sum x_i = $ \blankline{1.5cm} \hspace{1cm} $\bar{x} = $ \blankline{2cm}
+
+	\item \textbf{Check the prior.} Confirm that $\text{Gamma}(8,2)$ really does encode ``about 4 per hour'': prior mean $= \alpha/\beta = $ \blankline{2cm}
+
+	\vspace{0.3em}
+	And its prior sample size is $n_0 = \beta = $ \blankline{1.5cm}
+
+	\item \textbf{Update.}
+	\[
+	\lambda \mid \mathbf{x} \sim \text{Gamma}\big(\alpha + \textstyle\sum x_i,\ \beta + n\big) = \text{Gamma}\big(\blankline{1.5cm},\ \blankline{1.5cm}\big)
+	\]
+
+	Posterior mean $=$ \blankline{2.5cm} \hspace{1cm} Posterior SD $= \sqrt{\alpha_{\text{post}}/\beta_{\text{post}}^2} = $ \blankline{2.5cm}
+
+	\item \textbf{The pattern, a third time.} Weights: \blankline{1.5cm} on the prior, \blankline{1.5cm} on the data.
+
+	\vspace{0.3em}
+	Verify: \blankline{1.2cm} $\times$ \blankline{1.2cm} $+$ \blankline{1.2cm} $\times$ \blankline{1.2cm} $=$ \blankline{2cm}
+
+	\item \textbf{Answer the director's question.} She will add an afternoon receptionist if the rate has genuinely risen above 4 per hour. Compute $P(\lambda > 4 \mid \mathbf{x})$ with \texttt{pgamma()}.
+
+	$P(\lambda > 4 \mid \mathbf{x}) = $ \blankline{2.5cm}
+
+	\vspace{0.3em}
+	What do you tell her? Note that you answered her question \emph{directly}, with no null hypothesis and no p-value --- say in one sentence why that is possible here but was not in Module 2. \\[4em]
+
+\end{enumerate}
+
+\newpage
+
+\subsection*{Part 4: One Pattern, Three Families}
+\textbf{\color{red} Do not use Gen AI when completing this part!}
+
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.6em]
+	\item \textbf{Fill in the table} from your work above. This is the whole lecture on one line each.
+
+	\vspace{0.3em}
+	\begin{center}
+	\renewcommand{\arraystretch}{1.5}
+	{\small
+	\begin{tabular}{lccccc}
+	\toprule
+	& \textbf{Parameter} & \textbf{$n_0$ recipe} & \textbf{$n_0$} & \textbf{$n$} & \textbf{Weight on data} \\
+	\midrule
+	Part 1 (Beta-Bin.)  & $p$       & $\alpha+\beta$          & \blankline{1.2cm} & \blankline{1.2cm} & \blankline{1.8cm} \\
+	Part 2 (Normal-Nor.)& $\mu$     & $\sigma^2/\sigma_0^2$   & \blankline{1.2cm} & \blankline{1.2cm} & \blankline{1.8cm} \\
+	Part 3 (Gamma-Pois.)& $\lambda$ & $\beta$                 & \blankline{1.2cm} & \blankline{1.2cm} & \blankline{1.8cm} \\
+	\bottomrule
+	\end{tabular}}
+	\end{center}
+
+	\item Rank the three analyzes from ``prior matters most'' to ``prior matters least.'' Which single number decides the ranking? \\[3em]
+
+	\item \textbf{Doubling the data.} Suppose the clinic doubles each sample --- 100 charts, 40 SBP readings, 12 hours of walk-ins --- and every summary statistic ($x/n$, $\bar x$, $\bar x$) comes out identical. Without recomputing anything, say what happens to each posterior mean and to each posterior SD, and why. \\[5em]
+
+	\item \textbf{Where it breaks.} The director now asks: ``what fraction of patients have uncontrolled hypertension \emph{and} arrive as walk-ins \emph{and} are over 65?'' --- three unknowns at once, tangled together. Explain in two sentences why none of today's three update rules helps, and what that tells you about how special conjugacy is. \\[5em]
+
+\end{enumerate}
+
+\end{document}

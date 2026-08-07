@@ -1,0 +1,361 @@
+---
+title: "CAS MA 214 — Project 2 week2"
+subtitle: "Design Your Own Simulation Study"
+author: "Group Members: ______________________________________"
+date: "Wednesday, March 18, 2026"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: flatly
+    highlight: tango
+editor_options:
+  markdown:
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(tidyverse)
+```
+
+------------------------------------------------------------------------
+
+## Group Setup
+
+**Group members:**
+
+1.  
+
+    ------------------------------------------------------------------------
+
+2.  
+
+    ------------------------------------------------------------------------
+
+3.  
+
+    ------------------------------------------------------------------------
+
+4.  
+
+    ------------------------------------------------------------------------
+
+**Chosen studies:** Study \_\_\_\_\_ and Study \_\_\_\_\_
+
+------------------------------------------------------------------------
+
+# Overview
+
+In this lab you will **design and run your own simulation study** for
+Project 2 Part I. You will make the key decisions: which error
+distributions to use, how severe each scenario is, what sample sizes to
+try, and how many bootstrap resamples to draw.
+
+The base model for all groups is:
+
+$$Y_i = \beta_0 + \beta_1 X_i + \epsilon_i, \qquad  \epsilon_i \sim N(0,\sigma^2)$$
+
+What varies is the distribution of $\epsilon_i$ .
+
+------------------------------------------------------------------------
+
+# Part 1: Design Your Simulation
+
+## Step 1: Data-generating process with assumption violations and linear regression fit
+
+```{r setting-up, eval=FALSE}
+
+beta0  <- 1
+beta1  <- 2
+alpha  <- 0.05
+n <- 30
+
+# This is what ONE replicate looks like.
+# In the full simulation you will repeat this n_reps times.
+
+X       <- rnorm(n) # this can change
+
+#epsilon <- error_function(n, X)   # <-- your function plugs in here
+
+epsilon <- rnorm(n)
+Y       <- beta0 + beta1 * X + epsilon
+
+# You will change either epsilon through error_function(n,X)
+# or through the functional form of X and Y 
+# or Both
+
+
+df  <- data.frame(X, Y)
+fit <- lm(Y ~ X, data = df)
+s_result <- summary(fit)
+s_result
+```
+
+Your `Y` will vary based on `epsilon`, which encodes the specific
+assumption violation you are studying.
+
+#### Discussion Question 1. What kinds of violations (studies) will we use for the project?
+
+-\>
+
+### Make an `error_function(n, X)`
+
+Write a function that takes the sample size `n` and the predictor vector
+`X` as inputs and returns `n` error terms. The table below gives one
+example per study to get you started.
+
+| Study | Violation          | Example `error_function` body                  |
+|-------|--------------------|------------------------------------------------|
+| A     | Non-normality      | `e <- rchisq(n, df = 2); e - mean(e)`          |
+| B     | Heteroskedasticity | `rnorm(n, sd = 1 + abs(X))`                    |
+| C     | Heavy tails        | `rt(n, df = 3)`                                |
+| D     | Nonlinearity       | `gamma * X^2 + rnorm(n)` then fit linear model |
+
+> **Key rules:**
+>
+> -   Studies A and C: errors must be **mean-centered** so
+>     $E(\epsilon_i) = 0$. Subtract `mean(e)` before returning.
+> -   Study B: variance depends on `X`, so the function must use `X`.
+> -   Study D: the violation is in how `Y` is generated. Use
+>     `Y <- beta0 + beta1*X + gamma*X^2 + rnorm(n)` and fit a **linear**
+>     model (no $X^2$ term). Use different `gamma` values as severity
+>     levels.
+
+```{r error_function}
+# TODO: Write your error_function for your baseline scenario.
+# You will create additional versions for mild/moderate/severe.
+
+error_function <- function(n, X) {
+  # Replace this with your chosen error distribution.
+  # Must return a vector of length n.
+  rnorm(n)   # baseline: standard normal (no violation)
+}
+
+# TODO: Try and test it. 
+```
+
+# Part 2: Build the Simulation
+
+## Step 2: The Algorithm — What Happens in Each Replicate
+
+Before writing a loop, make sure you understand what needs to happen
+**once** inside each replicate. Work through the steps in the chunk
+below and confirm they run correctly for a single iteration.
+
+> **One replicate = one pass through this checklist:**
+>
+> 1.  Generate `X ~ N(0,1)` and `epsilon` from your error function.
+> 2.  Compute `Y = beta0 + beta1*X + epsilon` (or
+>     `Y <- beta0 + beta1*X + gamma*X^2 + rnorm(n)` for study D).
+> 3.  Fit `lm(Y ~ X)`.
+> 4.  Extract the OLS slope $\hat\beta_1$ and its classical 95% CI.
+> 5.  Check whether the CI contains the true `beta1`. Record
+>     `TRUE/FALSE`.
+> 6.  Compute the bootstrap 95% percentile CI: resample rows `B` times,
+>     refit each time, take 2.5th and 97.5th percentiles of the `B`
+>     slopes.
+> 7.  Check whether the bootstrap CI contains `beta1`. Record
+>     `TRUE/FALSE`.
+> 8.  Compute the bootstrap p-value for $H_0: \beta_1 = 0$: shift the
+>     bootstrap distribution to be centered at 0 (subtract its mean),
+>     then find the proportion of resamples where
+>     $|\hat\beta_1^* - \bar{\hat\beta}_1^*| \ge |\hat\beta_1|$.
+
+1.  Generate `X ~ N(0,1)` and `epsilon` from your error function.
+2.  Compute `Y = beta0 + beta1*X + epsilon` (or
+    `Y <- beta0 + beta1*X + gamma*X^2 + rnorm(n)` for study D).
+3.  Fit `lm(Y ~ X)`.
+4.  Extract the OLS slope $\hat\beta_1$ and its classical 95% CI.
+5.  Check whether the CI contains the true `beta1 = 2`. Record
+    `TRUE/FALSE`.
+
+```{r one-replicate1}
+
+beta0 <- 1
+beta1 <- 2
+alpha <- 0.05
+B     <- 100   # bootstrap resamples
+n     <- 30
+
+# ── 1-3: Generate data ────────────────────────────────────────────────
+X       <- rnorm(n)
+epsilon <- error_function(n, X)
+Y       <- beta0 + beta1 * X + epsilon
+df <- data.frame(Y = Y, X = X)
+
+
+# ── 4: Fit OLS ────────────────────────────────────────────────────────
+fit <- lm(Y ~ X)
+s   <- summary(fit)
+b1  <- coef(fit)["X"]
+se <- s$coefficients["X", "Std. Error"]
+degrees_of_freedom <- fit$df.residual    # n - 2 for simple linear regression
+
+# ── 5: Classical CI and coverage ─────────────────────────────────────
+t_critical <- 0 # TODO : critical value
+  
+ci_lower <- b1  # TODO : lower part of the confidence interval
+ci_upper <-  b1  # TODO : upper part of the confidence interval
+
+ci_cls    <- c(ci_lower, ci_upper)
+cover_cls <- (ci_cls[1] <= beta1) & (beta1 <= ci_cls[2])
+pval_cls  <- summary(fit)$coefficients["X", "Pr(>|t|)"]
+
+cat("Classical CI: [", round(ci_cls[1], 3), ",", round(ci_cls[2], 3), "]\n")
+cat("Contains true beta1?", cover_cls, "\n")
+
+
+```
+
+6.  Compute the bootstrap 95% percentile CI: resample rows `B` times,
+    refit each time, take 2.5th and 97.5th percentiles of the `B`
+    slopes.
+7.  Check whether the bootstrap CI contains `beta1`. Record
+    `TRUE/FALSE`.
+
+```{r one-replicate2}
+
+# ── 6-7: Bootstrap CI and coverage ───────────────────────────────────
+# Resample ROWS (pairs of X and Y) with replacement and refit each time.
+boot_b1 <- numeric(B)
+for (j in seq_len(B)) { 
+  # TODO : Resample the rows and save the fitted value for b1 as boot_b1
+  idx        <- sample(n, replace = TRUE)   # sample row indices
+
+}
+
+
+ci_boot    <- quantile(boot_b1, c(0.025, 0.975)) # TODO : Bootstrap confidence interval
+cover_boot <- (ci_boot[1] <= beta1) & (beta1 <= ci_boot[2])
+
+cat("Bootstrap CI: [", round(ci_boot[1], 3), ",", round(ci_boot[2], 3), "]\n")
+cat("Contains true beta1?", cover_boot, "\n")
+
+
+```
+
+8.  Compute the bootstrap p-value for $H_0: \beta_1 = 0$: shift the
+    bootstrap distribution to be centered at 0 (subtract its mean), then
+    find the proportion of resamples where
+    $|\hat\beta_1^* - \bar{\hat\beta}_1^*| \ge |\hat\beta_1|$.
+
+```{r}
+# ── 8: Bootstrap p-value for H0: beta1 = 0 ───────────────────────────
+# TODO : Bootstrap p-value
+
+
+# Hints : abs(x) gives the absolute value of x
+# Hints : The meaning of p-value for H0: beta1 = 0 ? 
+
+cat("Classical p-value:", round(pval_cls,  4), "\n")
+cat("Bootstrap p-value:", round(pval_boot, 4), "\n")
+
+```
+
+#### Discussion Question 2. What should we present for each study?
+
+-\>
+
+#### Discussion Question 3. Discuss and fill in the scenarios for each study.
+
+-\>
+
+Study 1
+
+| Study | Scenario | Violation level         | Error distribution $\epsilon_i$ | Note |
+|-------|----------|-------------------------|---------------------------------|------|
+|       | 1        | Baseline (no violation) |                                 |      |
+|       | 2        | Mild                    |                                 |      |
+|       | 3        | Moderate                |                                 |      |
+|       | 4        | Severe                  |                                 |      |
+
+Study 2
+
+| Study | Scenario | Violation level         | Error distribution $\epsilon_i$ | Note |
+|-------|----------|-------------------------|---------------------------------|------|
+|       | 1        | Baseline (no violation) |                                 |      |
+|       | 2        | Mild                    |                                 |      |
+|       | 3        | Moderate                |                                 |      |
+|       | 4        | Severe                  |                                 |      |
+
+## Step 3: Wrap the Algorithm in a Function
+
+Instead of copy-pasting the chunk above for every scenario and sample
+size, wrap it in a **function** that accepts your design choices and
+returns a one-row summary for one cell (scenario × sample size).
+
+> **Why a function?**\
+> You have 2 studies × 4 scenarios × 3 sample sizes = **24 cells**. A
+> function lets you call `run_simulation(error_fn, n, n_reps, B)` 24
+> times cleanly instead of repeating the same lines of code over and
+> over.
+
+```{r simulation-function}
+# run_simulation() runs n_reps replicates for ONE (error_fn, n) cell.
+# Returns a one-row data frame summarising that cell.
+
+run_simulation <- function(error_fn, n, n_reps = 100, B = 100) {
+
+  # Pre-allocate storage vectors
+  # This is one version; you can enhance/modify it
+  cover_cls  <- logical(n_reps)
+  cover_boot <- logical(n_reps)
+  width_cls  <- numeric(n_reps)
+  width_boot <- numeric(n_reps)
+  b1_vec     <- numeric(n_reps)
+  pval_cls   <- numeric(n_reps)
+  pval_boot  <- numeric(n_reps)
+
+  for (i in seq_len(n_reps)) {
+  # TODO !!!
+ 
+  }
+
+  data.frame(
+    n          = n,
+    cov_cls    = mean(cover_cls),
+    cov_boot   = mean(cover_boot),
+    width_cls  = mean(width_cls),
+    width_boot = mean(width_boot),
+    bias       = mean(b1_vec) - beta1,
+    rej_cls    = mean(pval_cls  < alpha),
+    rej_boot   = mean(pval_boot < alpha)
+  )
+}
+
+# Quick check on the baseline — coverage should be close to 0.95
+test <- run_simulation(error_fn = error_function, n = 30, n_reps = 200, B = 200)
+cat("Test coverage — classical:", round(test$cov_cls,  3),
+    " | bootstrap:", round(test$cov_boot, 3), "\n")
+
+print(test)
+```
+
+## Step 4: Plan for the simulation study
+
+Share and discuss these plans with your group.
+
+-   Modify the error function for each study — define one baseline and
+    three increasingly severe scenarios. Change only the parameter that
+    controls the violation (e.g., degrees of freedom, variance scale, or
+    gamma).
+
+-   Try at least three sample sizes $n$ to observe how results change as
+    $n$ grows.
+
+-   What plots do we need? Consider showing the distribution of
+    $\hat\beta_1$ across replicates, a coverage probability plot, and CI
+    width as a function of $n$.
+
+-   Which metrics should we report? Coverage rate, average CI width,
+    rejection rate, and bias are all good candidates.
+
+-   What is the main story we want to tell? How does each violation
+    affect classical inference versus bootstrap inference, and does
+    increasing $n$ help?
+
+*Submit this `.Rmd` and its knitted PDF to Blackboard **before the end
+of today's lab**.*
+
+------------------------------------------------------------------------

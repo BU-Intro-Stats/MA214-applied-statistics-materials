@@ -1,0 +1,487 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Slide options
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Option 1: Slides with solutions
+
+\documentclass[slidestop,compress,mathserif]{beamer}
+\newcommand{\soln}[1]{\textit{#1}}
+\newcommand{\solnGr}[1]{#1}
+\usepackage{booktabs}
+
+% Option 2: Handouts without solutions
+
+%\documentclass[11pt,containsverbatim,handout]{beamer}
+%\usepackage{pgfpages}
+%\pgfpagesuselayout{4 on 1}[letterpaper,landscape,border shrink=5mm]
+%\newcommand{\soln}[1]{ }
+%\newcommand{\solnGr}{ }
+
+\def\argmax{\operatornamewithlimits{arg\,max}}
+\def\argmin{\operatornamewithlimits{arg\,min}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Style
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{../../common/lec_style.tex}
+\graphicspath{ {../../common/} }
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Preamble
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title[Lecture 7]{Lecture 7: Model selection}
+\subtitle{Module 1: Modeling and Linear Regression}
+\author{Introduction to Modern Statistics, 2nd Edition}
+\institute{$\:$ \\ {\footnotesize Based on slides developed by Mine \c{C}etinkaya-Rundel of OpenIntro.  \\
+The slides may be copied, edited, and/or shared via the \webLink{http://creativecommons.org/licenses/by-sa/3.0/us/}{CC BY-SA license.} \\
+Some images may be included under fair use guidelines (educational purposes).}}
+\date{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Begin document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Title page
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\maketitleframe
+
+\include{Lecture7_agenda}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The model-selection problem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Multiple logistic regression: what we can already fit}
+
+Logistic regression can use several predictors, exactly as in multiple linear regression:
+
+\formula{Multiple logistic regression}{%
+\[
+Y_i \sim \text{Bernoulli}(p_i),
+\qquad
+\log\!\left(\frac{p_i}{1-p_i}\right)
+= \beta_0 + \beta_1 x_{i1}+\cdots+\beta_p x_{ip}.
+\]}
+
+For the Donner Party we fit
+\[
+\log\!\left(\frac{p}{1-p}\right)
+= 1.633 - 0.078\,\text{Age} + 1.597\,\text{Female},
+\]
+and read each coefficient \hl{holding the other predictors fixed}.
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{But we never asked: \emph{should} we use that model?}
+
+Fitting gives estimates once we \emph{choose} a formula. Choosing it is a separate decision, and there are several candidates:
+
+{\footnotesize
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Candidate model & Question it answers \\
+\midrule
+\texttt{Status $\sim$ 1} & Is survival just a coin flip? \\
+\texttt{Status $\sim$ Age} & Does age alone explain it? \\
+\texttt{Status $\sim$ Sex} & Does sex alone explain it? \\
+\texttt{Status $\sim$ Age + Sex} & Do they help \emph{together}? \\
+\bottomrule
+\end{tabular}
+\end{center}}
+
+\vspace{-0.2em}
+\keyidea[-- Model selection]{The question is not whether we \emph{can} add predictors, but whether adding a
+predictor improves the model \emph{enough to justify the extra noise and complexity}.}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Why not just use every predictor?}
+
+\begin{columns}[T]
+\column{0.48\textwidth}
+\textbf{Adding predictors can help}
+\begin{itemize}
+\item reduces residual error
+\item controls for confounding
+\item can improve prediction
+\end{itemize}
+
+\column{0.48\textwidth}
+\textbf{Adding predictors can hurt}
+\begin{itemize}
+\item harder to interpret
+\item unstable estimates
+\item overfitting
+\item \hl{collinearity}
+\end{itemize}
+\end{columns}
+
+\vspace{0.6em}
+More predictors almost always fit the \emph{observed} data better. We want the simplest model that captures the real signal, so we need a criterion that charges a price for complexity.
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Criterion 1: adjusted $R^2$}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Review: $R^2$ and adjusted $R^2$}
+
+From Lecture 5 --- for a \emph{linear} model:
+\[
+R^2 = \frac{\text{explained variability}}{\text{total variability}}
+= 1 - \frac{SS_{\text{Error}}}{SS_{\text{Total}}}.
+\]
+\formula{Adjusted $R^2$}{%
+\[
+R^2_{\text{adj}}
+= 1 - \left(\frac{SS_{\text{Error}}}{SS_{\text{Total}}}\right)
+\!\left(\frac{n-1}{n-p-1}\right),
+\]
+where $n$ is the number of cases and $p$ the number of predictors.}
+
+\begin{itemize}
+\item $R^2$ \emph{never decreases} when a predictor is added, so on its own it always prefers the bigger model.
+\item The factor $\frac{n-1}{n-p-1}$ is a penalty that grows with $p$: adjusted $R^2$ rises only if the predictor pays for itself.
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Step-by-step: does a predictor earn its place?}
+
+\workedexample[white]{
+Recall the state poverty models from Lecture 5:
+%
+{\small
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+Model & $R^2$ & Adjusted $R^2$ \\
+\midrule
+\texttt{poverty $\sim$ female\_house} & 0.28 & 0.26 \\
+\texttt{poverty $\sim$ female\_house + white} & 0.29 & 0.26 \\
+\bottomrule
+\end{tabular}
+\end{center}}
+%
+\begin{enumerate}
+\item Look at $R^2$: it went \emph{up} ($0.28\to0.29$). But it always does.
+\pause
+\item Look at adjusted $R^2$: it did \emph{not} move ($0.26\to0.26$).
+\pause
+\item Conclude: The extra predictor did not improve predictive performance. Use only \texttt{female\_house}.
+\end{enumerate}
+}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Criterion 2: AIC}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{AIC: the same idea, for \emph{any} likelihood model}
+
+Adjusted $R^2$ needs $SS_{\text{Error}}$ --- which only exists for a linear model. Logistic regression has no $SS_{\text{Error}}$, but it does have a \hl{likelihood}.
+
+\formula{Akaike Information Criterion}{%
+\[
+\text{AIC} = -2\log L(\hat\theta_{MLE}) + 2k,
+\]
+where $L(\hat\theta_{MLE})$ is the maximized likelihood and $k$ the number of estimated parameters.}
+
+\begin{itemize}
+\item Better fit $\Rightarrow$ larger likelihood $\Rightarrow$ \emph{lower} AIC.
+\item More parameters $\Rightarrow$ larger penalty $2k$ $\Rightarrow$ \emph{higher} AIC.
+\item Comparing models on the same data: \hl{lower AIC is better}.
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Step-by-step: selecting a model with AIC}
+
+Software reports an AIC for each candidate, all fit to the same $45$ Donner Party members:
+
+{\footnotesize
+\begin{center}
+\begin{tabular}{lcr}
+\toprule
+Model & $k$ (parameters) & AIC \\
+\midrule
+\texttt{Status $\sim$ 1}          & 1 & 63.827 \\
+\texttt{Status $\sim$ Sex}        & 2 & 61.286 \\
+\texttt{Status $\sim$ Age}        & 2 & 60.291 \\
+\texttt{Status $\sim$ Age + Sex}  & 3 & \hl{57.256} \\
+\bottomrule
+\end{tabular}
+\end{center}}
+
+\vspace{-0.3em}
+{\small
+\begin{enumerate}
+\item Check the models are comparable: same response, same rows of data.
+\pause
+\item Read off each AIC (never mind how it was computed).
+\pause
+\item Pick the \hl{smallest}: \texttt{Age + Sex}, at $57.256$.
+\end{enumerate}}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Why does the biggest model win?}
+
+\texttt{Age + Sex} pays the \emph{largest} penalty, yet still comes out lowest.
+
+\dq{Adding \texttt{Sex} to the age-only model costs an extra parameter. What did it buy?}
+
+\pause
+\vspace{-0.4em}
+\workedexample[the bargain]{AIC fell from $60.291$ to $57.256$ \emph{even after} paying for that parameter: the gain in fit more than covered its price, so \texttt{Sex} earns its place.
+
+\smallskip
+Note that \texttt{Sex} \emph{alone} (AIC $61.286$) loses to \texttt{Age} alone: a predictor can be useful yet not be the best \emph{single} choice, so we compare whole models, not variables one at a time.}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{Doing it in R}
+
+\begin{lstlisting}[language=R]
+age_fit  <- glm(Status ~ Age, data = donner,
+                family = binomial)
+sex_fit  <- glm(Status ~ Sex, data = donner,
+                family = binomial)
+full_fit <- glm(Status ~ Age + Sex,
+                data = donner, family = binomial)
+
+AIC(age_fit, sex_fit, full_fit)
+\end{lstlisting}
+
+\vspace{-0.3em}
+\caution{AIC is only comparable across models fit to the \emph{same response} and the \emph{same data}. An AIC of $57.3$ is not ``good'' on its own, only lower \emph{than another model's}.}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Adjusted $R^2$ vs.\ AIC}
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+Criterion & Where it applies & Direction \\
+\midrule
+$R^2$ & describing linear fit & larger better \\
+Adjusted $R^2$ & \emph{linear} model selection & larger better \\
+AIC & \emph{any} likelihood model & \hl{smaller better} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.5em}
+\keyidea[-- Same bargain, two currencies]{Both criteria trade fit against complexity. Adjusted $R^2$ pays in \emph{explained variability}; AIC pays in \emph{likelihood}, which is why AIC still works for logistic regression, where $R^2$ does not.}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Multicollinearity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Multicollinearity: when predictors overlap}
+
+Two predictors are \hl{collinear} when they are strongly associated \emph{with each other}. Here \texttt{white} and \texttt{female\_house} have $r=-0.75$:
+
+\begin{columns}[T]
+\begin{column}{0.56\textwidth}
+\begin{center}
+\includegraphics[width=0.98\textwidth]{figures/poverty-pairs.pdf}
+\end{center}
+\end{column}
+\begin{column}{0.44\textwidth}
+{\small The off-diagonal numbers are correlations \emph{between predictors}, not with the response.}
+
+\vspace{0.3em}
+\dq{If \texttt{white} and \texttt{female\_house} move together, what does ``holding \texttt{white} fixed'' even mean?}
+\end{column}
+\end{columns}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Collinearity inflates the standard error}
+
+The same predictor, \texttt{female\_house}, in two models:
+
+{\footnotesize
+\begin{center}
+\begin{tabular}{llrrr}
+\toprule
+Model & Term & Estimate & \textbf{Std. Error} & $p$-value \\
+\midrule
+\texttt{$\sim$ female\_house} & female\_house & 0.69 & \textbf{0.16} & 0.00 \\
+\midrule
+\texttt{$\sim$ female\_house} & female\_house & 0.89 & \textbf{0.24} & 0.00 \\
+\texttt{\quad + white}        & white         & 0.04 & 0.04 & 0.29 \\
+\bottomrule
+\end{tabular}
+\end{center}}
+
+\pause
+\begin{itemize}
+\item The estimate \emph{moved}: $0.69 \to 0.89$.
+\item The standard error \emph{inflated} by $51\%$: $0.16 \to 0.24$.
+\end{itemize}
+
+\pause
+\vspace{-0.3em}
+\caution{This is the signature of collinearity: the predictors carry overlapping information, so the data cannot cleanly attribute the effect to either one.}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Why we avoid collinear predictors}
+
+\begin{itemize}
+\item Predictors are also called \emph{independent} variables; ideally they would be independent \emph{of each other}. Collinearity breaks that.
+\pause
+\item Adding a predictor that duplicates one already in the model usually \hl{brings nothing new to the table}, while still costing a parameter.
+\pause
+\item We interpret every slope \hl{with all else held constant} --- but that phrase is not meaningful for predictors that never move separately.
+\pause
+\item We prefer the simplest model that does the job: a \hl{parsimonious} model.
+\pause
+\item Collinearity is unavoidable in observational data, but a designed \emph{experiment} can prevent it.
+\vspace{-0.3em}
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{How to spot it}
+
+\begin{columns}[T]
+\column{0.5\textwidth}
+\textbf{Warning signs}
+\begin{itemize}
+\item high correlation among predictors
+\item standard errors that inflate when a predictor is added
+\item a coefficient that changes a lot, or flips sign
+\item large variance inflation factors (VIF)
+\end{itemize}
+
+\column{0.5\textwidth}
+\textbf{VIF}
+\[
+\mathrm{VIF}_j = \frac{1}{1-R_j^2},
+\]
+where $R_j^2$ comes from predicting predictor $j$ using all the other predictors. With just two predictors, $R_j^2=r^2$. For our pair, $r=-0.751$:
+\[ \frac{1}{1-0.751^2}=2.30. \]
+A VIF near 1 means no overlap; large VIFs signal trouble.
+\end{columns}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Putting it together}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Stepwise selection: a search, not a truth machine}
+
+\begin{columns}[T]
+\column{0.48\textwidth}
+\textbf{Backward selection}
+\begin{enumerate}
+\item Start with the full model.
+\item Try dropping each variable.
+\item Keep the best drop.
+\item Stop when no drop helps.
+\end{enumerate}
+
+\column{0.48\textwidth}
+\textbf{Forward selection}
+\begin{enumerate}
+\item Start with the smallest model.
+\item Try adding each variable.
+\item Keep the best add.
+\item Stop when no add helps.
+\end{enumerate}
+\end{columns}
+
+\vspace{0.4em}
+\caution{Stepwise search is a convenience, not a proof: it can land on different models depending on the direction and criterion, and does not replace scientific judgment.}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Activity: choose a model}
+
+\activity[-- selecting a model]{%
+A researcher models course evaluation score with these candidates. (\texttt{noise} is a column of random numbers.)
+
+{\footnotesize
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+Model & Adj.\ $R^2$ & AIC \\
+\midrule
+M1: beauty + age & 0.071 & 720.4 \\
+M2: M1 + gender & 0.083 & 714.1 \\
+M3: M2 + native & 0.084 & 713.8 \\
+M4: M3 + noise & 0.083 & 715.9 \\
+\bottomrule
+\end{tabular}
+\end{center}}
+
+Which model would you choose? What does M4 tell you?}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Activity: choose a model}
+\solnbox{M3: highest adjusted $R^2$ \emph{and} lowest AIC, so both criteria agree. M4 is the check: a \emph{random} column made adjusted $R^2$ fall and AIC rise, so both correctly refused to pay for a useless predictor.}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{A practical model-selection workflow}
+
+\begin{enumerate}
+\item Start from a scientific question and a sensible set of candidate predictors.
+\item Fit models you could actually \emph{interpret}.
+\item Compare fit against complexity: adjusted $R^2$ for linear models, AIC for any likelihood model.
+\item Check for collinearity among the predictors.
+\item Prefer the simplest model that answers the question well.
+\item Report the uncertainty and the limitations.
+\end{enumerate}
+
+\vspace{0.4em}
+A model can be statistically better yet practically worse if it is unstable, uninterpretable, or aimed at the wrong question.
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Wrap-up}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Key takeaways}
+
+\begin{itemize}
+\item Fitting a model is easy; \emph{choosing} one is the real decision.
+\item $R^2$ always rises with more predictors, so it can never select a model.
+\item \hl{Adjusted $R^2$} charges for complexity, but needs a linear model.
+\item \hl{AIC} $=-2\log L(\hat\theta_{MLE})+2k$ does the same job for \emph{any} likelihood model; lower is better.
+\item Check for \hl{collinearity}: overlapping predictors inflate standard errors and break the ``all else held constant'' interpretation.
+\item Prefer the simplest model that answers the question.
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% End document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}

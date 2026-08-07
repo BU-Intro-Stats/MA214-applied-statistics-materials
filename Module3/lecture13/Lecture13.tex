@@ -1,0 +1,422 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Slide options
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Option 1: Slides with solutions
+
+\documentclass[slidestop,compress,mathserif]{beamer}
+\usepackage{booktabs}
+\newcommand{\soln}[1]{\textit{#1}}
+\newcommand{\solnGr}[1]{#1}
+
+% Option 2: Handouts without solutions
+
+%\documentclass[11pt,containsverbatim,handout]{beamer}
+%\usepackage{pgfpages}
+%\pgfpagesuselayout{4 on 1}[letterpaper,landscape,border shrink=5mm]
+%\newcommand{\soln}[1]{ }
+%\newcommand{\solnGr}{ }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Style
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{../../common/lec_style.tex}
+\graphicspath{ {../../common/} {figures/}  }
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Preamble
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title[Lecture 13]{Lecture 13: Inference about the slope}
+\subtitle{Module 3: Regression Inference}
+\author{Introduction to Modern Statistics, 2nd Edition}
+\institute{$\:$ \\ {\footnotesize Based on slides developed by Mine \c{C}etinkaya-Rundel of OpenIntro.  \\
+The slides may be copied, edited, and/or shared via the \webLink{http://creativecommons.org/licenses/by-sa/3.0/us/}{CC BY-SA license.} \\
+Some images may be included under fair use guidelines (educational purposes).}}
+\date{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Begin document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Title page
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\maketitleframe
+
+\include{Lecture13_agenda}
+
+
+\section{The regression slope}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{We can fit a line: is its tilt real?}
+
+Since Lecture 3 we have fit lines by least squares. For $40$ Palmer penguins, $\texttt{body\_mass} = \beta_0 + \beta_1\cdot\texttt{flipper\_length} + \varepsilon$ (intercept $\beta_0$, slope $\beta_1$, error $\varepsilon$):
+
+\vspace{-0.3em}
+\begin{center}
+\includegraphics[width=0.46\textwidth]{penguins_scatter.png}
+\end{center}
+
+\vspace{-0.3em}
+\dq{The fitted slope is $\hat\beta_1 = 50.4$ g/mm, from $40$ penguins rather than all penguins. Could a \emph{flat} truth produce a tilt this steep by chance?}
+
+\end{frame}
+
+
+\section{Two roads to the null distribution}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Road A: shuffle the pairing}
+\examplehead{Palmer penguins}
+
+Under $H_0:\beta_1 = 0$, which mass belongs to which flipper is arbitrary: the pairing is \hl{exchangeable}. Shuffle the masses, refit, record the slope, repeat.
+
+\vspace{-0.2em}
+\begin{center}
+\includegraphics[width=0.52\textwidth]{perm_lines.png}
+\end{center}
+
+\vspace{-0.3em}
+{\small Each grey line is one shuffle, scattering around \emph{flat}. The real line (black) is far steeper: a small p-value, seen.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Road B: the $t$ model}
+
+The $t$ distribution from Lecture 10 returns here, for the slope.
+
+\vspace{0.2em}
+\formula{Inference for the slope}{
+\[
+\mathrm{SE}(\hat\beta_1) = \frac{s_e}{s_x\sqrt{n-1}},
+\qquad
+T = \frac{\hat\beta_1}{\mathrm{SE}(\hat\beta_1)} \sim t_{n-2}.
+\]}
+
+\vspace{0.2em}
+{\small
+\begin{itemize}\setlength{\itemsep}{1pt}
+\item $s_e$ is the spread of the residuals, $s_x$ the spread of $x$. A slope is easier to pin down when the points hug the line and the $x$'s spread wide.
+\item Why $t_{n-2}$? Placing a line costs \emph{two} estimates, slope and intercept, one more than a single mean.
+\item \hl{The shortcut has conditions}, checked shortly.
+\end{itemize}}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{Road A in R}
+\examplehead{Palmer penguins}
+
+\begin{lstlisting}[language=R, basicstyle=\ttfamily\scriptsize]
+t_of <- function(x, y) ...          # slope / SE(slope)
+
+t_obs <- t_of(peng$flipper, peng$mass)     # 12.3
+
+null <- replicate(10000,
+  t_of(peng$flipper, sample(peng$mass)))   # shuffle!
+
+mean(abs(null) >= abs(t_obs))              #> 0 (p<0.001)
+\end{lstlisting}
+
+\vspace{-0.2em}
+{\small We record the scale-free $t = \hat\beta_1/\mathrm{SE}$ from Road B, shuffle, and count how often $|t|$ beats the observed $12.3$. It never does. Taking $|t|$ makes the test \hl{two-sided}: a slope that is too \emph{negative} is evidence against $H_0:\beta_1=0$ just as much as one that is too positive.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{And the two roads agree}
+\examplehead{Palmer penguins}
+
+\vspace{-0.2em}
+\begin{center}
+\includegraphics[width=0.60\textwidth]{slope_null_overlay.png}
+\end{center}
+
+\vspace{-0.3em}
+\keyidea{The shuffled $t$-statistics pile up into exactly the $t_{38}$ curve: mean $0.01$ (theory $0$), SD $1.03$ (theory $1.03$). Both roads give $p < 0.001$, and the observed $t = 12.3$ is far beyond either.}
+
+\end{frame}
+
+
+\section{A confidence interval, two ways}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Plausible slopes: bootstrap the pairs}
+\examplehead{Palmer penguins}
+
+For a \emph{range} of plausible slopes, resample whole $(x, y)$ \hl{pairs} with replacement, so the $x$--$y$ link survives. Refit, collect the slope.
+
+\vspace{-0.1em}
+\begin{center}
+\includegraphics[width=0.6\textwidth]{slope_boot_ci.png}
+\end{center}
+
+\vspace{-0.3em}
+{\small Bootstrap CI $[43.5, 58.6]$ versus the formula's $\hat\beta_1 \pm t^\ast\,\mathrm{SE} = [42.1, 58.7]$, with $t^\ast$ the critical value from $t_{n-2}$. The same interval, two ways.}
+
+\end{frame}
+
+
+\section{Checking model conditions}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The formula's conditions: LINE}
+
+The $t_{n-2}$ shortcut is trustworthy only under four conditions, \hl{LINE}:
+
+\vspace{0.1em}
+\begin{enumerate}
+\item \textbf{L}inearity: the trend really is a straight line.
+\item \textbf{I}ndependence: observations do not influence one another.
+\item \textbf{N}ormality: the residuals are roughly normal.
+\item \textbf{E}qual variance: residual spread is constant across $x$.
+\end{enumerate}
+
+\vspace{0.2em}
+\caution{%
+\begin{itemize}\setlength{\itemsep}{1pt}
+\item Check on the \emph{residuals}: residuals-vs-fitted for L and E, Q--Q for N, the design for I.
+\item Both simulations need I too. Only the bootstrap adapts to unequal variance.
+\end{itemize}}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Checking LINE on the penguins}
+\examplehead{Palmer penguins}
+
+\vspace{-0.2em}
+\twocol{0.5}{0.5}
+{
+\begin{center}
+\includegraphics[width=0.94\textwidth]{resid_fitted.png}
+\end{center}
+}
+{
+\begin{center}
+\includegraphics[width=0.94\textwidth]{qq.png}
+\end{center}
+}
+
+\vspace{-0.2em}
+{\small \textbf{Left:} residuals flat around zero with even spread, so L and E look fine. \textbf{Right:} points hug the line, so N is reasonable. The \hl{same diagnostics as ANOVA} (Lecture 12): both are the one linear model.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{What a broken condition looks like}
+
+\vspace{-0.2em}
+\begin{center}
+\includegraphics[width=0.85\textwidth]{violations_grid.png}
+\end{center}
+
+\vspace{-0.3em}
+{\small A \emph{curve} in the residuals means the relationship is not linear. A \emph{funnel} means the variance is not constant. Either way the formula is not to be trusted.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{When the two roads \emph{disagree}}
+\examplehead{Loans}
+
+Loan amount vs.\ annual income, $400$ loans.
+
+\vspace{-0.2em}
+\begin{center}
+\includegraphics[width=0.52\textwidth]{loans_ci.png}
+\end{center}
+
+\vspace{-0.3em}
+\caution{Bigger incomes bring far more variable loans, so equal variance fails. The $t$ CI is too narrow. The bootstrap tracks the changing spread.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{A remedy: transform, then re-check}
+\examplehead{Loans}
+
+\vspace{-0.3em}
+\begin{center}
+\includegraphics[width=0.66\textwidth]{loans_resid_fix.png}
+\end{center}
+
+\vspace{-0.3em}
+\keyidea{Modeling $\log(\texttt{loan})$ on $\log(\texttt{income})$ steadies the spread (funnel indicator $0.25 \to -0.12$), so LINE holds and the two roads re-agree. The slope is now an \hl{elasticity}: $1\%$ more income predicts about $0.48\%$ more loan.}
+
+\end{frame}
+
+
+\section{Reading the output; the intercept}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{Reading it straight off \texttt{lm()}}
+\examplehead{Palmer penguins}
+
+\begin{lstlisting}[language=R, basicstyle=\ttfamily\scriptsize]
+lm(body_mass_g ~ flipper_length_mm, data = peng) |>
+  tidy(conf.int = TRUE)
+
+  term               estimate  std.error  statistic  p.value
+  (Intercept)          -5820        842      -6.92    <0.001
+  flipper_length_mm       50.4        4.1     12.3     <0.001
+                     conf.low  conf.high
+                       -7523      -4116
+                        42.1       58.7
+\end{lstlisting}
+
+\vspace{-0.2em}
+{\small The \texttt{flipper} row \emph{is} Road B: estimate $50.4$, $\mathrm{SE}$ $4.1$, $t = 12.3$, CI $[42.1, 58.7]$. One extra mm of flipper predicts about $50$ g more mass.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The intercept: often a nonsense point}
+\examplehead{Palmer penguins}
+
+$\hat\beta_0 = -5820$ g is the predicted mass at flipper length $= 0$ mm.
+
+\vspace{0.3em}
+{\small A penguin with no flipper does not weigh $-5820$ g. The intercept sits far outside the data (flippers run $172$--$231$ mm), so it \emph{anchors} the line but has no meaning on its own.}
+
+\pause
+\vspace{0.3em}
+\keyidea{Interpret and test the intercept only when $x = 0$ is near the data. Its confidence interval is built exactly like the slope's: $\hat\beta_0 \pm t^\ast\,\mathrm{SE}(\hat\beta_0)$.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Testing a slope against a value other than zero}
+
+Sometimes the question is not ``is the slope zero?'' but ``is it some particular $c$?''
+
+\vspace{0.2em}
+\formula{A general slope test}{
+\[
+t = \frac{\hat\beta_1 - c}{\mathrm{SE}(\hat\beta_1)} \sim t_{n-2}
+\qquad \text{under } H_0:\beta_1 = c.
+\]}
+
+\vspace{0.2em}
+{\small Setting $c = 0$ recovers the usual test. And note the \hl{duality with the CI}: a value $c$ lies inside the $95\%$ CI \emph{exactly when} the test does not reject $\beta_1 = c$ at the $5\%$ level. Here $40$ sits just below $[42.1, 58.7]$, so we would (barely) reject $\beta_1 = 40$.}
+
+\end{frame}
+
+
+\section{Wrap-up}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The same two roads, now in regression}
+
+{\scriptsize
+\begin{center}
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{lll}
+\toprule
+\textbf{The statistic} & \textbf{By simulation} & \textbf{By formula} \\
+\midrule
+a proportion & simulate $H_0$ (Lec 8) & binomial, exact; $z$ (Lec 10) \\
+a mean or a difference & bootstrap (Lec 9), permute (Lec 8) & the CLT: $z$, $t$ (Lec 10) \\
+a whole table, $X^2$ & permute one column (Lec 11) & $\chi^2_{df}$ (Lec 11) \\
+several group means, $F$ & permute the labels (Lec 12) & $F_{df_1,df_2}$ (Lec 12) \\
+\hl{a regression slope, $\hat\beta_1$} & \hl{shuffle / bootstrap pairs (today)} & \hl{$t_{n-2}$ (today)} \\
+\bottomrule
+\end{tabular}
+\end{center}}
+
+\vspace{0.3em}
+\emph{State $H_0$, build a statistic, get its null two ways, then see how extreme the data are}, now for the slope of a line.
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Summary}
+
+\begin{itemize}
+\item A fitted slope is an \emph{estimate}: ask whether its tilt is real, and which values are plausible.
+\item Test $H_0:\beta_1 = 0$ two roads, \hl{shuffle the pairing} or $T = \hat\beta_1/\mathrm{SE} \sim t_{n-2}$. On the penguins both gave $p < 0.001$.
+\item Interval two roads, \hl{bootstrap the pairs} or $\hat\beta_1 \pm t^\ast\,\mathrm{SE}$. Both gave about $[42, 59]$ g/mm.
+\item The formula needs \hl{LINE}; read it off residual and Q--Q plots. If it fails, transform or trust the simulation.
+\item Pull $\hat\beta_1$, its SE, $t$, and CI straight from \texttt{lm()}/\texttt{tidy()}, and check whether the intercept is even meaningful.
+\end{itemize}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Coming up next}
+
+\hl{Next, multiple regression:} more than one predictor at once. Today's slope test becomes one \emph{row} of the \texttt{lm()} table, with $df$ going $n-2 \to n-p-1$ and each slope read ``holding the others fixed'' (IMS Ch.\ 25).
+
+\vspace{0.4em}
+{\small The $t$ statistic, the CI, the LINE conditions and the residual plots all carry over unchanged.}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Activity
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Activity: do heavier kangaroo rats have longer feet?}
+
+\activity{The Portal kangaroo rats from Lectures 9--10: the same $347$ animals, a new question. Fit \texttt{weight \textasciitilde{} hindfoot\_length}, then
+\begin{itemize}\setlength{\itemsep}{1pt}
+\item test the slope both ways: shuffle vs.\ the $t$ formula;
+\item bound it both ways: bootstrap vs.\ $\hat\beta_1 \pm t^\ast\,\mathrm{SE}$;
+\item check LINE on the residuals. Do the two roads agree?
+\end{itemize}}
+
+\vspace{0.3em}
+{\small
+\begin{itemize}
+\item Work in \emph{pairs} (analyst + guide); one worksheet per pair.
+\item We pause for check-ins. \hl{Be ready to share}.
+\item Data and starter code are on Blackboard.
+\end{itemize}}
+
+\end{frame}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% End document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}
