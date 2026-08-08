@@ -6,20 +6,24 @@
 
 - **Week:** 1
 - **Lecture Anchor:** Lecture 1
-- **Purpose:** Establish the R workflow used throughout the course and review basic data exploration.
+- **Purpose:** Establish the R workflow used throughout the course and review basic data exploration with flights data.
 - **Primary Objectives:**
   - Carry out a complete, reproducible statistical workflow in R
+  - Import, inspect, summarize, visualize, and interpret a data set
 - **Pre-Lab Activity:**
-  - Complete the R onboarding site
-  - Complete Tutorial 1 on R and data
+  - Introduce yourself to a partner and identify what one row represents in a familiar data set.
 - **In-Lab Activity:**
-  - Set up the R workflow and working directories
-  - Import and inspect data sets
-  - Practice basic summaries, visualizations, and script submission
+  - Open `lab-starter.R` and import `flights.csv` without using `setwd()`.
+  - Inspect dimensions, names, structure, and the meaning of `origin`, `dest`, and `air_time`.
+  - Predict which NYC airport has the most flights, then verify with grouped counts.
+  - Summarize destinations and mean air time by month.
+  - Interpret the strongest comparison in context and identify a limitation.
+  - Optionally plot air time across months or origin airports and save it with `ggsave()`.
 - **Post-Lab Activity:**
-  - Submit the Lab 1 in-lab activity
+  - Write a final claim about the flights data, cite evidence, and explain the context.
 - **Deliverables:**
-  - Lab 1 in-lab activity
+  - Completed `lab-starter.R` with the requested objects and plots.
+  - Completed in-lab activity response sheet.
 
 ---
 
@@ -31,16 +35,21 @@
 - **Primary Objectives:**
   - Understanding and Applying Linear Regression Models
   - Use R for a reproducible statistical workflow
+  - Compare regression models using summaries, diagnostics, and R-squared
 - **Pre-Lab Activity:**
-  - Complete Tutorial 2 on regression
+  - Introduce yourself to a partner and identify a variable that might predict a car's miles per gallon.
 - **In-Lab Activity:**
-  - Fit and interpret simple regression models
-  - Explore regression output and model summaries in R
+  - Import `mtcars.csv` and inspect the response and candidate predictors.
+  - Plot `mpg` against `wt` and compute their correlation.
+  - Predict the sign of the slope, then fit `mpg ~ wt`.
+  - Fit `mpg ~ hp` and `mpg ~ qsec` and compare the three models using summaries and R-squared.
+  - Interpret the strongest simple model and identify a limitation or caution.
+  - Optionally fit `mpg ~ wt + hp` and compare it with the best simple model.
 - **Post-Lab Activity:**
-  - Submit the Lab 2 in-lab activity
+  - Write a final response naming the chosen model, citing evidence, and interpreting it in context.
 - **Deliverables:**
-  - Tutorial 2 hash
-  - Lab 2 in-lab activity
+  - Completed `lab-starter.R` with the fitted models and requested autograder objects.
+  - Completed in-lab activity response sheet.
 
 ---
 
@@ -53,13 +62,19 @@
   - Understanding and Applying Linear Regression Models
   - Explain statistical results in a presentation
 - **Pre-Lab Activity:**
+  - Review the Project 1 overview, rubric, required sections, and final submission format.
 - **In-Lab Activity:**
-  - Review the Project 1 prompt and rubric
-  - Choose a data source and draft research questions
-  - Prepare the first project outline
+  - Create and share one group Google Doc named `P1_GroupNumber_Outline`.
+  - Add names and BUIDs and assign project, data, analysis, and editor/scheduler roles.
+  - Select a data set and record its source and access information.
+  - Draft and prioritize research questions, objectives, or hypotheses.
+  - Identify the response, candidate predictors, initial summaries/plots, and limitations.
+  - Peer-edit the complete draft and ask the instructor/TA to check feasibility.
 - **Post-Lab Activity:**
+  - Confirm that the document is readable, comments are resolved, all members contributed, and the link is accessible.
 - **Deliverables:**
-  - Project 1 outline
+  - Completed Project 1 outline submitted through the course platform.
+  - Shared Google Doc containing the title, motivation, questions, data description, limitations, roles, and timeline.
 
 ---
 
@@ -72,14 +87,18 @@
   - Use R for a reproducible statistical workflow
   - Categorical Variables and Indicator Variables
 - **Pre-Lab Activity:**
+  - Open the Project 1 outline and identify the data, response, predictors, and unresolved data questions.
 - **In-Lab Activity:**
-  - Import and inspect the project data
-  - Clean, transform, and summarize variables
-  - Begin exploratory visualizations and assumption checks
+  - Import and inspect dimensions, variable types, missing values, and unusual entries.
+  - Rename variables, recode categories, create useful derived variables, and document decisions.
+  - Summarize the response and candidate predictors.
+  - Create exploratory plots connected to the research question and model assumptions.
+  - Record the most important cleaning decision and revise the research questions if needed.
 - **Post-Lab Activity:**
-  - Submit the Project 1 progress report
+  - Update the shared outline with cleaned-data notes, initial EDA, and revised research questions.
 - **Deliverables:**
-  - Project 1 plan
+  - Project 1 progress materials submitted through the course platform.
+  - Cleaned-data notes, initial EDA, revised questions, and accessible shared Google Doc link.
 
 ---
 
@@ -92,13 +111,18 @@
   - Model Selection, R-squared, and Adjusted R-squared
   - Logistic Regression Models
 - **Pre-Lab Activity:**
+  - Review the EDA and identify candidate models and assumptions that require checking.
 - **In-Lab Activity:**
-  - Fit linear, multiple regression, or logistic models as appropriate
-  - Compare candidate models using adjusted R-squared and AIC
-  - Diagnose model issues and choose a final strategy
+  - Fit linear, multiple regression, or logistic regression models as appropriate.
+  - Compare fit, prediction, and interpretability using adjusted R-squared, AIC, residual behavior, and other relevant evidence.
+  - Check residuals, influential observations, transformations, and classification summaries as appropriate.
+  - Translate key coefficients or predictions into language connected to the research question.
+  - Select a justified modeling direction and document remaining concerns.
 - **Post-Lab Activity:**
+  - Update the shared report with candidate models, diagnostics, interpretation, and the modeling decision.
 - **Deliverables:**
-  - Project 1 progress report
+  - Project 1 progress report submitted through the course platform.
+  - Candidate models, diagnostics, justified modeling direction, and accessible shared Google Doc link.
 
 ---
 
@@ -110,14 +134,17 @@
 - **Primary Objectives:**
   - Explain statistical results in a presentation
 - **Pre-Lab Activity:**
+  - Review the final model, key plots, statistical interpretation, and known limitations.
 - **In-Lab Activity:**
-  - Refine slides, code, and interpretation
-  - Practice communicating results and model limitations
-  - Prepare the final presentation deliverables
+  - Confirm the final model, plots, and interpretation.
+  - Build a concise presentation covering motivation, data, method, results, limitations, and conclusion.
+  - Rehearse, revise wording and visuals, and check timing.
+  - Confirm that code runs and figures/tables are reproducible.
 - **Post-Lab Activity:**
-  - Submit the Project 1 video
+  - Rehearse the final presentation and verify that all four members contributed.
 - **Deliverables:**
-  - Project 1 video
+  - Project 1 final presentation materials or video submitted through the course platform.
+  - Shared script/document link and reproducible supporting files.
 
 ---
 
@@ -130,13 +157,19 @@
   - Simulation-based Inference
   - Randomization Tests and Bootstrap Confidence Intervals in Regression
 - **Pre-Lab Activity:**
+  - Review the Project 2 overview and rubric and identify the required simulation and real-data components.
 - **In-Lab Activity:**
-  - Practice bootstrap resampling and confidence intervals
-  - Select simulation studies
-  - Begin real-data planning
+  - Create and share one group Google Doc named `P2_GroupNumber_Outline` and assign group roles.
+  - Implement or review a bootstrap confidence interval for a regression quantity.
+  - Select two studies (A-D), explain their assumption violations, and justify the comparison.
+  - Select a real data set, response Y, predictor X, source, and expected violations.
+  - Add sample sizes, repetitions, data-generating processes, outputs, roles, and timeline.
+  - Ask the instructor/TA to review the study choices and simulation/data connection.
 - **Post-Lab Activity:**
+  - Confirm the outline is complete, readable, accessible, and reviewed by every member.
 - **Deliverables:**
-  - Project 2 initial plan
+  - Completed Project 2 outline submitted through the course platform.
+  - Shared document with study plans, research questions, real-data plan, timeline, roles, and planned outputs.
 
 ---
 
@@ -149,13 +182,18 @@
   - Approaches to Inference
   - Simulation-based Inference
 - **Pre-Lab Activity:**
+  - Review the two selected studies, violations, data-generating processes, and research questions.
 - **In-Lab Activity:**
-  - Design scenarios with assumption violations
-  - Build the simulation algorithm
-  - Plan project outputs
+  - Specify scenario assumptions and parameter values.
+  - Code one simulated data set, then wrap it in repeated simulation.
+  - Store classical intervals, bootstrap intervals, coverage indicators, and interval widths.
+  - Decide which tables and plots will summarize the simulation results.
+  - Define how the group will judge whether one inference method performs better.
 - **Post-Lab Activity:**
+  - Review the algorithm and outputs for reproducibility and update the shared plan.
 - **Deliverables:**
-  - Project 2 plan
+  - Project 2 simulation-design materials submitted through the course platform.
+  - Simulation algorithm, planned outputs, shared document link, and reproducible code files.
 
 ---
 
@@ -168,13 +206,18 @@
   - Model Checking and Remedial Measures in Linear Regression
   - Interpret Software Output for Multiple Regression
 - **Pre-Lab Activity:**
+  - Review the planned real-data model and identify the simulation scenarios most relevant to its assumptions.
 - **In-Lab Activity:**
-  - Load and explore the real data
-  - Compare classical and bootstrap inference
-  - Check residual diagnostics and connect them to the simulations
+  - Import and inspect the response, predictors, missing values, and variable types.
+  - Fit the planned regression model and interpret the target coefficient or prediction.
+  - Compare classical and bootstrap intervals for the target quantity.
+  - Check residual patterns and connect diagnostics to the simulation assumptions.
+  - Decide whether the real data resemble one of the simulated scenarios.
 - **Post-Lab Activity:**
+  - Update the report with the real-data analysis, diagnostics, and connection to the simulations.
 - **Deliverables:**
-  - Project 2 progress report
+  - Project 2 progress report submitted through the course platform.
+  - Real-data analysis, diagnostics, shared document link, and reproducible code files.
 
 ---
 
@@ -182,18 +225,22 @@
 
 - **Week:** 10
 - **Lecture Anchor:** Lecture 15
-- **Purpose:** Complete the simulation results, real-data analysis, and written report.
+- **Purpose:** Complete the simulation results, real-data analysis, interpretation, and written report.
 - **Primary Objectives:**
   - Prediction and Cross-Validation for Model Comparison
   - Explain statistical results in a written report
 - **Pre-Lab Activity:**
+  - Review the complete simulation and real-data results and identify unresolved interpretation or reproducibility issues.
 - **In-Lab Activity:**
-  - Finalize simulation and real-data results
-  - Refine the comparison of classical and bootstrap methods
-  - Prepare the final report, code, and data submission
+  - Verify that all simulation scenarios run reproducibly and summarize key results.
+  - Finalize the real-data model, intervals, diagnostics, and interpretation.
+  - Explain when classical inference worked well, when bootstrap inference helped, and remaining limitations.
+  - Assemble the report, code, data, output files, and shared link.
 - **Post-Lab Activity:**
+  - Have every member review the complete submission before upload.
 - **Deliverables:**
-  - Project 2 write-up
+  - Project 2 writeup, code, and required supporting files submitted through the course platform.
+  - Shared Google Doc link and confirmation of group review.
 
 ---
 
@@ -206,14 +253,18 @@
   - Bayesian Inference
   - Comparing Bayesian and Frequentist Approaches
 - **Pre-Lab Activity:**
-  - Complete Tutorial 3 on Bayes' Rule
+  - Consider what an observed sequence of heads suggests about five possible coin types before formal calculation.
 - **In-Lab Activity:**
-  - Use Bayes' Rule in a coin-flip setting
-  - Compare full-data posterior calculation with sequential updating
+  - Load the assigned coin file and compute flips, heads, and the sample proportion.
+  - Use equal prior probabilities and `dbinom()` to compute a batch posterior.
+  - Update the posterior one flip at a time and compare it with the batch result.
+  - Interpret the most likely coin type, posterior probability, and limitations.
+  - Optionally plot posterior probabilities after every flip.
 - **Post-Lab Activity:**
-  - Complete posterior-probability practice
+  - State a coin-type claim, cite one posterior probability, and explain the context.
 - **Deliverables:**
-  - Tutorial 3 hash
+  - Completed `lab-starter.R` with the required posterior objects.
+  - Completed posterior-probability practice or Tutorial 3 hash, as assigned.
 
 ---
 
@@ -225,14 +276,19 @@
 - **Primary Objectives:**
   - Conjugate Models
 - **Pre-Lab Activity:**
-  - Complete Tutorial 4 on conjugate families
+  - Choose and justify a Beta prior for the probability of heads before seeing coin data.
 - **In-Lab Activity:**
-  - Review the beta-binomial model
-  - Compare batch and sequential posterior updating
-  - Interpret the influence of the prior and data
+  - Load the assigned coin file and compute flips, heads, tails, and the sample proportion.
+  - Choose prior parameters and explain how much the prior should influence the answer.
+  - Compute the Beta-Binomial posterior mean and credible interval.
+  - Update the Beta parameters one flip at a time and compare with the batch posterior.
+  - Interpret the posterior estimate and credible interval in context.
+  - Optionally plot the posterior density with its mean and interval.
 - **Post-Lab Activity:**
+  - State an estimate of pi, cite a credible interval, and explain the context.
 - **Deliverables:**
-  - Tutorial 4 hash
+  - Completed `lab-starter.R` with the requested posterior summaries.
+  - Completed conjugate-model practice or Tutorial 4 hash, as assigned.
 
 ---
 
@@ -245,11 +301,17 @@
   - Inference and Prediction
   - Bayesian Linear Regression
 - **Pre-Lab Activity:**
-  - Complete Tutorial 5 on Bayesian linear regression
+  - Use the scatter plot and prior for the slope to predict the direction of the customer-revenue relationship.
 - **In-Lab Activity:**
-  - Work through the Coffee Shop Oracle activity
-  - Fit and interpret Bayesian linear regression models
-  - Connect priors, posterior inference, and prediction
+  - Load the coffee data and plot revenue against customers.
+  - Identify the response, predictor, and model parameters.
+  - Review the log-posterior using normal priors and a log-normal variance prior.
+  - Run the provided Metropolis-Hastings code and summarize post-burn-in draws.
+  - Compute the posterior credible interval for the slope.
+  - Use posterior samples to predict revenue for a new day with three customers.
+  - Interpret the posterior slope, predictive result, and limitations.
 - **Post-Lab Activity:**
+  - State a posterior predictive claim, cite one posterior summary, and explain the context.
 - **Deliverables:**
-  - Tutorial 5 hash
+  - Completed `lab-starter.R` with the data, log-posterior, credible interval, and posterior predictive mean objects.
+  - Completed Bayesian-regression practice or Tutorial 5 hash, as assigned.

@@ -6,4 +6,4 @@ section schedule is finalized.
 | Event Type | Weekday | Start Time | End Time |
 | --- | --- | --- | --- |
 | Lab / Project | Wednesday |  |  |
-| Lab Deliverable | Sunday |  | 10:00PM |
+| Lab Deliverable | Tuesday |  | 10:00PM |

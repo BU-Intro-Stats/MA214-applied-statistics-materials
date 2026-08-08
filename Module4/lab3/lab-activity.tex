@@ -1,0 +1,182 @@
+\documentclass{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{xcolor}
+\usepackage{parskip}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{listings}
+
+\definecolor{codegray}{gray}{0.97}
+\definecolor{huddleblue}{RGB}{214,234,255}
+\definecolor{predictionyellow}{RGB}{255,242,200}
+\definecolor{debatepink}{RGB}{255,225,225}
+
+\lstset{basicstyle=\ttfamily\small,columns=fullflexible,frame=single,framerule=0.4pt,backgroundcolor=\color{codegray},breaklines=true,showstringspaces=false,keepspaces=true}
+\newcommand{\coursenumber}{MA 214}
+\newcommand{\nameblank}{\rule{1.75in}{0.4pt}}
+\newcommand{\idblank}{\rule{1.55in}{0.4pt}}
+\newcommand{\shortblank}{\rule{1.6in}{0.4pt}}
+\newcommand{\longblank}{\rule{0.93\linewidth}{0.4pt}}
+\newcommand{\responsebox}[2]{\noindent\fbox{\begin{minipage}{0.95\linewidth}\textbf{#1} #2\vspace{0.55in}\end{minipage}}}
+\newcommand{\linedbox}[1]{\noindent\fbox{\begin{minipage}{0.95\linewidth}#1\vspace{0.18in}\par\longblank\par\vspace{0.18in}\longblank\par\vspace{0.18in}\longblank\end{minipage}}}
+\newcommand{\callout}[3]{\noindent\colorbox{#1}{\makebox[\dimexpr0.95\linewidth-2\fboxsep\relax][l]{\textbf{#2}}}\par\noindent\fbox{\begin{minipage}{0.93\linewidth}#3\end{minipage}}}
+
+\begin{document}
+
+\begin{center}
+  {\LARGE \coursenumber{} Week 11: Lab 3}\\
+  {\large Bayes' Rule}
+\end{center}
+
+\begin{enumerate}[label=\arabic*.,leftmargin=*,itemsep=.7em]
+  \item \textbf{Your name:} \nameblank \hfill \textbf{BU ID:} \idblank
+  \item \textbf{Partner's name:} \nameblank \hfill \textbf{BU ID:} \idblank
+\end{enumerate}
+
+\textbf{Big idea:} Bayes' Rule updates beliefs by combining prior probabilities with the likelihood of the observed data.
+\textbf{Do not use GenAI tools for this lab.} The point is to practice your own analysis work, coding skills, and statistical reasoning.
+
+\textbf{Files used:} coin files in \texttt{coin\_data\_in\_lab/}, \texttt{lab3\_post\_data.csv}, and \texttt{lab-starter.R}
+
+\textbf{Skills practiced:} \texttt{dbinom()}, vectorized probability calculations, posterior normalization, and sequential updating.
+
+\textbf{Your mission:} Use coin-flip data to infer which of five possible coin types the dealer gave you.
+
+\section*{Icebreaker}
+
+Before opening R: introduce yourself to your partner and answer the warm-up question below.
+
+\responsebox{Warm-up response:}{If a coin lands heads 8 times in 10 flips, what would you believe about the coin before doing any formal calculation?}
+
+\section*{Getting Started}
+
+Open \texttt{lab-starter.R}. Choose or use your assigned coin file, then load the data and count the number of heads.
+
+\begin{lstlisting}
+library(dplyr)
+library(ggplot2)
+
+my_coin_file <- file.path("coin_data_in_lab", "coin_01.csv")
+coin_df <- read.csv(my_coin_file)
+
+p_js <- c(0.15, 0.30, 0.50, 0.70, 0.90)
+coin_labels <- c("A", "B", "C", "D", "E")
+
+n_flips <- nrow(coin_df)
+n_heads <- sum(coin_df$result)
+\end{lstlisting}
+
+\callout{huddleblue}{HUDDLE UP}{Before calculating anything, which coin type seems most plausible from the sample proportion of heads? What makes you unsure?}
+
+\newpage
+
+\section*{Question 1. Explore the Coin Data}
+
+Record the possible coin types, the observed number of flips, and the observed number of heads.
+
+\begin{lstlisting}
+n_flips
+n_heads
+n_heads / n_flips
+\end{lstlisting}
+
+\begin{center}
+\renewcommand{\arraystretch}{2.3}
+\begin{tabular}{|p{0.24\linewidth}|p{0.27\linewidth}|p{0.36\linewidth}|}
+\hline
+\textbf{Variable or data set} & \textbf{Type or role} & \textbf{What it means} \\
+\hline
+\texttt{p\_js} & & \\
+\hline
+\texttt{coin\_df\$result} & & \\
+\hline
+\texttt{prior\_probs} & & \\
+\hline
+\end{tabular}
+\end{center}
+
+\linedbox{\textbf{Write 2-3 sentences describing what the data suggest before applying Bayes' Rule.}}
+
+\section*{Question 2. Make a Prediction}
+
+Before computing the posterior, predict which coin type will have the highest posterior probability.
+
+\callout{predictionyellow}{PREDICTION TIME}{Use the sample proportion of heads to make a prediction. Be specific enough that the posterior can support or challenge your answer.}
+
+\begin{lstlisting}
+prior_probs <- rep(1 / 5, 5)
+
+likelihood <- dbinom(n_heads, size = n_flips, prob = p_js)
+numerator <- likelihood * prior_probs
+posterior_batch <- numerator / sum(numerator)
+\end{lstlisting}
+
+\newpage
+
+\linedbox{\textbf{What did your team predict? What evidence did you check first?}}
+
+\section*{Question 3. Compute the Posterior}
+
+Compare the batch posterior with the posterior from sequential updating.
+
+\begin{lstlisting}
+post_mat <- matrix(NA, nrow = n_flips + 1, ncol = 5)
+post_mat[1, ] <- prior_probs
+
+for (i in 1:n_flips) {
+  lk <- ifelse(coin_df$result[i] == 1, p_js, 1 - p_js)
+  unnorm <- post_mat[i, ] * lk
+  post_mat[i + 1, ] <- unnorm / sum(unnorm)
+}
+
+posterior_seq <- post_mat[n_flips + 1, ]
+\end{lstlisting}
+
+\callout{huddleblue}{HUDDLE UP}{Do the batch and sequential posterior probabilities match? What does that tell you about Bayesian updating?}
+
+\callout{huddleblue}{CLAIM, EVIDENCE, CONTEXT}{%
+The most likely coin type is \shortblank.\\[.6em]
+My evidence is \shortblank.\\[.6em]
+This matters because \shortblank.
+}
+
+\section*{Question 4. Interpret in Context}
+
+Use posterior probabilities to make a decision about the coin type.
+
+\begin{center}
+\renewcommand{\arraystretch}{2.25}
+\begin{tabular}{|p{0.42\linewidth}|p{0.50\linewidth}|}
+\hline
+\textbf{Question} & \textbf{Your answer} \\
+\hline
+What comparison did you make? & \\
+\hline
+What result is strongest? & \\
+\hline
+What limitation or caution should readers know? & \\
+\hline
+\end{tabular}
+\end{center}
+
+\newpage
+
+\callout{debatepink}{DEBATE CORNER}{If you and your partner disagree about the final coin type, write both arguments first. Then decide what claim the evidence actually supports.}
+
+\section*{Question 5. Close the Lab}
+
+Submit your completed \texttt{lab-starter.R}. Your submitted file should define the required posterior objects listed in the starter file.
+
+\linedbox{\textbf{Final response:} state your coin-type claim, cite one posterior probability, and explain the context.}
+
+\section*{Optional Challenge}
+
+Plot the posterior probability of each coin type after every flip.
+
+\begin{lstlisting}
+# Optional challenge starter code.
+matplot(post_mat, type = "l", lty = 1)
+\end{lstlisting}
+
+\end{document}

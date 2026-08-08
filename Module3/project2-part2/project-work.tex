@@ -1,0 +1,66 @@
+\documentclass{article}
+\usepackage[margin=1.25in]{geometry}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{enumitem}
+
+\newcommand{\coursename}{MA 214: Applied Statistics}
+\newcommand{\termname}{Fall 2026}
+\newcommand{\activitydate}{Week 8}
+\newcommand{\projecttitle}{Project 2 Simulation Design}
+\newcommand{\submissionplatform}{Gradescope or Blackboard}
+\newcommand{\duedate}{Sunday, October 25 at 10:00 PM}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\coursename{} (\termname{})}
+\rhead{\activitydate{}}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{.4mm}
+\newcommand{\blankline}{\underline{\phantom{XXXXXXXXXXXXXXXXXXXXXXXX}}}
+\newcommand{\blankid}{\underline{\phantom{XXXXXXXXXXXXXXX}}}
+
+\begin{document}
+\noindent\textbf{Group:}\blankline{}\hfill\textbf{Section:}\blankid{}
+
+\medskip
+\noindent\textbf{Member 1:}\blankline{}\hfill\textbf{BUID:}\blankid{}
+
+\medskip
+\noindent\textbf{Member 2:}\blankline{}\hfill\textbf{BUID:}\blankid{}
+
+\medskip
+\noindent\textbf{Member 3:}\blankline{}\hfill\textbf{BUID:}\blankid{}
+
+\medskip
+\noindent\textbf{Member 4:}\blankline{}\hfill\textbf{BUID:}\blankid{}
+
+\begin{center}
+  {\Large \textbf{\projecttitle{}}}
+\end{center}
+
+\subsection*{Purpose}
+Today you will turn the Project 2 plan into a simulation algorithm that compares classical and bootstrap inference across planned scenarios.
+
+\subsection*{Shared Group Workflow}
+Work in one shared Google Doc and one shared analysis folder. Assign the four roles below, then have every member review the simulation design and outputs.
+\begin{itemize}[itemsep=.25em]
+  \item \textbf{Member 1 -- Scenario 1 lead:} define and code the first violation scenario.
+  \item \textbf{Member 2 -- Scenario 2 lead:} define and code the second violation scenario.
+  \item \textbf{Member 3 -- Methods lead:} implement classical and bootstrap comparisons and coverage measures.
+  \item \textbf{Member 4 -- Results editor:} organize tables, plots, reproducibility notes, and the shared report.
+\end{itemize}
+
+\subsection*{In-Class Work}
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.5em]
+  \item \textbf{Define scenarios.} Specify the data-generating process, assumptions being violated, and parameter values.
+  \item \textbf{Write the algorithm.} Build code for one simulated data set, then wrap it in repeated simulation.
+  \item \textbf{Compare methods.} Store classical intervals, bootstrap intervals, coverage indicators, and interval widths.
+  \item \textbf{Output plan.} Decide which tables and plots will summarize the simulation results.
+  \item \textbf{Check-in.} How will you know whether one inference method is performing better?
+\end{enumerate}
+
+\subsection*{Deliverable}
+Submit the Project 2 simulation-design materials through \submissionplatform{} by \duedate{}. Include the simulation algorithm, planned outputs, shared Google Doc link, and reproducible code files.
+
+\end{document}

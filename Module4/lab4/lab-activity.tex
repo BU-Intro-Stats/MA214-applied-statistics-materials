@@ -1,0 +1,182 @@
+\documentclass{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{xcolor}
+\usepackage{parskip}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{listings}
+
+\definecolor{codegray}{gray}{0.97}
+\definecolor{huddleblue}{RGB}{214,234,255}
+\definecolor{predictionyellow}{RGB}{255,242,200}
+\definecolor{debatepink}{RGB}{255,225,225}
+
+\lstset{basicstyle=\ttfamily\small,columns=fullflexible,frame=single,framerule=0.4pt,backgroundcolor=\color{codegray},breaklines=true,showstringspaces=false,keepspaces=true}
+\newcommand{\coursenumber}{MA 214}
+\newcommand{\nameblank}{\rule{1.75in}{0.4pt}}
+\newcommand{\idblank}{\rule{1.55in}{0.4pt}}
+\newcommand{\shortblank}{\rule{1.6in}{0.4pt}}
+\newcommand{\longblank}{\rule{0.93\linewidth}{0.4pt}}
+\newcommand{\responsebox}[2]{\noindent\fbox{\begin{minipage}{0.95\linewidth}\textbf{#1} #2\vspace{0.55in}\end{minipage}}}
+\newcommand{\linedbox}[1]{\noindent\fbox{\begin{minipage}{0.95\linewidth}#1\vspace{0.18in}\par\longblank\par\vspace{0.18in}\longblank\par\vspace{0.18in}\longblank\end{minipage}}}
+\newcommand{\callout}[3]{\noindent\colorbox{#1}{\makebox[\dimexpr0.95\linewidth-2\fboxsep\relax][l]{\textbf{#2}}}\par\noindent\fbox{\begin{minipage}{0.93\linewidth}#3\end{minipage}}}
+
+\begin{document}
+
+\begin{center}
+  {\LARGE \coursenumber{} Week 12: Lab 4}\\
+  {\large Conjugate Families: Beta-Binomial}
+\end{center}
+
+\begin{enumerate}[label=\arabic*.,leftmargin=*,itemsep=.7em]
+  \item \textbf{Your name:} \nameblank \hfill \textbf{BU ID:} \idblank
+  \item \textbf{Partner's name:} \nameblank \hfill \textbf{BU ID:} \idblank
+\end{enumerate}
+
+\textbf{Big idea:} A Beta prior and Binomial likelihood form a conjugate pair, so updating beliefs about a coin's probability of heads only requires adding heads and tails.
+\textbf{Do not use GenAI tools for this lab.} The point is to practice your own analysis work, coding skills, and statistical reasoning.
+
+\textbf{Files used:} coin files in \texttt{Lab4\_data/}, \texttt{lab4\_post\_data.csv}, and \texttt{lab-starter.R}
+
+\textbf{Skills practiced:} Beta priors, conjugate posterior updates, \texttt{qbeta()}, sequential updating, and credible intervals.
+
+\textbf{Your mission:} Estimate an unknown coin probability $\pi$ and describe uncertainty using a Beta-Binomial posterior.
+
+\section*{Icebreaker}
+
+Before opening R: introduce yourself to your partner and answer the warm-up question below.
+
+\responsebox{Warm-up response:}{If you had no coin data yet, what Beta prior would you choose for the probability of heads? Why?}
+
+\section*{Getting Started}
+
+Open \texttt{lab-starter.R}. Choose or use your assigned Lab 4 coin file and compute the number of heads and tails.
+
+\begin{lstlisting}
+library(dplyr)
+library(ggplot2)
+
+my_coin_file <- file.path("Lab4_data", "lab4_coin_01.csv")
+coin_df <- read.csv(my_coin_file)
+
+n_flips <- nrow(coin_df)
+n_heads <- sum(coin_df$result)
+n_tails <- n_flips - n_heads
+\end{lstlisting}
+
+\callout{huddleblue}{HUDDLE UP}{Before calculating anything, what does the sample proportion suggest about $\pi$? How much should your prior influence the answer?}
+
+\newpage
+
+\section*{Question 1. Explore the Coin Data}
+
+Record the observed number of heads and tails, then choose prior parameters.
+
+\begin{lstlisting}
+n_heads
+n_tails
+n_heads / n_flips
+
+alpha_prior <- ________
+beta_prior <- ________
+\end{lstlisting}
+
+\begin{center}
+\renewcommand{\arraystretch}{2.3}
+\begin{tabular}{|p{0.24\linewidth}|p{0.27\linewidth}|p{0.36\linewidth}|}
+\hline
+\textbf{Variable or data set} & \textbf{Type or role} & \textbf{What it means} \\
+\hline
+\texttt{alpha\_prior} & & \\
+\hline
+\texttt{beta\_prior} & & \\
+\hline
+\texttt{n\_heads} & & \\
+\hline
+\end{tabular}
+\end{center}
+
+\linedbox{\textbf{Write 2-3 sentences explaining your prior choice and what the raw data suggest.}}
+
+\section*{Question 2. Make a Prediction}
+
+Before computing the posterior, predict whether the posterior mean will be above, below, or close to 0.50.
+
+\callout{predictionyellow}{PREDICTION TIME}{Use your prior and the sample proportion to predict where the posterior mean will land.}
+
+\begin{lstlisting}
+alpha_post <- alpha_prior + n_heads
+beta_post <- beta_prior + n_tails
+
+post_mean <- alpha_post / (alpha_post + beta_post)
+cred_int <- qbeta(c(0.025, 0.975), alpha_post, beta_post)
+\end{lstlisting}
+
+\newpage
+
+\linedbox{\textbf{What did your team predict? What evidence did you check first?}}
+
+\section*{Question 3. Compute Sequential Updates}
+
+Update the Beta parameters one flip at a time and compare with the batch posterior.
+
+\begin{lstlisting}
+a_seq <- rep(NA, n_flips + 1)
+b_seq <- rep(NA, n_flips + 1)
+a_seq[1] <- alpha_prior
+b_seq[1] <- beta_prior
+
+for (i in 1:n_flips) {
+  a_seq[i + 1] <- a_seq[i] + coin_df$result[i]
+  b_seq[i + 1] <- b_seq[i] + (1 - coin_df$result[i])
+}
+\end{lstlisting}
+
+\callout{huddleblue}{HUDDLE UP}{Does sequential updating lead to the same final $\alpha$ and $\beta$ as the all-at-once update? Why?}
+
+\callout{huddleblue}{CLAIM, EVIDENCE, CONTEXT}{%
+The posterior estimate of $\pi$ is \shortblank.\\[.6em]
+My evidence is \shortblank.\\[.6em]
+This matters because \shortblank.
+}
+
+\section*{Question 4. Interpret in Context}
+
+Use the posterior mean and credible interval to describe the coin.
+
+\begin{center}
+\renewcommand{\arraystretch}{2.25}
+\begin{tabular}{|p{0.42\linewidth}|p{0.50\linewidth}|}
+\hline
+\textbf{Question} & \textbf{Your answer} \\
+\hline
+What comparison did you make? & \\
+\hline
+What result is strongest? & \\
+\hline
+What limitation or caution should readers know? & \\
+\hline
+\end{tabular}
+\end{center}
+
+\newpage
+
+\callout{debatepink}{DEBATE CORNER}{If you and your partner disagree about how strong the evidence is, write both arguments first. Then decide what claim the posterior actually supports.}
+
+\section*{Question 5. Close the Lab}
+
+Submit your completed \texttt{lab-starter.R}. Your script should define the posterior summaries requested by your instructor.
+
+\linedbox{\textbf{Final response:} state your estimate of $\pi$, cite a credible interval, and explain the context.}
+
+\section*{Optional Challenge}
+
+Plot the posterior density and mark the posterior mean and credible interval.
+
+\begin{lstlisting}
+# Optional challenge starter code.
+curve(dbeta(x, alpha_post, beta_post), from = 0, to = 1)
+\end{lstlisting}
+
+\end{document}

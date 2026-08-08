@@ -1,0 +1,66 @@
+\documentclass{article}
+\usepackage[margin=1.25in]{geometry}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{enumitem}
+
+\newcommand{\coursename}{MA 214: Applied Statistics}
+\newcommand{\termname}{Fall 2026}
+\newcommand{\activitydate}{Week 5}
+\newcommand{\projecttitle}{Project 1 Modeling, Model Selection, and Diagnostics}
+\newcommand{\submissionplatform}{Gradescope or Blackboard}
+\newcommand{\duedate}{Sunday, October 4 at 10:00 PM}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\coursename{} (\termname{})}
+\rhead{\activitydate{}}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{.4mm}
+\newcommand{\blankline}{\underline{\phantom{XXXXXXXXXXXXXXXXXXXXXXXX}}}
+\newcommand{\blankid}{\underline{\phantom{XXXXXXXXXXXXXXX}}}
+
+\begin{document}
+\noindent\textbf{Group:}\blankline{}\hfill\textbf{Section:}\blankid{}
+
+\medskip
+\noindent\textbf{Member 1:}\blankline{}\hfill\textbf{BUID:}\blankid{}
+
+\medskip
+\noindent\textbf{Member 2:}\blankline{}\hfill\textbf{BUID:}\blankid{}
+
+\medskip
+\noindent\textbf{Member 3:}\blankline{}\hfill\textbf{BUID:}\blankid{}
+
+\medskip
+\noindent\textbf{Member 4:}\blankline{}\hfill\textbf{BUID:}\blankid{}
+
+\begin{center}
+  {\Large \textbf{\projecttitle{}}}
+\end{center}
+
+\subsection*{Purpose}
+Today you will fit candidate Project 1 models, compare them, diagnose model issues, and decide what evidence supports your final modeling strategy.
+
+\subsection*{Shared Group Workflow}
+Work in one shared Google Doc and one shared analysis folder. Assign the four roles below, then have every member inspect the models and sign off on the interpretation.
+\begin{itemize}[itemsep=.25em]
+  \item \textbf{Member 1 -- Modeling lead:} fit and document the candidate models.
+  \item \textbf{Member 2 -- Comparison lead:} compare fit, prediction, and interpretability evidence.
+  \item \textbf{Member 3 -- Diagnostics lead:} check assumptions, influential observations, and remedial options.
+  \item \textbf{Member 4 -- Interpretation editor:} connect results to the research question and maintain the shared report.
+\end{itemize}
+
+\subsection*{In-Class Work}
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.5em]
+  \item \textbf{Candidate models.} Fit linear, multiple regression, or logistic regression models as appropriate for your response variable.
+  \item \textbf{Model comparison.} Compare candidate models using summaries such as adjusted $R^2$, AIC, residual behavior, prediction quality, or interpretability.
+  \item \textbf{Diagnostics.} Check residual plots, influential observations, transformations, or classification summaries as appropriate.
+  \item \textbf{Interpretation.} Translate key coefficients or predictions into language connected to your research question.
+  \item \textbf{Check-in.} Which model is currently strongest, and what concern still needs to be addressed?
+\end{enumerate}
+
+\subsection*{Deliverable}
+Submit the Project 1 progress report through \submissionplatform{} by \duedate{}. Include candidate models, diagnostics, a justified modeling direction, and the accessible shared Google Doc link.
+
+\end{document}

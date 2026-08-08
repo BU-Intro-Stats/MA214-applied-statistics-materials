@@ -37,6 +37,10 @@ pip install -r requirements.txt && pip install -e .
 python generate_schedule_table.py
 mkdocs build
 ```
+**Preview the website** locally:
+```
+python -m mkdocs serve -f mkdocs.yml
+```
 
 ## Assessments
 

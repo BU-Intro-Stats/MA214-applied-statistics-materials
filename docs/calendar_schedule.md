@@ -90,7 +90,7 @@ This month view is generated from course summaries, `instructor_inputs/important
 <div class="calendar-event__kind">Lab Deliverable</div>
 <h3>Lab 1 Deliverables Due</h3>
 <p class="calendar-event__time">Due 10:00 PM</p>
-<p>Lab 1 in-lab activity</p>
+<p>Completed `lab-starter.R` with the requested objects and plots. | Completed in-lab activity response sheet.</p>
 </article>
 </section>
 <section class="calendar-date">
@@ -173,7 +173,7 @@ This month view is generated from course summaries, `instructor_inputs/important
 <div class="calendar-event__kind">Lab Deliverable</div>
 <h3>Lab 2 Deliverables Due</h3>
 <p class="calendar-event__time">Due 10:00 PM</p>
-<p>Tutorial 2 hash | Lab 2 in-lab activity</p>
+<p>Completed `lab-starter.R` with the fitted models and requested autograder objects. | Completed in-lab activity response sheet.</p>
 </article>
 </section>
 <section class="calendar-date">
@@ -260,7 +260,7 @@ This month view is generated from course summaries, `instructor_inputs/important
 <div class="calendar-event__kind">Lab Deliverable</div>
 <h3>Project1-1 Deliverables Due</h3>
 <p class="calendar-event__time">Due 10:00 PM</p>
-<p>Project 1 outline</p>
+<p>Completed Project 1 outline submitted through the course platform. | Shared Google Doc containing the title, motivation, questions, data description, limitations, roles, and timeline.</p>
 </article>
 </section>
 <section class="calendar-date">
@@ -347,7 +347,7 @@ This month view is generated from course summaries, `instructor_inputs/important
 <div class="calendar-event__kind">Lab Deliverable</div>
 <h3>Project1-2 Deliverables Due</h3>
 <p class="calendar-event__time">Due 10:00 PM</p>
-<p>Project 1 plan</p>
+<p>Project 1 progress materials submitted through the course platform. | Cleaned-data notes, initial EDA, revised questions, and accessible shared Google Doc link.</p>
 </article>
 </section>
 <section class="calendar-date">
@@ -490,7 +490,7 @@ This month view is generated from course summaries, `instructor_inputs/important
 <div class="calendar-event__kind">Lab Deliverable</div>
 <h3>Project1-3 Deliverables Due</h3>
 <p class="calendar-event__time">Due 10:00 PM</p>
-<p>Project 1 progress report</p>
+<p>Project 1 progress report submitted through the course platform. | Candidate models, diagnostics, justified modeling direction, and accessible shared Google Doc link.</p>
 </article>
 </section>
 <section class="calendar-date">
@@ -577,7 +577,7 @@ This month view is generated from course summaries, `instructor_inputs/important
 <div class="calendar-event__kind">Lab Deliverable</div>
 <h3>Project1-4 Deliverables Due</h3>
 <p class="calendar-event__time">Due 10:00 PM</p>
-<p>Project 1 video</p>
+<p>Project 1 final presentation materials or video submitted through the course platform. | Shared script/document link and reproducible supporting files.</p>
 </article>
 </section>
 <section class="calendar-date">
@@ -670,7 +670,7 @@ This month view is generated from course summaries, `instructor_inputs/important
 <div class="calendar-event__kind">Lab Deliverable</div>
 <h3>Project2-1 Deliverables Due</h3>
 <p class="calendar-event__time">Due 10:00 PM</p>
-<p>Project 2 initial plan</p>
+<p>Completed Project 2 outline submitted through the course platform. | Shared document with study plans, research questions, real-data plan, timeline, roles, and planned outputs.</p>
 </article>
 </section>
 <section class="calendar-date">
@@ -763,7 +763,7 @@ This month view is generated from course summaries, `instructor_inputs/important
 <div class="calendar-event__kind">Lab Deliverable</div>
 <h3>Project2-2 Deliverables Due</h3>
 <p class="calendar-event__time">Due 10:00 PM</p>
-<p>Project 2 plan</p>
+<p>Project 2 simulation-design materials submitted through the course platform. | Simulation algorithm, planned outputs, shared document link, and reproducible code files.</p>
 </article>
 </section>
 <section class="calendar-date">
@@ -884,7 +884,7 @@ This month view is generated from course summaries, `instructor_inputs/important
 <div class="calendar-event__kind">Lab Deliverable</div>
 <h3>Project2-3 Deliverables Due</h3>
 <p class="calendar-event__time">Due 10:00 PM</p>
-<p>Project 2 progress report</p>
+<p>Project 2 progress report submitted through the course platform. | Real-data analysis, diagnostics, shared document link, and reproducible code files.</p>
 </article>
 </section>
 <section class="calendar-date">
@@ -972,7 +972,7 @@ This month view is generated from course summaries, `instructor_inputs/important
 <div class="calendar-event__kind">Lab Deliverable</div>
 <h3>Project2-4 Deliverables Due</h3>
 <p class="calendar-event__time">Due 10:00 PM</p>
-<p>Project 2 write-up</p>
+<p>Project 2 writeup, code, and required supporting files submitted through the course platform. | Shared Google Doc link and confirmation of group review.</p>
 </article>
 </section>
 <section class="calendar-date">
@@ -1059,7 +1059,7 @@ This month view is generated from course summaries, `instructor_inputs/important
 <div class="calendar-event__kind">Lab Deliverable</div>
 <h3>Lab 3 Deliverables Due</h3>
 <p class="calendar-event__time">Due 10:00 PM</p>
-<p>Tutorial 3 hash</p>
+<p>Completed `lab-starter.R` with the required posterior objects. | Completed posterior-probability practice or Tutorial 3 hash, as assigned.</p>
 </article>
 </section>
 <section class="calendar-date">
@@ -1146,7 +1146,7 @@ This month view is generated from course summaries, `instructor_inputs/important
 <div class="calendar-event__kind">Lab Deliverable</div>
 <h3>Lab 4 Deliverables Due</h3>
 <p class="calendar-event__time">Due 10:00 PM</p>
-<p>Tutorial 4 hash</p>
+<p>Completed `lab-starter.R` with the requested posterior summaries. | Completed conjugate-model practice or Tutorial 4 hash, as assigned.</p>
 </article>
 </section>
 <section class="calendar-date">
@@ -1367,7 +1367,7 @@ This month view is generated from course summaries, `instructor_inputs/important
 <div class="calendar-event__kind">Lab Deliverable</div>
 <h3>Lab 5 Deliverables Due</h3>
 <p class="calendar-event__time">Due 10:00 PM</p>
-<p>Tutorial 5 hash</p>
+<p>Completed `lab-starter.R` with the data, log-posterior, credible interval, and posterior predictive mean objects. | Completed Bayesian-regression practice or Tutorial 5 hash, as assigned.</p>
 </article>
 </section>
 <section class="calendar-date">

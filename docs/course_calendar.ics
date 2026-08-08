@@ -63,7 +63,8 @@ UID:2026-09-06-1-Lab-1-Deliverables-Due@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20260906T220000
 SUMMARY:Lab 1 Deliverables Due
-DESCRIPTION:Lab 1 in-lab activity
+DESCRIPTION:Completed `lab-starter.R` with the requested objects and plots.
+  | Completed in-lab activity response sheet.
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-09-07-1-Academic-Calendar@ma214-course-calendar
@@ -147,7 +148,8 @@ UID:2026-09-13-1-Lab-2-Deliverables-Due@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20260913T220000
 SUMMARY:Lab 2 Deliverables Due
-DESCRIPTION:Tutorial 2 hash | Lab 2 in-lab activity
+DESCRIPTION:Completed `lab-starter.R` with the fitted models and requested 
+ autograder objects. | Completed in-lab activity response sheet.
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-09-14-1-Office-Hour-Lab-Instructor@ma214-course-calendar
@@ -236,7 +238,9 @@ UID:2026-09-20-1-Project1-1-Deliverables-Due@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20260920T220000
 SUMMARY:Project1-1 Deliverables Due
-DESCRIPTION:Project 1 outline
+DESCRIPTION:Completed Project 1 outline submitted through the course platfo
+ rm. | Shared Google Doc containing the title\, motivation\, questions\, da
+ ta description\, limitations\, roles\, and timeline.
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-09-21-1-Office-Hour-Lab-Instructor@ma214-course-calendar
@@ -325,7 +329,9 @@ UID:2026-09-27-1-Project1-2-Deliverables-Due@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20260927T220000
 SUMMARY:Project1-2 Deliverables Due
-DESCRIPTION:Project 1 plan
+DESCRIPTION:Project 1 progress materials submitted through the course platf
+ orm. | Cleaned-data notes\, initial EDA\, revised questions\, and accessib
+ le shared Google Doc link.
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-09-28-1-Office-Hour-Lab-Instructor@ma214-course-calendar
@@ -415,7 +421,9 @@ UID:2026-10-04-1-Project1-3-Deliverables-Due@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20261004T220000
 SUMMARY:Project1-3 Deliverables Due
-DESCRIPTION:Project 1 progress report
+DESCRIPTION:Project 1 progress report submitted through the course platform
+ . | Candidate models\, diagnostics\, justified modeling direction\, and ac
+ cessible shared Google Doc link.
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-10-05-1-Office-Hour-Lab-Instructor@ma214-course-calendar
@@ -506,7 +514,9 @@ UID:2026-10-11-1-Project1-4-Deliverables-Due@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20261011T220000
 SUMMARY:Project1-4 Deliverables Due
-DESCRIPTION:Project 1 video
+DESCRIPTION:Project 1 final presentation materials or video submitted throu
+ gh the course platform. | Shared script/document link and reproducible sup
+ porting files.
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-10-12-1-Academic-Calendar@ma214-course-calendar
@@ -607,7 +617,9 @@ UID:2026-10-18-1-Project2-1-Deliverables-Due@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20261018T220000
 SUMMARY:Project2-1 Deliverables Due
-DESCRIPTION:Project 2 initial plan
+DESCRIPTION:Completed Project 2 outline submitted through the course platfo
+ rm. | Shared document with study plans\, research questions\, real-data pl
+ an\, timeline\, roles\, and planned outputs.
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-10-19-1-Academic-Calendar@ma214-course-calendar
@@ -704,7 +716,9 @@ UID:2026-10-25-1-Project2-2-Deliverables-Due@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20261025T220000
 SUMMARY:Project2-2 Deliverables Due
-DESCRIPTION:Project 2 plan
+DESCRIPTION:Project 2 simulation-design materials submitted through the cou
+ rse platform. | Simulation algorithm\, planned outputs\, shared document l
+ ink\, and reproducible code files.
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-10-26-1-Office-Hour-Lab-Instructor@ma214-course-calendar
@@ -795,7 +809,9 @@ UID:2026-11-01-1-Project2-3-Deliverables-Due@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20261101T220000
 SUMMARY:Project2-3 Deliverables Due
-DESCRIPTION:Project 2 progress report
+DESCRIPTION:Project 2 progress report submitted through the course platform
+ . | Real-data analysis\, diagnostics\, shared document link\, and reproduc
+ ible code files.
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-02-1-Office-Hour-Lab-Instructor@ma214-course-calendar
@@ -885,7 +901,9 @@ UID:2026-11-08-1-Project2-4-Deliverables-Due@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20261108T220000
 SUMMARY:Project2-4 Deliverables Due
-DESCRIPTION:Project 2 write-up
+DESCRIPTION:Project 2 writeup\, code\, and required supporting files submit
+ ted through the course platform. | Shared Google Doc link and confirmation
+  of group review.
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-09-1-Office-Hour-Lab-Instructor@ma214-course-calendar
@@ -975,7 +993,9 @@ UID:2026-11-15-1-Lab-3-Deliverables-Due@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20261115T220000
 SUMMARY:Lab 3 Deliverables Due
-DESCRIPTION:Tutorial 3 hash
+DESCRIPTION:Completed `lab-starter.R` with the required posterior objects. 
+ | Completed posterior-probability practice or Tutorial 3 hash\, as assigne
+ d.
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-16-1-Office-Hour-Lab-Instructor@ma214-course-calendar
@@ -1065,7 +1085,8 @@ UID:2026-11-22-1-Lab-4-Deliverables-Due@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20261122T220000
 SUMMARY:Lab 4 Deliverables Due
-DESCRIPTION:Tutorial 4 hash
+DESCRIPTION:Completed `lab-starter.R` with the requested posterior summarie
+ s. | Completed conjugate-model practice or Tutorial 4 hash\, as assigned.
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-23-1-Office-Hour-Lab-Instructor@ma214-course-calendar
@@ -1240,7 +1261,9 @@ UID:2026-12-06-1-Lab-5-Deliverables-Due@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20261206T220000
 SUMMARY:Lab 5 Deliverables Due
-DESCRIPTION:Tutorial 5 hash
+DESCRIPTION:Completed `lab-starter.R` with the data\, log-posterior\, credi
+ ble interval\, and posterior predictive mean objects. | Completed Bayesian
+ -regression practice or Tutorial 5 hash\, as assigned.
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-12-10-1-Academic-Calendar@ma214-course-calendar
