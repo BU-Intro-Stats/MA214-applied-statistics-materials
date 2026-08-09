@@ -31,7 +31,7 @@ Each `lab<N>/` holds `lab-activity.tex`/`.pdf` (the printed in-lab worksheet), `
 
 Students do **not** submit `lab-starter.R`. It is working code for use during lab, not a collected deliverable.
 
-Deliverables are due Tuesdays at 10:00 PM, set by the `Lab Deliverable` row in [`instructor_inputs/Lab_schedules.md`](instructor_inputs/Lab_schedules.md). Lab 1 is the exception — the preceding Tuesday falls before Classes Begin, so it is due on the lab day itself.
+Both are due together at 10:00 PM on the Tuesday **after** the session — six days later, since labs meet Wednesdays. The hash is still meant to be done before lab; the shared deadline is just when both are collected. Change the weekday or time in the `Lab Deliverable` row of [`instructor_inputs/Lab_schedules.md`](instructor_inputs/Lab_schedules.md), then regenerate.
 
 **Projects** — three deliverables each:
 

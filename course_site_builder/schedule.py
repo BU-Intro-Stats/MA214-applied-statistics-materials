@@ -1391,9 +1391,11 @@ def build_calendar_events(
         )
 
         if lab["deliverables"]:
+            # Deliverables are due in the week after the session, so a deadline
+            # falling earlier in the week than the lab itself still comes after it.
             deliverable_date = scheduled_weekday_date(
                 term_start,
-                lab["week"],
+                lab["week"] + 1,
                 lab_deliverable_weekday,
                 suspended,
             )

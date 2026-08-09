@@ -18,6 +18,6 @@
 - State an estimate of $π$, cite a credible interval, and explain the context.
 
 **Deliverables**
-- Tutorial 4 hash submitted before lab.
+- Tutorial 4 hash (due before lab).
 - Completed in-lab activity response sheet.
 
