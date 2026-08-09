@@ -2,7 +2,6 @@
 # Lab 1: Working with R and Data
 # MA 214 Applied Statistics
 # ============================================================
-# Submit this R file to Gradescope.
 # Do not use setwd().
 
 library(ggplot2)

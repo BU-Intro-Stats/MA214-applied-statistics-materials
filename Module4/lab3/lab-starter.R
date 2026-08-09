@@ -2,7 +2,6 @@
 # Lab 3: Bayes' Rule
 # MA 214 Applied Statistics
 # ============================================================
-# Submit this R file to Gradescope.
 # Do not use setwd().
 
 library(dplyr)

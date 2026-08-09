@@ -18,6 +18,6 @@
 - State an estimate of $π$, cite a credible interval, and explain the context.
 
 **Deliverables**
-- Completed `lab-starter.R` with the requested posterior summaries.
-- Completed conjugate-model practice or Tutorial 4 hash, as assigned.
+- Tutorial 4 hash submitted before lab.
+- Completed in-lab activity response sheet.
 

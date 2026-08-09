@@ -29,13 +29,15 @@ Each `lab<N>/` holds `lab-activity.tex`/`.pdf` (the printed in-lab worksheet), `
 | Before lab | Tutorial hash |
 | After lab | In-lab worksheet — counts as one deliverable |
 
+Students do **not** submit `lab-starter.R`. It is working code for use during lab, not a collected deliverable.
+
+Deliverables are due Tuesdays at 10:00 PM, set by the `Lab Deliverable` row in [`instructor_inputs/Lab_schedules.md`](instructor_inputs/Lab_schedules.md). Lab 1 is the exception — the preceding Tuesday falls before Classes Begin, so it is due on the lab day itself.
+
 **Projects** — three deliverables each:
 
 1. Project plan — shared Google Doc (`P1_GroupNumber_Outline`, `P2_GroupNumber_Outline`)
 2. Project slides
 3. Final output — video presentation for Project 1, written writeup for Project 2
-
-> Note: the per-session entries in `lab_summary.md` do not yet match this policy — labs 1–2 list only the worksheet, labs 3–5 list practice **or** a hash. Worth reconciling before the term starts.
 
 ## Tutorials
 

@@ -2,7 +2,6 @@
 # Lab 2: Regression Models
 # MA 214 Applied Statistics
 # ============================================================
-# Submit this R file to Gradescope.
 # Do not use setwd().
 
 library(ggplot2)

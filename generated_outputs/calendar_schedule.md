@@ -49,7 +49,7 @@ This month view is generated from course summaries, `instructor_inputs/important
 <div class="calendar-event__kind">Lab Deliverable</div>
 <h3>Lab 1 Deliverables Due</h3>
 <p class="calendar-event__time">Due 10:00 PM</p>
-<p>Completed `lab-starter.R` with the requested objects and plots. | Completed in-lab activity response sheet.</p>
+<p>Tutorial 1 hash submitted before lab. | Completed in-lab activity response sheet.</p>
 </article>
 <article class="calendar-event calendar-event--office-hours">
 <div class="calendar-event__kind">Office Hours</div>
@@ -115,7 +115,7 @@ This month view is generated from course summaries, `instructor_inputs/important
 <div class="calendar-event__kind">Lab Deliverable</div>
 <h3>Lab 2 Deliverables Due</h3>
 <p class="calendar-event__time">Due 10:00 PM</p>
-<p>Completed `lab-starter.R` with the fitted models and requested autograder objects. | Completed in-lab activity response sheet.</p>
+<p>Tutorial 2 hash submitted before lab. | Completed in-lab activity response sheet.</p>
 </article>
 <article class="calendar-event calendar-event--office-hours">
 <div class="calendar-event__kind">Office Hours</div>
@@ -1010,7 +1010,7 @@ This month view is generated from course summaries, `instructor_inputs/important
 <div class="calendar-event__kind">Lab Deliverable</div>
 <h3>Lab 3 Deliverables Due</h3>
 <p class="calendar-event__time">Due 10:00 PM</p>
-<p>Completed `lab-starter.R` with the required posterior objects. | Completed posterior-probability practice or Tutorial 3 hash, as assigned.</p>
+<p>Tutorial 3 hash submitted before lab. | Completed in-lab activity response sheet.</p>
 </article>
 <article class="calendar-event calendar-event--office-hours">
 <div class="calendar-event__kind">Office Hours</div>
@@ -1098,7 +1098,7 @@ This month view is generated from course summaries, `instructor_inputs/important
 <div class="calendar-event__kind">Lab Deliverable</div>
 <h3>Lab 4 Deliverables Due</h3>
 <p class="calendar-event__time">Due 10:00 PM</p>
-<p>Completed `lab-starter.R` with the requested posterior summaries. | Completed conjugate-model practice or Tutorial 4 hash, as assigned.</p>
+<p>Tutorial 4 hash submitted before lab. | Completed in-lab activity response sheet.</p>
 </article>
 <article class="calendar-event calendar-event--office-hours">
 <div class="calendar-event__kind">Office Hours</div>
@@ -1326,7 +1326,7 @@ This month view is generated from course summaries, `instructor_inputs/important
 <div class="calendar-event__kind">Lab Deliverable</div>
 <h3>Lab 5 Deliverables Due</h3>
 <p class="calendar-event__time">Due 10:00 PM</p>
-<p>Completed `lab-starter.R` with the data, log-posterior, credible interval, and posterior predictive mean objects. | Completed Bayesian-regression practice or Tutorial 5 hash, as assigned.</p>
+<p>Tutorial 5 hash submitted before lab. | Completed in-lab activity response sheet.</p>
 </article>
 <article class="calendar-event calendar-event--office-hours">
 <div class="calendar-event__kind">Office Hours</div>

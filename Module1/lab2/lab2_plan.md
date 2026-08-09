@@ -18,6 +18,6 @@
 - Write a final response naming the chosen model, citing evidence, and interpreting it in context.
 
 **Deliverables**
-- Completed `lab-starter.R` with the fitted models and requested autograder objects.
+- Tutorial 2 hash submitted before lab.
 - Completed in-lab activity response sheet.
 

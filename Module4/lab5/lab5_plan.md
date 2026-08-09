@@ -19,6 +19,6 @@
 - State a posterior predictive claim, cite one posterior summary, and explain the context.
 
 **Deliverables**
-- Completed `lab-starter.R` with the data, log-posterior, credible interval, and posterior predictive mean objects.
-- Completed Bayesian-regression practice or Tutorial 5 hash, as assigned.
+- Tutorial 5 hash submitted before lab.
+- Completed in-lab activity response sheet.
 

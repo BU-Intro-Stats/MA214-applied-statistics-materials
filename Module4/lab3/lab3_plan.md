@@ -17,6 +17,6 @@
 - State a coin-type claim, cite one posterior probability, and explain the context.
 
 **Deliverables**
-- Completed `lab-starter.R` with the required posterior objects.
-- Completed posterior-probability practice or Tutorial 3 hash, as assigned.
+- Tutorial 3 hash submitted before lab.
+- Completed in-lab activity response sheet.
 

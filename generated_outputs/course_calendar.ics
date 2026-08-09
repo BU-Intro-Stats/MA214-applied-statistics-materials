@@ -26,8 +26,8 @@ UID:2026-09-02-3-Lab-1-Deliverables-Due@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20260902T220000
 SUMMARY:Lab 1 Deliverables Due
-DESCRIPTION:Completed `lab-starter.R` with the requested objects and plots.
-  | Completed in-lab activity response sheet.
+DESCRIPTION:Tutorial 1 hash submitted before lab. | Completed in-lab activi
+ ty response sheet.
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-09-02-4-Office-Hour-TF-2@ma214-course-calendar
@@ -89,8 +89,8 @@ UID:2026-09-08-2-Lab-2-Deliverables-Due@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20260908T220000
 SUMMARY:Lab 2 Deliverables Due
-DESCRIPTION:Completed `lab-starter.R` with the fitted models and requested 
- autograder objects. | Completed in-lab activity response sheet.
+DESCRIPTION:Tutorial 2 hash submitted before lab. | Completed in-lab activi
+ ty response sheet.
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-09-08-3-Office-Hour-Course-Instructor@ma214-course-calendar
@@ -934,9 +934,8 @@ UID:2026-11-10-2-Lab-3-Deliverables-Due@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20261110T220000
 SUMMARY:Lab 3 Deliverables Due
-DESCRIPTION:Completed `lab-starter.R` with the required posterior objects. 
- | Completed posterior-probability practice or Tutorial 3 hash\, as assigne
- d.
+DESCRIPTION:Tutorial 3 hash submitted before lab. | Completed in-lab activi
+ ty response sheet.
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-10-3-Office-Hour-Course-Instructor@ma214-course-calendar
@@ -1025,8 +1024,8 @@ UID:2026-11-17-2-Lab-4-Deliverables-Due@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20261117T220000
 SUMMARY:Lab 4 Deliverables Due
-DESCRIPTION:Completed `lab-starter.R` with the requested posterior summarie
- s. | Completed conjugate-model practice or Tutorial 4 hash\, as assigned.
+DESCRIPTION:Tutorial 4 hash submitted before lab. | Completed in-lab activi
+ ty response sheet.
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-17-3-Office-Hour-Course-Instructor@ma214-course-calendar
@@ -1211,9 +1210,8 @@ UID:2026-12-01-2-Lab-5-Deliverables-Due@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20261201T220000
 SUMMARY:Lab 5 Deliverables Due
-DESCRIPTION:Completed `lab-starter.R` with the data\, log-posterior\, credi
- ble interval\, and posterior predictive mean objects. | Completed Bayesian
- -regression practice or Tutorial 5 hash\, as assigned.
+DESCRIPTION:Tutorial 5 hash submitted before lab. | Completed in-lab activi
+ ty response sheet.
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-12-01-3-Office-Hour-Course-Instructor@ma214-course-calendar

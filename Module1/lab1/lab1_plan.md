@@ -18,6 +18,6 @@
 - Write a final claim about the flights data, cite evidence, and explain the context.
 
 **Deliverables**
-- Completed `lab-starter.R` with the requested objects and plots.
+- Tutorial 1 hash submitted before lab.
 - Completed in-lab activity response sheet.
 

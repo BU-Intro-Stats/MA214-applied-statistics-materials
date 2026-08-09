@@ -22,7 +22,7 @@
 - **Post-Lab Activity:**
   - Write a final claim about the flights data, cite evidence, and explain the context.
 - **Deliverables:**
-  - Completed `lab-starter.R` with the requested objects and plots.
+  - Tutorial 1 hash submitted before lab.
   - Completed in-lab activity response sheet.
 
 ---
@@ -48,7 +48,7 @@
 - **Post-Lab Activity:**
   - Write a final response naming the chosen model, citing evidence, and interpreting it in context.
 - **Deliverables:**
-  - Completed `lab-starter.R` with the fitted models and requested autograder objects.
+  - Tutorial 2 hash submitted before lab.
   - Completed in-lab activity response sheet.
 
 ---
@@ -263,8 +263,8 @@
 - **Post-Lab Activity:**
   - State a coin-type claim, cite one posterior probability, and explain the context.
 - **Deliverables:**
-  - Completed `lab-starter.R` with the required posterior objects.
-  - Completed posterior-probability practice or Tutorial 3 hash, as assigned.
+  - Tutorial 3 hash submitted before lab.
+  - Completed in-lab activity response sheet.
 
 ---
 
@@ -287,8 +287,8 @@
 - **Post-Lab Activity:**
   - State an estimate of pi, cite a credible interval, and explain the context.
 - **Deliverables:**
-  - Completed `lab-starter.R` with the requested posterior summaries.
-  - Completed conjugate-model practice or Tutorial 4 hash, as assigned.
+  - Tutorial 4 hash submitted before lab.
+  - Completed in-lab activity response sheet.
 
 ---
 
@@ -313,5 +313,5 @@
 - **Post-Lab Activity:**
   - State a posterior predictive claim, cite one posterior summary, and explain the context.
 - **Deliverables:**
-  - Completed `lab-starter.R` with the data, log-posterior, credible interval, and posterior predictive mean objects.
-  - Completed Bayesian-regression practice or Tutorial 5 hash, as assigned.
+  - Tutorial 5 hash submitted before lab.
+  - Completed in-lab activity response sheet.
