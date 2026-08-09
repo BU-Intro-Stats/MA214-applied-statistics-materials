@@ -77,22 +77,35 @@ DESCRIPTION:Probability models and likelihoods\, Maximum likelihood\, Appli
  ay\, Classes Suspended
 END:VEVENT
 BEGIN:VEVENT
-UID:2026-09-08-2-Lab-1-Deliverables-Due@ma214-course-calendar
+UID:2026-09-08-2-Lab-1-Tutorial-Hash-Due@ma214-course-calendar
+DTSTAMP:20260101T000000Z
+DTSTART;TZID=America/New_York:20260908T220000
+SUMMARY:Lab 1 Tutorial Hash Due
+DESCRIPTION:Tutorial 1 hash.
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-09-08-3-Lab-1-Deliverables-Due@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20260908T220000
 SUMMARY:Lab 1 Deliverables Due
-DESCRIPTION:Tutorial 1 hash (due before lab). | Completed in-lab activity r
- esponse sheet.
+DESCRIPTION:Completed in-lab activity response sheet.
 END:VEVENT
 BEGIN:VEVENT
-UID:2026-09-08-3-Office-Hour-Course-Instructor@ma214-course-calendar
+UID:2026-09-08-4-Lab-2-Tutorial-Hash-Due@ma214-course-calendar
+DTSTAMP:20260101T000000Z
+DTSTART;TZID=America/New_York:20260908T220000
+SUMMARY:Lab 2 Tutorial Hash Due
+DESCRIPTION:Tutorial 2 hash.
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-09-08-5-Office-Hour-Course-Instructor@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20260908T140000
 DTEND;TZID=America/New_York:20260908T160000
 SUMMARY:Office Hour Course Instructor
 END:VEVENT
 BEGIN:VEVENT
-UID:2026-09-08-4-Office-Hour-LA-2@ma214-course-calendar
+UID:2026-09-08-6-Office-Hour-LA-2@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20260908T110000
 DTEND;TZID=America/New_York:20260908T120000
@@ -107,14 +120,21 @@ SUMMARY:Lab 2
 DESCRIPTION:Anchor: Lecture 3
 END:VEVENT
 BEGIN:VEVENT
-UID:2026-09-09-2-Office-Hour-TF-2@ma214-course-calendar
+UID:2026-09-09-2-Lab-2-Deliverables-Due@ma214-course-calendar
+DTSTAMP:20260101T000000Z
+DTSTART;TZID=America/New_York:20260909T220000
+SUMMARY:Lab 2 Deliverables Due
+DESCRIPTION:Completed in-lab activity response sheet.
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-09-09-3-Office-Hour-TF-2@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20260909T093000
 DTEND;TZID=America/New_York:20260909T113000
 SUMMARY:Office Hour TF 2
 END:VEVENT
 BEGIN:VEVENT
-UID:2026-09-09-3-Office-Hour-TF-3@ma214-course-calendar
+UID:2026-09-09-4-Office-Hour-TF-3@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20260909T120000
 DTEND;TZID=America/New_York:20260909T140000
@@ -167,22 +187,14 @@ DESCRIPTION:R² and correlation\, prediction and extrapolation\, categorical
   predictors
 END:VEVENT
 BEGIN:VEVENT
-UID:2026-09-15-2-Lab-2-Deliverables-Due@ma214-course-calendar
-DTSTAMP:20260101T000000Z
-DTSTART;TZID=America/New_York:20260915T220000
-SUMMARY:Lab 2 Deliverables Due
-DESCRIPTION:Tutorial 2 hash (due before lab). | Completed in-lab activity r
- esponse sheet.
-END:VEVENT
-BEGIN:VEVENT
-UID:2026-09-15-3-Office-Hour-Course-Instructor@ma214-course-calendar
+UID:2026-09-15-2-Office-Hour-Course-Instructor@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20260915T140000
 DTEND;TZID=America/New_York:20260915T160000
 SUMMARY:Office Hour Course Instructor
 END:VEVENT
 BEGIN:VEVENT
-UID:2026-09-15-4-Office-Hour-LA-2@ma214-course-calendar
+UID:2026-09-15-3-Office-Hour-LA-2@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20260915T110000
 DTEND;TZID=America/New_York:20260915T120000
@@ -930,14 +942,21 @@ DESCRIPTION:Project 2 writeup\, code\, and required supporting files submit
   of group review.
 END:VEVENT
 BEGIN:VEVENT
-UID:2026-11-10-3-Office-Hour-Course-Instructor@ma214-course-calendar
+UID:2026-11-10-3-Lab-3-Tutorial-Hash-Due@ma214-course-calendar
+DTSTAMP:20260101T000000Z
+DTSTART;TZID=America/New_York:20261110T220000
+SUMMARY:Lab 3 Tutorial Hash Due
+DESCRIPTION:Tutorial 3 hash.
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-11-10-4-Office-Hour-Course-Instructor@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20261110T140000
 DTEND;TZID=America/New_York:20261110T160000
 SUMMARY:Office Hour Course Instructor
 END:VEVENT
 BEGIN:VEVENT
-UID:2026-11-10-4-Office-Hour-LA-2@ma214-course-calendar
+UID:2026-11-10-5-Office-Hour-LA-2@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20261110T110000
 DTEND;TZID=America/New_York:20261110T120000
@@ -952,14 +971,21 @@ SUMMARY:Lab 3
 DESCRIPTION:Anchor: Lecture 17
 END:VEVENT
 BEGIN:VEVENT
-UID:2026-11-11-2-Office-Hour-TF-2@ma214-course-calendar
+UID:2026-11-11-2-Lab-3-Deliverables-Due@ma214-course-calendar
+DTSTAMP:20260101T000000Z
+DTSTART;TZID=America/New_York:20261111T220000
+SUMMARY:Lab 3 Deliverables Due
+DESCRIPTION:Completed in-lab activity response sheet.
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-11-11-3-Office-Hour-TF-2@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20261111T093000
 DTEND;TZID=America/New_York:20261111T113000
 SUMMARY:Office Hour TF 2
 END:VEVENT
 BEGIN:VEVENT
-UID:2026-11-11-3-Office-Hour-TF-3@ma214-course-calendar
+UID:2026-11-11-4-Office-Hour-TF-3@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20261111T120000
 DTEND;TZID=America/New_York:20261111T140000
@@ -1012,12 +1038,11 @@ DESCRIPTION:Grid approximation\, Markov chain Monte Carlo\, trace plots\, b
  urn-in\, step size\, R-hat\, ESS\, and MCSE
 END:VEVENT
 BEGIN:VEVENT
-UID:2026-11-17-2-Lab-3-Deliverables-Due@ma214-course-calendar
+UID:2026-11-17-2-Lab-4-Tutorial-Hash-Due@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20261117T220000
-SUMMARY:Lab 3 Deliverables Due
-DESCRIPTION:Tutorial 3 hash (due before lab). | Completed in-lab activity r
- esponse sheet.
+SUMMARY:Lab 4 Tutorial Hash Due
+DESCRIPTION:Tutorial 4 hash.
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-11-17-3-Office-Hour-Course-Instructor@ma214-course-calendar
@@ -1042,14 +1067,21 @@ SUMMARY:Lab 4
 DESCRIPTION:Anchor: Lecture 18
 END:VEVENT
 BEGIN:VEVENT
-UID:2026-11-18-2-Office-Hour-TF-2@ma214-course-calendar
+UID:2026-11-18-2-Lab-4-Deliverables-Due@ma214-course-calendar
+DTSTAMP:20260101T000000Z
+DTSTART;TZID=America/New_York:20261118T220000
+SUMMARY:Lab 4 Deliverables Due
+DESCRIPTION:Completed in-lab activity response sheet.
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-11-18-3-Office-Hour-TF-2@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20261118T093000
 DTEND;TZID=America/New_York:20261118T113000
 SUMMARY:Office Hour TF 2
 END:VEVENT
 BEGIN:VEVENT
-UID:2026-11-18-3-Office-Hour-TF-3@ma214-course-calendar
+UID:2026-11-18-4-Office-Hour-TF-3@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20261118T120000
 DTEND;TZID=America/New_York:20261118T140000
@@ -1105,22 +1137,14 @@ DESCRIPTION:Priors for regression parameters\, prior predictive checks\, po
  giving Recess
 END:VEVENT
 BEGIN:VEVENT
-UID:2026-11-24-2-Lab-4-Deliverables-Due@ma214-course-calendar
-DTSTAMP:20260101T000000Z
-DTSTART;TZID=America/New_York:20261124T220000
-SUMMARY:Lab 4 Deliverables Due
-DESCRIPTION:Tutorial 4 hash (due before lab). | Completed in-lab activity r
- esponse sheet.
-END:VEVENT
-BEGIN:VEVENT
-UID:2026-11-24-3-Office-Hour-Course-Instructor@ma214-course-calendar
+UID:2026-11-24-2-Office-Hour-Course-Instructor@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20261124T140000
 DTEND;TZID=America/New_York:20261124T160000
 SUMMARY:Office Hour Course Instructor
 END:VEVENT
 BEGIN:VEVENT
-UID:2026-11-24-4-Office-Hour-LA-2@ma214-course-calendar
+UID:2026-11-24-3-Office-Hour-LA-2@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20261124T110000
 DTEND;TZID=America/New_York:20261124T120000
@@ -1206,14 +1230,21 @@ DESCRIPTION:tentative\; Module 4\nNear Thanksgiving Recess | Near Classes R
  z 4
 END:VEVENT
 BEGIN:VEVENT
-UID:2026-12-01-2-Office-Hour-Course-Instructor@ma214-course-calendar
+UID:2026-12-01-2-Lab-5-Tutorial-Hash-Due@ma214-course-calendar
+DTSTAMP:20260101T000000Z
+DTSTART;TZID=America/New_York:20261201T220000
+SUMMARY:Lab 5 Tutorial Hash Due
+DESCRIPTION:Tutorial 5 hash.
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-12-01-3-Office-Hour-Course-Instructor@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20261201T140000
 DTEND;TZID=America/New_York:20261201T160000
 SUMMARY:Office Hour Course Instructor
 END:VEVENT
 BEGIN:VEVENT
-UID:2026-12-01-3-Office-Hour-LA-2@ma214-course-calendar
+UID:2026-12-01-4-Office-Hour-LA-2@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20261201T110000
 DTEND;TZID=America/New_York:20261201T120000
@@ -1228,14 +1259,21 @@ SUMMARY:Lab 5
 DESCRIPTION:Anchor: Lecture 21
 END:VEVENT
 BEGIN:VEVENT
-UID:2026-12-02-2-Office-Hour-TF-2@ma214-course-calendar
+UID:2026-12-02-2-Lab-5-Deliverables-Due@ma214-course-calendar
+DTSTAMP:20260101T000000Z
+DTSTART;TZID=America/New_York:20261202T220000
+SUMMARY:Lab 5 Deliverables Due
+DESCRIPTION:Completed in-lab activity response sheet.
+END:VEVENT
+BEGIN:VEVENT
+UID:2026-12-02-3-Office-Hour-TF-2@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20261202T093000
 DTEND;TZID=America/New_York:20261202T113000
 SUMMARY:Office Hour TF 2
 END:VEVENT
 BEGIN:VEVENT
-UID:2026-12-02-3-Office-Hour-TF-3@ma214-course-calendar
+UID:2026-12-02-4-Office-Hour-TF-3@ma214-course-calendar
 DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20261202T120000
 DTEND;TZID=America/New_York:20261202T140000
@@ -1254,14 +1292,6 @@ DTSTAMP:20260101T000000Z
 DTSTART;TZID=America/New_York:20261203T123000
 SUMMARY:Homework 14
 DESCRIPTION:Weekly written homework.
-END:VEVENT
-BEGIN:VEVENT
-UID:2026-12-08-1-Lab-5-Deliverables-Due@ma214-course-calendar
-DTSTAMP:20260101T000000Z
-DTSTART;TZID=America/New_York:20261208T220000
-SUMMARY:Lab 5 Deliverables Due
-DESCRIPTION:Tutorial 5 hash (due before lab). | Completed in-lab activity r
- esponse sheet.
 END:VEVENT
 BEGIN:VEVENT
 UID:2026-12-10-1-Academic-Calendar@ma214-course-calendar

@@ -18,6 +18,6 @@
 - Write a final response naming the chosen model, citing evidence, and interpreting it in context.
 
 **Deliverables**
-- Tutorial 2 hash (due before lab).
+- Tutorial 2 hash.
 - Completed in-lab activity response sheet.
 

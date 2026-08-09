@@ -18,6 +18,6 @@
 - Write a final claim about the flights data, cite evidence, and explain the context.
 
 **Deliverables**
-- Tutorial 1 hash (due before lab).
+- Tutorial 1 hash.
 - Completed in-lab activity response sheet.
 

@@ -22,7 +22,7 @@
 - **Post-Lab Activity:**
   - Write a final claim about the flights data, cite evidence, and explain the context.
 - **Deliverables:**
-  - Tutorial 1 hash (due before lab).
+  - Tutorial 1 hash.
   - Completed in-lab activity response sheet.
 
 ---
@@ -48,7 +48,7 @@
 - **Post-Lab Activity:**
   - Write a final response naming the chosen model, citing evidence, and interpreting it in context.
 - **Deliverables:**
-  - Tutorial 2 hash (due before lab).
+  - Tutorial 2 hash.
   - Completed in-lab activity response sheet.
 
 ---
@@ -263,7 +263,7 @@
 - **Post-Lab Activity:**
   - State a coin-type claim, cite one posterior probability, and explain the context.
 - **Deliverables:**
-  - Tutorial 3 hash (due before lab).
+  - Tutorial 3 hash.
   - Completed in-lab activity response sheet.
 
 ---
@@ -287,7 +287,7 @@
 - **Post-Lab Activity:**
   - State an estimate of pi, cite a credible interval, and explain the context.
 - **Deliverables:**
-  - Tutorial 4 hash (due before lab).
+  - Tutorial 4 hash.
   - Completed in-lab activity response sheet.
 
 ---
@@ -313,5 +313,5 @@
 - **Post-Lab Activity:**
   - State a posterior predictive claim, cite one posterior summary, and explain the context.
 - **Deliverables:**
-  - Tutorial 5 hash (due before lab).
+  - Tutorial 5 hash.
   - Completed in-lab activity response sheet.

@@ -1,11 +1,17 @@
 <!--
 Instructor notes:
-- Everything about lab and deliverable dates is set in this file. No Python edits needed.
+- Everything about lab and deadline dates is set in this file. No Python edits needed.
 - Weekday and times set the regular pattern for every session.
-- Weeks After sets the gap between a session and its deliverable deadline:
-  1 means the deadline is the following week, 0 means the same week.
-  Labs meet Wednesday and deliverables are due Tuesday, so 0 would put the
-  deadline the day BEFORE the lab. Keep it at 1 unless the weekdays change.
+- Weeks After sets the gap between a session and a deadline:
+    0 = the session's own week, 1 = the following week.
+  Labs meet Wednesday and deadlines fall Tuesday, so 0 lands the day BEFORE
+  the lab and 1 lands six days after it.
+- That is why the deadlines differ: the tutorial hash is due the day before its
+  own lab, the worksheet at the end of the lab day, and project deliverables the
+  Tuesday of the following week.
+- Lab Deliverable covers the five skills labs; Project Deliverable covers the
+  eight project parts. They are separate rows so changing one leaves the other
+  alone.
 - Use Session Overrides below to pin an exact date for one session. Anything left
   blank keeps deriving from the pattern, so only fill in what is wrong.
 - After editing, run: python generate_schedule_table.py
@@ -19,7 +25,9 @@ section schedule is finalized.
 | Event Type | Weekday | Start Time | End Time | Weeks After |
 | --- | --- | --- | --- | --- |
 | Lab / Project | Wednesday |  |  |  |
-| Lab Deliverable | Tuesday |  | 10:00PM | 1 |
+| Tutorial Hash | Tuesday |  | 10:00PM | 0 |
+| Lab Deliverable | Wednesday |  | 10:00PM | 0 |
+| Project Deliverable | Tuesday |  | 10:00PM | 1 |
 
 ## Session Overrides
 
@@ -31,6 +39,10 @@ Session names match the headings in `lab_summary.md`: `Lab 1` through `Lab 5`,
 and `Project1-1` through `Project2-4`. Dates can be written as `2026-09-08`,
 `9/8/2026`, or `9/8`.
 
-| Session | Meets | Deliverable Due |
-| --- | --- | --- |
-|  |  |  |
+Lab 1 is the standing exception: its tutorial cannot be due before the first lab
+of the term, so both its hash and its worksheet are collected a week later and
+can be submitted together.
+
+| Session | Meets | Deliverable Due | Tutorial Due |
+| --- | --- | --- | --- |
+| Lab 1 |  | 2026-09-08 | 2026-09-08 |

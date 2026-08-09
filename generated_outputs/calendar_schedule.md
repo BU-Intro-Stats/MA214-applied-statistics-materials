@@ -107,9 +107,21 @@ This month view is generated from course summaries, `instructor_inputs/important
 </article>
 <article class="calendar-event calendar-event--lab-deliverable">
 <div class="calendar-event__kind">Lab Deliverable</div>
+<h3>Lab 1 Tutorial Hash Due</h3>
+<p class="calendar-event__time">Due 10:00 PM</p>
+<p>Tutorial 1 hash.</p>
+</article>
+<article class="calendar-event calendar-event--lab-deliverable">
+<div class="calendar-event__kind">Lab Deliverable</div>
 <h3>Lab 1 Deliverables Due</h3>
 <p class="calendar-event__time">Due 10:00 PM</p>
-<p>Tutorial 1 hash (due before lab). | Completed in-lab activity response sheet.</p>
+<p>Completed in-lab activity response sheet.</p>
+</article>
+<article class="calendar-event calendar-event--lab-deliverable">
+<div class="calendar-event__kind">Lab Deliverable</div>
+<h3>Lab 2 Tutorial Hash Due</h3>
+<p class="calendar-event__time">Due 10:00 PM</p>
+<p>Tutorial 2 hash.</p>
 </article>
 <article class="calendar-event calendar-event--office-hours">
 <div class="calendar-event__kind">Office Hours</div>
@@ -128,6 +140,12 @@ This month view is generated from course summaries, `instructor_inputs/important
 <div class="calendar-event__kind">Lab</div>
 <h3>Lab 2</h3>
 <p class="calendar-event__meta">Anchor: Lecture 3</p>
+</article>
+<article class="calendar-event calendar-event--lab-deliverable">
+<div class="calendar-event__kind">Lab Deliverable</div>
+<h3>Lab 2 Deliverables Due</h3>
+<p class="calendar-event__time">Due 10:00 PM</p>
+<p>Completed in-lab activity response sheet.</p>
 </article>
 <article class="calendar-event calendar-event--office-hours">
 <div class="calendar-event__kind">Office Hours</div>
@@ -192,12 +210,6 @@ This month view is generated from course summaries, `instructor_inputs/important
 <h3>Lecture 4: Using linear regression</h3>
 <p class="calendar-event__time">12:30 PM-1:45 PM</p>
 <p>R² and correlation, prediction and extrapolation, categorical predictors</p>
-</article>
-<article class="calendar-event calendar-event--lab-deliverable">
-<div class="calendar-event__kind">Lab Deliverable</div>
-<h3>Lab 2 Deliverables Due</h3>
-<p class="calendar-event__time">Due 10:00 PM</p>
-<p>Tutorial 2 hash (due before lab). | Completed in-lab activity response sheet.</p>
 </article>
 <article class="calendar-event calendar-event--office-hours">
 <div class="calendar-event__kind">Office Hours</div>
@@ -1006,6 +1018,12 @@ This month view is generated from course summaries, `instructor_inputs/important
 <p class="calendar-event__time">Due 10:00 PM</p>
 <p>Project 2 writeup, code, and required supporting files submitted through the course platform. | Shared Google Doc link and confirmation of group review.</p>
 </article>
+<article class="calendar-event calendar-event--lab-deliverable">
+<div class="calendar-event__kind">Lab Deliverable</div>
+<h3>Lab 3 Tutorial Hash Due</h3>
+<p class="calendar-event__time">Due 10:00 PM</p>
+<p>Tutorial 3 hash.</p>
+</article>
 <article class="calendar-event calendar-event--office-hours">
 <div class="calendar-event__kind">Office Hours</div>
 <h3>Office Hour Course Instructor</h3>
@@ -1023,6 +1041,12 @@ This month view is generated from course summaries, `instructor_inputs/important
 <div class="calendar-event__kind">Lab</div>
 <h3>Lab 3</h3>
 <p class="calendar-event__meta">Anchor: Lecture 17</p>
+</article>
+<article class="calendar-event calendar-event--lab-deliverable">
+<div class="calendar-event__kind">Lab Deliverable</div>
+<h3>Lab 3 Deliverables Due</h3>
+<p class="calendar-event__time">Due 10:00 PM</p>
+<p>Completed in-lab activity response sheet.</p>
 </article>
 <article class="calendar-event calendar-event--office-hours">
 <div class="calendar-event__kind">Office Hours</div>
@@ -1090,9 +1114,9 @@ This month view is generated from course summaries, `instructor_inputs/important
 </article>
 <article class="calendar-event calendar-event--lab-deliverable">
 <div class="calendar-event__kind">Lab Deliverable</div>
-<h3>Lab 3 Deliverables Due</h3>
+<h3>Lab 4 Tutorial Hash Due</h3>
 <p class="calendar-event__time">Due 10:00 PM</p>
-<p>Tutorial 3 hash (due before lab). | Completed in-lab activity response sheet.</p>
+<p>Tutorial 4 hash.</p>
 </article>
 <article class="calendar-event calendar-event--office-hours">
 <div class="calendar-event__kind">Office Hours</div>
@@ -1111,6 +1135,12 @@ This month view is generated from course summaries, `instructor_inputs/important
 <div class="calendar-event__kind">Lab</div>
 <h3>Lab 4</h3>
 <p class="calendar-event__meta">Anchor: Lecture 18</p>
+</article>
+<article class="calendar-event calendar-event--lab-deliverable">
+<div class="calendar-event__kind">Lab Deliverable</div>
+<h3>Lab 4 Deliverables Due</h3>
+<p class="calendar-event__time">Due 10:00 PM</p>
+<p>Completed in-lab activity response sheet.</p>
 </article>
 <article class="calendar-event calendar-event--office-hours">
 <div class="calendar-event__kind">Office Hours</div>
@@ -1176,12 +1206,6 @@ This month view is generated from course summaries, `instructor_inputs/important
 <p class="calendar-event__time">12:30 PM-1:45 PM</p>
 <p>Priors for regression parameters, prior predictive checks, posterior inference, credible intervals, posterior prediction</p>
 <p class="calendar-event__meta">Near Thanksgiving Recess</p>
-</article>
-<article class="calendar-event calendar-event--lab-deliverable">
-<div class="calendar-event__kind">Lab Deliverable</div>
-<h3>Lab 4 Deliverables Due</h3>
-<p class="calendar-event__time">Due 10:00 PM</p>
-<p>Tutorial 4 hash (due before lab). | Completed in-lab activity response sheet.</p>
 </article>
 <article class="calendar-event calendar-event--office-hours">
 <div class="calendar-event__kind">Office Hours</div>
@@ -1322,6 +1346,12 @@ This month view is generated from course summaries, `instructor_inputs/important
 <p>tentative; Module 4</p>
 <p class="calendar-event__meta">Near Thanksgiving Recess | Near Classes Resume | Missing prerequisite metadata: add learning-objective tags for Quiz 4</p>
 </article>
+<article class="calendar-event calendar-event--lab-deliverable">
+<div class="calendar-event__kind">Lab Deliverable</div>
+<h3>Lab 5 Tutorial Hash Due</h3>
+<p class="calendar-event__time">Due 10:00 PM</p>
+<p>Tutorial 5 hash.</p>
+</article>
 <article class="calendar-event calendar-event--office-hours">
 <div class="calendar-event__kind">Office Hours</div>
 <h3>Office Hour Course Instructor</h3>
@@ -1339,6 +1369,12 @@ This month view is generated from course summaries, `instructor_inputs/important
 <div class="calendar-event__kind">Lab</div>
 <h3>Lab 5</h3>
 <p class="calendar-event__meta">Anchor: Lecture 21</p>
+</article>
+<article class="calendar-event calendar-event--lab-deliverable">
+<div class="calendar-event__kind">Lab Deliverable</div>
+<h3>Lab 5 Deliverables Due</h3>
+<p class="calendar-event__time">Due 10:00 PM</p>
+<p>Completed in-lab activity response sheet.</p>
 </article>
 <article class="calendar-event calendar-event--office-hours">
 <div class="calendar-event__kind">Office Hours</div>
@@ -1383,12 +1419,7 @@ This month view is generated from course summaries, `instructor_inputs/important
 </section>
 <section class="calendar-date">
 <div class="calendar-date__number">8</div>
-<article class="calendar-event calendar-event--lab-deliverable">
-<div class="calendar-event__kind">Lab Deliverable</div>
-<h3>Lab 5 Deliverables Due</h3>
-<p class="calendar-event__time">Due 10:00 PM</p>
-<p>Tutorial 5 hash (due before lab). | Completed in-lab activity response sheet.</p>
-</article>
+<p class="calendar-empty">No events</p>
 </section>
 <section class="calendar-date">
 <div class="calendar-date__number">9</div>

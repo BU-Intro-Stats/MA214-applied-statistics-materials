@@ -17,6 +17,6 @@
 - State a coin-type claim, cite one posterior probability, and explain the context.
 
 **Deliverables**
-- Tutorial 3 hash (due before lab).
+- Tutorial 3 hash.
 - Completed in-lab activity response sheet.
 

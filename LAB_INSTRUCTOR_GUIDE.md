@@ -24,28 +24,33 @@ Each `lab<N>/` holds `lab-activity.tex`/`.pdf` (the printed in-lab worksheet), `
 
 **Skills labs** — two submissions, both graded by completion:
 
-| When | What |
-| --- | --- |
-| Before lab | Tutorial hash |
-| After lab | In-lab worksheet — counts as one deliverable |
+| What | Due | Which is |
+| --- | --- | --- |
+| Tutorial hash | Tuesday 10:00 PM | the day before lab |
+| In-lab worksheet | Wednesday 10:00 PM | the end of the lab day |
 
 Students do **not** submit `lab-starter.R`. It is working code for use during lab, not a collected deliverable.
 
-Both are due together at 10:00 PM on the Tuesday **after** the session — six days later, since labs meet Wednesdays. The hash is still meant to be done before lab; the shared deadline is just when both are collected.
+Lab 1 is the exception. Its tutorial cannot be due before the first lab of the term, so both deliverables are collected the following Tuesday and can be submitted together.
 
 ## Changing dates
 
 All lab and deliverable dates come from [`instructor_inputs/Lab_schedules.md`](instructor_inputs/Lab_schedules.md). Nothing here requires editing Python.
 
-| To change | Edit |
-| --- | --- |
-| The day or time everything meets or is due | `Weekday`, `Start Time`, `End Time` in the Lab Meeting Pattern table |
-| The gap between a session and its deadline | `Weeks After` — `1` means the following week, `0` the same week |
-| One session that lands wrong | Add a row to Session Overrides with an exact date |
+Each deadline has its own row, so changing one does not move the others:
 
-Session Overrides wins over the pattern, and a blank cell keeps deriving automatically, so fill in only what is wrong. Session names match the `lab_summary.md` headings (`Lab 1`, `Project1-1`); `P1-1` also works. Run `python generate_schedule_table.py` after editing.
+| Row | Controls | Currently |
+| --- | --- | --- |
+| `Lab / Project` | when sessions meet | Wednesday |
+| `Tutorial Hash` | the hash deadline | Tuesday, same week — the day before lab |
+| `Lab Deliverable` | worksheets for the 5 skills labs | Wednesday, same week — end of the lab day |
+| `Project Deliverable` | the 8 project parts | Tuesday, following week |
 
-Take care with `Weeks After`: labs meet Wednesday and deliverables are due Tuesday, so `0` would place the deadline the day *before* the lab.
+`Weeks After` is the gap in weeks: `0` is the session's own week, `1` the next. Combined with the weekday, that is what places a deadline before or after the lab — with Wednesday labs, a Tuesday deadline at `0` lands the day before, and at `1` six days after.
+
+To fix a single session, add a row to **Session Overrides** with an exact date. It wins over the pattern, and a blank cell keeps deriving automatically, so fill in only what is wrong. Session names match the `lab_summary.md` headings (`Lab 1`, `Project1-1`); `P1-1` also works.
+
+Run `python generate_schedule_table.py` after editing.
 
 **Projects** — three deliverables each:
 

@@ -19,6 +19,6 @@
 - State a posterior predictive claim, cite one posterior summary, and explain the context.
 
 **Deliverables**
-- Tutorial 5 hash (due before lab).
+- Tutorial 5 hash.
 - Completed in-lab activity response sheet.
 
