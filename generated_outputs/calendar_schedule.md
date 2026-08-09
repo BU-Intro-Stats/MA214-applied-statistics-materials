@@ -45,6 +45,12 @@ This month view is generated from course summaries, `instructor_inputs/important
 <h3>Lab 1</h3>
 <p class="calendar-event__meta">Anchor: Lecture 1</p>
 </article>
+<article class="calendar-event calendar-event--lab-deliverable">
+<div class="calendar-event__kind">Lab Deliverable</div>
+<h3>Lab 1 Deliverables Due</h3>
+<p class="calendar-event__time">Due 10:00 PM</p>
+<p>Completed `lab-starter.R` with the requested objects and plots. | Completed in-lab activity response sheet.</p>
+</article>
 <article class="calendar-event calendar-event--office-hours">
 <div class="calendar-event__kind">Office Hours</div>
 <h3>Office Hour TF 2</h3>
@@ -86,12 +92,7 @@ This month view is generated from course summaries, `instructor_inputs/important
 </section>
 <section class="calendar-date">
 <div class="calendar-date__number">6</div>
-<article class="calendar-event calendar-event--lab-deliverable">
-<div class="calendar-event__kind">Lab Deliverable</div>
-<h3>Lab 1 Deliverables Due</h3>
-<p class="calendar-event__time">Due 10:00 PM</p>
-<p>Completed `lab-starter.R` with the requested objects and plots. | Completed in-lab activity response sheet.</p>
-</article>
+<p class="calendar-empty">No events</p>
 </section>
 <section class="calendar-date">
 <div class="calendar-date__number">7</div>
@@ -109,6 +110,12 @@ This month view is generated from course summaries, `instructor_inputs/important
 <p class="calendar-event__time">12:30 PM-1:45 PM</p>
 <p>Probability models and likelihoods, Maximum likelihood, Applications to estimating a proportion, mean, variance</p>
 <p class="calendar-event__meta">Near Labor Day Holiday, Classes Suspended</p>
+</article>
+<article class="calendar-event calendar-event--lab-deliverable">
+<div class="calendar-event__kind">Lab Deliverable</div>
+<h3>Lab 2 Deliverables Due</h3>
+<p class="calendar-event__time">Due 10:00 PM</p>
+<p>Completed `lab-starter.R` with the fitted models and requested autograder objects. | Completed in-lab activity response sheet.</p>
 </article>
 <article class="calendar-event calendar-event--office-hours">
 <div class="calendar-event__kind">Office Hours</div>
@@ -169,12 +176,7 @@ This month view is generated from course summaries, `instructor_inputs/important
 </section>
 <section class="calendar-date">
 <div class="calendar-date__number">13</div>
-<article class="calendar-event calendar-event--lab-deliverable">
-<div class="calendar-event__kind">Lab Deliverable</div>
-<h3>Lab 2 Deliverables Due</h3>
-<p class="calendar-event__time">Due 10:00 PM</p>
-<p>Completed `lab-starter.R` with the fitted models and requested autograder objects. | Completed in-lab activity response sheet.</p>
-</article>
+<p class="calendar-empty">No events</p>
 </section>
 <section class="calendar-date">
 <div class="calendar-date__number">14</div>
@@ -196,6 +198,12 @@ This month view is generated from course summaries, `instructor_inputs/important
 <h3>Lecture 4: Using linear regression</h3>
 <p class="calendar-event__time">12:30 PM-1:45 PM</p>
 <p>R² and correlation, prediction and extrapolation, categorical predictors</p>
+</article>
+<article class="calendar-event calendar-event--lab-deliverable">
+<div class="calendar-event__kind">Lab Deliverable</div>
+<h3>Project1-1 Deliverables Due</h3>
+<p class="calendar-event__time">Due 10:00 PM</p>
+<p>Completed Project 1 outline submitted through the course platform. | Shared Google Doc containing the title, motivation, questions, data description, limitations, roles, and timeline.</p>
 </article>
 <article class="calendar-event calendar-event--office-hours">
 <div class="calendar-event__kind">Office Hours</div>
@@ -256,12 +264,7 @@ This month view is generated from course summaries, `instructor_inputs/important
 </section>
 <section class="calendar-date">
 <div class="calendar-date__number">20</div>
-<article class="calendar-event calendar-event--lab-deliverable">
-<div class="calendar-event__kind">Lab Deliverable</div>
-<h3>Project1-1 Deliverables Due</h3>
-<p class="calendar-event__time">Due 10:00 PM</p>
-<p>Completed Project 1 outline submitted through the course platform. | Shared Google Doc containing the title, motivation, questions, data description, limitations, roles, and timeline.</p>
-</article>
+<p class="calendar-empty">No events</p>
 </section>
 <section class="calendar-date">
 <div class="calendar-date__number">21</div>
@@ -283,6 +286,12 @@ This month view is generated from course summaries, `instructor_inputs/important
 <h3>Lecture 6: Logistic regression</h3>
 <p class="calendar-event__time">12:30 PM-1:45 PM</p>
 <p>Logistic regression model and parameter interpretation, maximum likelihood estimation, unbalanced data</p>
+</article>
+<article class="calendar-event calendar-event--lab-deliverable">
+<div class="calendar-event__kind">Lab Deliverable</div>
+<h3>Project1-2 Deliverables Due</h3>
+<p class="calendar-event__time">Due 10:00 PM</p>
+<p>Project 1 progress materials submitted through the course platform. | Cleaned-data notes, initial EDA, revised questions, and accessible shared Google Doc link.</p>
 </article>
 <article class="calendar-event calendar-event--office-hours">
 <div class="calendar-event__kind">Office Hours</div>
@@ -343,12 +352,7 @@ This month view is generated from course summaries, `instructor_inputs/important
 </section>
 <section class="calendar-date">
 <div class="calendar-date__number">27</div>
-<article class="calendar-event calendar-event--lab-deliverable">
-<div class="calendar-event__kind">Lab Deliverable</div>
-<h3>Project1-2 Deliverables Due</h3>
-<p class="calendar-event__time">Due 10:00 PM</p>
-<p>Project 1 progress materials submitted through the course platform. | Cleaned-data notes, initial EDA, revised questions, and accessible shared Google Doc link.</p>
-</article>
+<p class="calendar-empty">No events</p>
 </section>
 <section class="calendar-date">
 <div class="calendar-date__number">28</div>
@@ -371,6 +375,12 @@ This month view is generated from course summaries, `instructor_inputs/important
 <p class="calendar-event__time">12:30 PM-1:45 PM</p>
 <p>tentative; Module 1</p>
 <p class="calendar-event__meta">Missing prerequisite metadata: add learning-objective tags for Quiz 1</p>
+</article>
+<article class="calendar-event calendar-event--lab-deliverable">
+<div class="calendar-event__kind">Lab Deliverable</div>
+<h3>Project1-3 Deliverables Due</h3>
+<p class="calendar-event__time">Due 10:00 PM</p>
+<p>Project 1 progress report submitted through the course platform. | Candidate models, diagnostics, justified modeling direction, and accessible shared Google Doc link.</p>
 </article>
 <article class="calendar-event calendar-event--office-hours">
 <div class="calendar-event__kind">Office Hours</div>
@@ -486,12 +496,7 @@ This month view is generated from course summaries, `instructor_inputs/important
 </section>
 <section class="calendar-date">
 <div class="calendar-date__number">4</div>
-<article class="calendar-event calendar-event--lab-deliverable">
-<div class="calendar-event__kind">Lab Deliverable</div>
-<h3>Project1-3 Deliverables Due</h3>
-<p class="calendar-event__time">Due 10:00 PM</p>
-<p>Project 1 progress report submitted through the course platform. | Candidate models, diagnostics, justified modeling direction, and accessible shared Google Doc link.</p>
-</article>
+<p class="calendar-empty">No events</p>
 </section>
 <section class="calendar-date">
 <div class="calendar-date__number">5</div>
@@ -513,6 +518,12 @@ This month view is generated from course summaries, `instructor_inputs/important
 <h3>Lecture 9: Confidence intervals with bootstrapping</h3>
 <p class="calendar-event__time">12:30 PM-1:45 PM</p>
 <p>Confidence interval review, bootstrap distributions, percentile and standard-error intervals</p>
+</article>
+<article class="calendar-event calendar-event--lab-deliverable">
+<div class="calendar-event__kind">Lab Deliverable</div>
+<h3>Project1-4 Deliverables Due</h3>
+<p class="calendar-event__time">Due 10:00 PM</p>
+<p>Project 1 final presentation materials or video submitted through the course platform. | Shared script/document link and reproducible supporting files.</p>
 </article>
 <article class="calendar-event calendar-event--office-hours">
 <div class="calendar-event__kind">Office Hours</div>
@@ -573,12 +584,7 @@ This month view is generated from course summaries, `instructor_inputs/important
 </section>
 <section class="calendar-date">
 <div class="calendar-date__number">11</div>
-<article class="calendar-event calendar-event--lab-deliverable">
-<div class="calendar-event__kind">Lab Deliverable</div>
-<h3>Project1-4 Deliverables Due</h3>
-<p class="calendar-event__time">Due 10:00 PM</p>
-<p>Project 1 final presentation materials or video submitted through the course platform. | Shared script/document link and reproducible supporting files.</p>
-</article>
+<p class="calendar-empty">No events</p>
 </section>
 <section class="calendar-date">
 <div class="calendar-date__number">12</div>
@@ -601,6 +607,12 @@ This month view is generated from course summaries, `instructor_inputs/important
 <p class="calendar-event__time">12:30 PM-1:45 PM</p>
 <p>Two-way tables, expected counts, randomization testing, chi-square testing</p>
 <p class="calendar-event__meta">Near Indigenous People&#x27;s Day Holiday, Classes Suspended | Substitute a Monday schedule of classes</p>
+</article>
+<article class="calendar-event calendar-event--lab-deliverable">
+<div class="calendar-event__kind">Lab Deliverable</div>
+<h3>Project2-1 Deliverables Due</h3>
+<p class="calendar-event__time">Due 10:00 PM</p>
+<p>Completed Project 2 outline submitted through the course platform. | Shared document with study plans, research questions, real-data plan, timeline, roles, and planned outputs.</p>
 </article>
 <article class="calendar-event calendar-event--office-hours">
 <div class="calendar-event__kind">Office Hours</div>
@@ -666,12 +678,7 @@ This month view is generated from course summaries, `instructor_inputs/important
 </section>
 <section class="calendar-date">
 <div class="calendar-date__number">18</div>
-<article class="calendar-event calendar-event--lab-deliverable">
-<div class="calendar-event__kind">Lab Deliverable</div>
-<h3>Project2-1 Deliverables Due</h3>
-<p class="calendar-event__time">Due 10:00 PM</p>
-<p>Completed Project 2 outline submitted through the course platform. | Shared document with study plans, research questions, real-data plan, timeline, roles, and planned outputs.</p>
-</article>
+<p class="calendar-empty">No events</p>
 </section>
 <section class="calendar-date">
 <div class="calendar-date__number">19</div>
@@ -699,6 +706,12 @@ This month view is generated from course summaries, `instructor_inputs/important
 <p class="calendar-event__time">12:30 PM-1:45 PM</p>
 <p>tentative; Module 2</p>
 <p class="calendar-event__meta">Missing prerequisite metadata: add learning-objective tags for Quiz 2</p>
+</article>
+<article class="calendar-event calendar-event--lab-deliverable">
+<div class="calendar-event__kind">Lab Deliverable</div>
+<h3>Project2-2 Deliverables Due</h3>
+<p class="calendar-event__time">Due 10:00 PM</p>
+<p>Project 2 simulation-design materials submitted through the course platform. | Simulation algorithm, planned outputs, shared document link, and reproducible code files.</p>
 </article>
 <article class="calendar-event calendar-event--office-hours">
 <div class="calendar-event__kind">Office Hours</div>
@@ -759,12 +772,7 @@ This month view is generated from course summaries, `instructor_inputs/important
 </section>
 <section class="calendar-date">
 <div class="calendar-date__number">25</div>
-<article class="calendar-event calendar-event--lab-deliverable">
-<div class="calendar-event__kind">Lab Deliverable</div>
-<h3>Project2-2 Deliverables Due</h3>
-<p class="calendar-event__time">Due 10:00 PM</p>
-<p>Project 2 simulation-design materials submitted through the course platform. | Simulation algorithm, planned outputs, shared document link, and reproducible code files.</p>
-</article>
+<p class="calendar-empty">No events</p>
 </section>
 <section class="calendar-date">
 <div class="calendar-date__number">26</div>
@@ -786,6 +794,12 @@ This month view is generated from course summaries, `instructor_inputs/important
 <h3>Lecture 14: Inference for multiple regression</h3>
 <p class="calendar-event__time">12:30 PM-1:45 PM</p>
 <p>Inference using software output, nonlinear and interaction models, transformations, multicollinearity</p>
+</article>
+<article class="calendar-event calendar-event--lab-deliverable">
+<div class="calendar-event__kind">Lab Deliverable</div>
+<h3>Project2-3 Deliverables Due</h3>
+<p class="calendar-event__time">Due 10:00 PM</p>
+<p>Project 2 progress report submitted through the course platform. | Real-data analysis, diagnostics, shared document link, and reproducible code files.</p>
 </article>
 <article class="calendar-event calendar-event--office-hours">
 <div class="calendar-event__kind">Office Hours</div>
@@ -880,12 +894,7 @@ This month view is generated from course summaries, `instructor_inputs/important
 <div class="calendar-weekday">Sat</div>
 <section class="calendar-date">
 <div class="calendar-date__number">1</div>
-<article class="calendar-event calendar-event--lab-deliverable">
-<div class="calendar-event__kind">Lab Deliverable</div>
-<h3>Project2-3 Deliverables Due</h3>
-<p class="calendar-event__time">Due 10:00 PM</p>
-<p>Project 2 progress report submitted through the course platform. | Real-data analysis, diagnostics, shared document link, and reproducible code files.</p>
-</article>
+<p class="calendar-empty">No events</p>
 </section>
 <section class="calendar-date">
 <div class="calendar-date__number">2</div>
@@ -907,6 +916,12 @@ This month view is generated from course summaries, `instructor_inputs/important
 <h3>Lecture 16: Logistic regression inference</h3>
 <p class="calendar-event__time">12:30 PM-1:45 PM</p>
 <p>Software output, coefficient and prediction intervals, diagnostics, prediction and cross-validation</p>
+</article>
+<article class="calendar-event calendar-event--lab-deliverable">
+<div class="calendar-event__kind">Lab Deliverable</div>
+<h3>Project2-4 Deliverables Due</h3>
+<p class="calendar-event__time">Due 10:00 PM</p>
+<p>Project 2 writeup, code, and required supporting files submitted through the course platform. | Shared Google Doc link and confirmation of group review.</p>
 </article>
 <article class="calendar-event calendar-event--office-hours">
 <div class="calendar-event__kind">Office Hours</div>
@@ -968,12 +983,7 @@ This month view is generated from course summaries, `instructor_inputs/important
 </section>
 <section class="calendar-date">
 <div class="calendar-date__number">8</div>
-<article class="calendar-event calendar-event--lab-deliverable">
-<div class="calendar-event__kind">Lab Deliverable</div>
-<h3>Project2-4 Deliverables Due</h3>
-<p class="calendar-event__time">Due 10:00 PM</p>
-<p>Project 2 writeup, code, and required supporting files submitted through the course platform. | Shared Google Doc link and confirmation of group review.</p>
-</article>
+<p class="calendar-empty">No events</p>
 </section>
 <section class="calendar-date">
 <div class="calendar-date__number">9</div>
@@ -995,6 +1005,12 @@ This month view is generated from course summaries, `instructor_inputs/important
 <h3>Lecture 17: Review of Bayesian statistics</h3>
 <p class="calendar-event__time">12:30 PM-1:45 PM</p>
 <p>Conditional probability and Bayes&#x27; rule, prior distributions, sequential updating, Bayesian and frequentist comparisons</p>
+</article>
+<article class="calendar-event calendar-event--lab-deliverable">
+<div class="calendar-event__kind">Lab Deliverable</div>
+<h3>Lab 3 Deliverables Due</h3>
+<p class="calendar-event__time">Due 10:00 PM</p>
+<p>Completed `lab-starter.R` with the required posterior objects. | Completed posterior-probability practice or Tutorial 3 hash, as assigned.</p>
 </article>
 <article class="calendar-event calendar-event--office-hours">
 <div class="calendar-event__kind">Office Hours</div>
@@ -1055,12 +1071,7 @@ This month view is generated from course summaries, `instructor_inputs/important
 </section>
 <section class="calendar-date">
 <div class="calendar-date__number">15</div>
-<article class="calendar-event calendar-event--lab-deliverable">
-<div class="calendar-event__kind">Lab Deliverable</div>
-<h3>Lab 3 Deliverables Due</h3>
-<p class="calendar-event__time">Due 10:00 PM</p>
-<p>Completed `lab-starter.R` with the required posterior objects. | Completed posterior-probability practice or Tutorial 3 hash, as assigned.</p>
-</article>
+<p class="calendar-empty">No events</p>
 </section>
 <section class="calendar-date">
 <div class="calendar-date__number">16</div>
@@ -1082,6 +1093,12 @@ This month view is generated from course summaries, `instructor_inputs/important
 <h3>Lecture 19: Posterior approximation</h3>
 <p class="calendar-event__time">12:30 PM-1:45 PM</p>
 <p>Grid approximation, Markov chain Monte Carlo, trace plots, burn-in, step size, R-hat, ESS, and MCSE</p>
+</article>
+<article class="calendar-event calendar-event--lab-deliverable">
+<div class="calendar-event__kind">Lab Deliverable</div>
+<h3>Lab 4 Deliverables Due</h3>
+<p class="calendar-event__time">Due 10:00 PM</p>
+<p>Completed `lab-starter.R` with the requested posterior summaries. | Completed conjugate-model practice or Tutorial 4 hash, as assigned.</p>
 </article>
 <article class="calendar-event calendar-event--office-hours">
 <div class="calendar-event__kind">Office Hours</div>
@@ -1142,12 +1159,7 @@ This month view is generated from course summaries, `instructor_inputs/important
 </section>
 <section class="calendar-date">
 <div class="calendar-date__number">22</div>
-<article class="calendar-event calendar-event--lab-deliverable">
-<div class="calendar-event__kind">Lab Deliverable</div>
-<h3>Lab 4 Deliverables Due</h3>
-<p class="calendar-event__time">Due 10:00 PM</p>
-<p>Completed `lab-starter.R` with the requested posterior summaries. | Completed conjugate-model practice or Tutorial 4 hash, as assigned.</p>
-</article>
+<p class="calendar-empty">No events</p>
 </section>
 <section class="calendar-date">
 <div class="calendar-date__number">23</div>
@@ -1310,6 +1322,12 @@ This month view is generated from course summaries, `instructor_inputs/important
 <p>tentative; Module 4</p>
 <p class="calendar-event__meta">Near Thanksgiving Recess | Near Classes Resume | Missing prerequisite metadata: add learning-objective tags for Quiz 4</p>
 </article>
+<article class="calendar-event calendar-event--lab-deliverable">
+<div class="calendar-event__kind">Lab Deliverable</div>
+<h3>Lab 5 Deliverables Due</h3>
+<p class="calendar-event__time">Due 10:00 PM</p>
+<p>Completed `lab-starter.R` with the data, log-posterior, credible interval, and posterior predictive mean objects. | Completed Bayesian-regression practice or Tutorial 5 hash, as assigned.</p>
+</article>
 <article class="calendar-event calendar-event--office-hours">
 <div class="calendar-event__kind">Office Hours</div>
 <h3>Office Hour Course Instructor</h3>
@@ -1363,12 +1381,7 @@ This month view is generated from course summaries, `instructor_inputs/important
 </section>
 <section class="calendar-date">
 <div class="calendar-date__number">6</div>
-<article class="calendar-event calendar-event--lab-deliverable">
-<div class="calendar-event__kind">Lab Deliverable</div>
-<h3>Lab 5 Deliverables Due</h3>
-<p class="calendar-event__time">Due 10:00 PM</p>
-<p>Completed `lab-starter.R` with the data, log-posterior, credible interval, and posterior predictive mean objects. | Completed Bayesian-regression practice or Tutorial 5 hash, as assigned.</p>
-</article>
+<p class="calendar-empty">No events</p>
 </section>
 <section class="calendar-date">
 <div class="calendar-date__number">7</div>
