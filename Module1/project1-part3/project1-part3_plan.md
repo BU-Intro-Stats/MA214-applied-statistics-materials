@@ -8,7 +8,7 @@
 
 **In-lab activity**
 - Fit linear, multiple regression, or logistic regression models as appropriate.
-- Compare fit, prediction, and interpretability using adjusted $R^2$, AIC, residual behavior, and other relevant evidence.
+- Compare fit, prediction, and interpretability using adjusted R-squared, AIC, residual behavior, and other relevant evidence.
 - Check residuals, influential observations, transformations, and classification summaries as appropriate.
 - Translate key coefficients or predictions into language connected to the research question.
 - Select a justified modeling direction and document remaining concerns.

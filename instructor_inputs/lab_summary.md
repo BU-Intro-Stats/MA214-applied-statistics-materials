@@ -5,6 +5,7 @@
 ### Lab 1: Working with R and Data
 
 - **Week:** 1
+- **Materials:** `flights.csv`, `lab-starter.R`
 - **Lecture Anchor:** Lecture 1
 - **Purpose:** Establish the R workflow used throughout the course and review basic data exploration with flights data.
 - **Primary Objectives:**
@@ -30,6 +31,7 @@
 ### Lab 2: Regression Models
 
 - **Week:** 2
+- **Materials:** `mtcars.csv`, `lab2_data.csv`, `lab2_data2.csv`, `lab-starter.R`
 - **Lecture Anchor:** Lecture 3
 - **Purpose:** Connect regression computation in R to the Module 1 modeling lectures.
 - **Primary Objectives:**
@@ -56,6 +58,7 @@
 ### Project1-1: Project 1 Launch and Outline
 
 - **Week:** 3
+- **Materials:** Project 1 overview, rubric, and shared Google Doc `P1_GroupNumber_Outline`
 - **Lecture Anchor:** Lecture 4
 - **Purpose:** Launch the statistical analysis and model-application project.
 - **Primary Objectives:**
@@ -64,7 +67,7 @@
 - **Pre-Lab Activity:**
   - Review the Project 1 overview, rubric, required sections, and final submission format.
 - **In-Lab Activity:**
-  - Create and share one group Google Doc named `P1_GroupNumber_Outline`.
+  - Create and share one group Google Doc named `P1_GroupNumber_Outline` with all four members and the instructor/TA.
   - Add names and BUIDs and assign project, data, analysis, and editor/scheduler roles.
   - Select a data set and record its source and access information.
   - Draft and prioritize research questions, objectives, or hypotheses.
@@ -81,6 +84,7 @@
 ### Project1-2: Project 1 Data Cleaning and EDA
 
 - **Week:** 4
+- **Materials:** Project 1 data, shared Google Doc, and shared analysis files
 - **Lecture Anchor:** Lecture 5
 - **Purpose:** Build a clean and interpretable foundation for the project analysis.
 - **Primary Objectives:**
@@ -105,6 +109,7 @@
 ### Project1-3: Project 1 Modeling and Diagnostics
 
 - **Week:** 5
+- **Materials:** Cleaned Project 1 data, shared Google Doc, and shared analysis files
 - **Lecture Anchor:** Lecture 7
 - **Purpose:** Select and diagnose a final modeling strategy.
 - **Primary Objectives:**
@@ -126,9 +131,10 @@
 
 ---
 
-### Project1-4: Project 1 Presentation Work Session
+### Project1-4: Project 1 Presentation and Final Work Session
 
 - **Week:** 6
+- **Materials:** Final Project 1 analysis, slides, code, data, figures, and shared script
 - **Lecture Anchor:** Lecture 8
 - **Purpose:** Prepare a clear, reproducible presentation of the Project 1 analysis.
 - **Primary Objectives:**
@@ -151,6 +157,7 @@
 ### Project2-1: Bootstrapping and Study Selection
 
 - **Week:** 7
+- **Materials:** Project 2 overview, rubric, bootstrap examples, and shared Google Doc `P2_GroupNumber_Outline`
 - **Lecture Anchor:** Lecture 9
 - **Purpose:** Launch the project on the reliability of linear regression inference.
 - **Primary Objectives:**
@@ -159,7 +166,7 @@
 - **Pre-Lab Activity:**
   - Review the Project 2 overview and rubric and identify the required simulation and real-data components.
 - **In-Lab Activity:**
-  - Create and share one group Google Doc named `P2_GroupNumber_Outline` and assign group roles.
+  - Create and share one group Google Doc named `P2_GroupNumber_Outline` and assign project, simulation, real-data, and editor roles.
   - Implement or review a bootstrap confidence interval for a regression quantity.
   - Select two studies (A-D), explain their assumption violations, and justify the comparison.
   - Select a real data set, response Y, predictor X, source, and expected violations.
@@ -176,6 +183,7 @@
 ### Project2-2: Simulation Design
 
 - **Week:** 8
+- **Materials:** Project 2 plan, shared Google Doc, and simulation analysis folder
 - **Lecture Anchor:** Lecture 10
 - **Purpose:** Design simulation studies that compare classical and bootstrap inference.
 - **Primary Objectives:**
@@ -200,6 +208,7 @@
 ### Project2-3: Real Data Analysis
 
 - **Week:** 9
+- **Materials:** Project 2 real data, simulation results, shared Google Doc, and analysis files
 - **Lecture Anchor:** Lecture 13
 - **Purpose:** Connect simulation results to a real regression analysis.
 - **Primary Objectives:**
@@ -224,6 +233,7 @@
 ### Project2-4: Final Work Session
 
 - **Week:** 10
+- **Materials:** Simulation results, real-data analysis, report, code, data, tables, and figures
 - **Lecture Anchor:** Lecture 15
 - **Purpose:** Complete the simulation results, real-data analysis, interpretation, and written report.
 - **Primary Objectives:**
@@ -247,6 +257,7 @@
 ### Lab 3: Bayes' Rule
 
 - **Week:** 11
+- **Materials:** `coin_data_in_lab/`, `lab3_post_data.csv`, `lab-starter.R`
 - **Lecture Anchor:** Lecture 17
 - **Purpose:** Practice Bayesian updating in a discrete coin-flip setting.
 - **Primary Objectives:**
@@ -271,6 +282,7 @@
 ### Lab 4: Beta-Binomial Conjugate Models
 
 - **Week:** 12
+- **Materials:** `Lab4_data/`, `lab4_post_data.csv`, `lab-starter.R`
 - **Lecture Anchor:** Lecture 18
 - **Purpose:** Interpret prior, likelihood, and posterior relationships in a conjugate model.
 - **Primary Objectives:**
@@ -295,6 +307,7 @@
 ### Lab 5: Bayesian Linear Regression
 
 - **Week:** 14
+- **Materials:** `Coffee_df.csv`, `lab-starter.R`
 - **Lecture Anchor:** Lecture 21
 - **Purpose:** Connect priors, posterior inference, and prediction in a regression model.
 - **Primary Objectives:**

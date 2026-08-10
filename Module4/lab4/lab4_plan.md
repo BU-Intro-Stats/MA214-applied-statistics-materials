@@ -15,7 +15,7 @@
 - Optionally plot the posterior density with its mean and interval.
 
 **Post-lab activity**
-- State an estimate of $π$, cite a credible interval, and explain the context.
+- State an estimate of pi, cite a credible interval, and explain the context.
 
 **Deliverables**
 - Tutorial 4 hash.

@@ -7,7 +7,7 @@
 - Review the Project 1 overview, rubric, required sections, and final submission format.
 
 **In-lab activity**
-- Create and share one group Google Doc with all four members and the instructor/TA.
+- Create and share one group Google Doc named `P1_GroupNumber_Outline` with all four members and the instructor/TA.
 - Add names and BUIDs and assign project, data, analysis, and editor/scheduler roles.
 - Select a data set and record its source and access information.
 - Draft and prioritize research questions, objectives, or hypotheses.

@@ -10,7 +10,7 @@
 - Import `mtcars.csv` and inspect the response and candidate predictors.
 - Plot `mpg` against `wt` and compute their correlation.
 - Predict the sign of the slope, then fit `mpg ~ wt`.
-- Fit `mpg ~ hp` and `mpg ~ qsec` and compare the three models using summaries and $R^2$.
+- Fit `mpg ~ hp` and `mpg ~ qsec` and compare the three models using summaries and R-squared.
 - Interpret the strongest simple model and identify a limitation or caution.
 - Optionally fit `mpg ~ wt + hp` and compare it with the best simple model.
 

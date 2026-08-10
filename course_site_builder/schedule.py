@@ -1102,6 +1102,7 @@ def split_combined_lab_titles(title: str):
 
 LAB_FIELD_ALIASES = {
     "week": "week",
+    "materials": "materials",
     "lecture anchor": "lecture_anchor",
     "purpose": "purpose",
     "primary objectives": "objectives",
