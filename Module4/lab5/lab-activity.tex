@@ -1,0 +1,185 @@
+\documentclass{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{xcolor}
+\usepackage{parskip}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{listings}
+
+\definecolor{codegray}{gray}{0.97}
+\definecolor{huddleblue}{RGB}{214,234,255}
+\definecolor{predictionyellow}{RGB}{255,242,200}
+\definecolor{debatepink}{RGB}{255,225,225}
+
+\lstset{basicstyle=\ttfamily\small,columns=fullflexible,frame=single,framerule=0.4pt,backgroundcolor=\color{codegray},breaklines=true,showstringspaces=false,keepspaces=true}
+\newcommand{\coursenumber}{MA 214}
+\newcommand{\nameblank}{\rule{1.75in}{0.4pt}}
+\newcommand{\idblank}{\rule{1.55in}{0.4pt}}
+\newcommand{\shortblank}{\rule{1.6in}{0.4pt}}
+\newcommand{\longblank}{\rule{0.93\linewidth}{0.4pt}}
+\newcommand{\responsebox}[2]{\noindent\fbox{\begin{minipage}{0.95\linewidth}\textbf{#1} #2\vspace{0.55in}\end{minipage}}}
+\newcommand{\linedbox}[1]{\noindent\fbox{\begin{minipage}{0.95\linewidth}#1\vspace{0.18in}\par\longblank\par\vspace{0.18in}\longblank\par\vspace{0.18in}\longblank\end{minipage}}}
+\newcommand{\callout}[3]{\noindent\colorbox{#1}{\makebox[\dimexpr0.95\linewidth-2\fboxsep\relax][l]{\textbf{#2}}}\par\noindent\fbox{\begin{minipage}{0.93\linewidth}#3\end{minipage}}}
+
+\begin{document}
+
+\begin{center}
+  {\LARGE \coursenumber{} Week 14: Lab 5}\\
+  {\large Bayesian Linear Regression}
+\end{center}
+
+\begin{enumerate}[label=\arabic*.,leftmargin=*,itemsep=.7em]
+  \item \textbf{Your name:} \nameblank \hfill \textbf{BU ID:} \idblank
+  \item \textbf{Partner's name:} \nameblank \hfill \textbf{BU ID:} \idblank
+\end{enumerate}
+
+\textbf{Big idea:} Bayesian linear regression combines a regression likelihood with prior distributions, then uses posterior draws to describe uncertainty and make predictions.
+\textbf{Do not use GenAI tools for this lab.} The point is to practice your own analysis work, coding skills, and statistical reasoning.
+
+\textbf{Files used:} \texttt{Coffee\_df.csv} and \texttt{lab-starter.R}
+
+\textbf{Skills practiced:} log-posterior functions, \texttt{dnorm()}, \texttt{dlnorm()}, Metropolis-Hastings output, credible intervals, and posterior prediction.
+
+\textbf{Your mission:} Use Bayesian linear regression to estimate how daily coffee-shop revenue changes with the number of customers and predict revenue for a new day.
+
+\section*{Icebreaker}
+
+Before opening R: introduce yourself to your partner and answer the warm-up question below.
+
+\responsebox{Warm-up response:}{If a coffee shop gets one more customer, what do you expect to happen to daily revenue? What could make that relationship noisy?}
+
+\section*{Getting Started}
+
+Open \texttt{lab-starter.R}. Load the coffee data and make a first plot of revenue versus customers.
+
+\begin{lstlisting}
+library(dplyr)
+library(ggplot2)
+library(readr)
+
+df <- read.csv("Coffee_df.csv")
+
+head(df)
+str(df)
+
+ggplot(df, aes(x = customers, y = revenue)) +
+  geom_point()
+\end{lstlisting}
+
+\callout{huddleblue}{HUDDLE UP}{Before calculating anything, does the relationship look roughly linear? What would the slope mean in dollars?}
+
+\newpage
+
+\section*{Question 1. Explore the Coffee Data}
+
+Identify the response, predictor, and model parameters before writing the log-posterior.
+
+\begin{lstlisting}
+x <- df$customers
+y <- df$revenue
+\end{lstlisting}
+
+\begin{center}
+\renewcommand{\arraystretch}{2.3}
+\begin{tabular}{|p{0.24\linewidth}|p{0.27\linewidth}|p{0.36\linewidth}|}
+\hline
+\textbf{Variable or parameter} & \textbf{Type or role} & \textbf{What it means} \\
+\hline
+\texttt{revenue} & & \\
+\hline
+\texttt{customers} & & \\
+\hline
+\texttt{beta1} & & \\
+\hline
+\end{tabular}
+\end{center}
+
+\linedbox{\textbf{Write 2-3 sentences describing the relationship before fitting the Bayesian model.}}
+
+\section*{Question 2. Make a Prediction}
+
+Before running MCMC, predict whether the posterior for \texttt{beta1} will be centered near 0, positive, or negative.
+
+\callout{predictionyellow}{PREDICTION TIME}{Use the scatter plot and the prior $\beta_1 \sim N(2,0.5^2)$ to predict what the posterior slope will look like.}
+
+\begin{lstlisting}
+log_posterior <- function(beta0, beta1, sigma2) {
+  if (sigma2 <= 0) return(-Inf)
+
+  mu <- beta0 + beta1 * x
+  log_lik <- sum(dnorm(y, mean = mu, sd = sqrt(sigma2), log = TRUE))
+
+  log_p_beta0 <- dnorm(beta0, mean = 5, sd = 2, log = TRUE)
+  log_p_beta1 <- dnorm(beta1, mean = 2, sd = 0.5, log = TRUE)
+  log_p_sigma2 <- dlnorm(sigma2, meanlog = 0, sdlog = 0.3, log = TRUE)
+
+  log_lik + log_p_beta0 + log_p_beta1 + log_p_sigma2
+}
+\end{lstlisting}
+
+\newpage
+
+\linedbox{\textbf{What did your team predict? What evidence did you check first?}}
+
+\section*{Question 3. Compute Posterior Summaries}
+
+Run the provided Metropolis-Hastings code in \texttt{lab-starter.R}. Then summarize the post-burn-in draws.
+
+\begin{lstlisting}
+post_b0 <- beta0_chain[(burn + 1):n_iter]
+post_b1 <- beta1_chain[(burn + 1):n_iter]
+post_s2 <- sigma2_chain[(burn + 1):n_iter]
+
+beta1_CI <- quantile(post_b1, c(0.025, 0.975))
+beta1_CI
+\end{lstlisting}
+
+\callout{huddleblue}{HUDDLE UP}{Does the credible interval for \texttt{beta1} support a positive customer-revenue relationship? What does the interval mean in context?}
+
+\callout{huddleblue}{CLAIM, EVIDENCE, CONTEXT}{%
+The posterior slope suggests \shortblank.\\[.6em]
+My evidence is \shortblank.\\[.6em]
+This matters because \shortblank.
+}
+
+\section*{Question 4. Interpret in Context}
+
+Use the posterior samples to predict revenue for a new day with $x^*=3$ customers.
+
+\begin{center}
+\renewcommand{\arraystretch}{2.25}
+\begin{tabular}{|p{0.42\linewidth}|p{0.50\linewidth}|}
+\hline
+\textbf{Question} & \textbf{Your answer} \\
+\hline
+What comparison did you make? & \\
+\hline
+What result is strongest? & \\
+\hline
+What limitation or caution should readers know? & \\
+\hline
+\end{tabular}
+\end{center}
+
+\newpage
+
+\callout{debatepink}{DEBATE CORNER}{If you and your partner disagree about the prediction, write both arguments first. Then decide what claim the posterior predictive evidence supports.}
+
+\section*{Question 5. Close the Lab}
+
+Submit your completed \texttt{lab-starter.R}. Your file should define the required data, log-posterior, credible interval, and posterior predictive mean objects.
+
+\linedbox{\textbf{Final response:} state your posterior predictive claim, cite one posterior summary, and explain the context.}
+
+\section*{Optional Challenge}
+
+Compare posterior predictive draws with and without the extra observation-noise term.
+
+\begin{lstlisting}
+# Optional challenge starter code.
+y_mean_only <- post_b0[idx] + post_b1[idx] * x_star
+y_with_noise <- y_mean_only + rnorm(n_samp, 0, sqrt(post_s2[idx]))
+\end{lstlisting}
+
+\end{document}

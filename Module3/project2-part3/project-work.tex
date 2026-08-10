@@ -1,0 +1,66 @@
+\documentclass{article}
+\usepackage[margin=1.25in]{geometry}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{enumitem}
+
+\newcommand{\coursename}{MA 214: Applied Statistics}
+\newcommand{\termname}{Fall 2026}
+\newcommand{\activitydate}{Week 9}
+\newcommand{\projecttitle}{Project 2 Real Data Analysis}
+\newcommand{\submissionplatform}{Gradescope or Blackboard}
+\newcommand{\duedate}{Tuesday, November 3 at 10:00 PM}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\coursename{} (\termname{})}
+\rhead{\activitydate{}}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{.4mm}
+\newcommand{\blankline}{\underline{\phantom{XXXXXXXXXXXXXXXXXXXXXXXX}}}
+\newcommand{\blankid}{\underline{\phantom{XXXXXXXXXXXXXXX}}}
+
+\begin{document}
+\noindent\textbf{Group:}\blankline{}\hfill\textbf{Section:}\blankid{}
+
+\medskip
+\noindent\textbf{Member 1:}\blankline{}\hfill\textbf{BUID:}\blankid{}
+
+\medskip
+\noindent\textbf{Member 2:}\blankline{}\hfill\textbf{BUID:}\blankid{}
+
+\medskip
+\noindent\textbf{Member 3:}\blankline{}\hfill\textbf{BUID:}\blankid{}
+
+\medskip
+\noindent\textbf{Member 4:}\blankline{}\hfill\textbf{BUID:}\blankid{}
+
+\begin{center}
+  {\Large \textbf{\projecttitle{}}}
+\end{center}
+
+\subsection*{Purpose}
+Today you will apply the Project 2 inference comparison to a real data set and connect real-data diagnostics to the simulation study.
+
+\subsection*{Shared Group Workflow}
+Work in one shared Google Doc and one shared analysis folder. Assign the four roles below, then have every member review the real-data analysis and its connection to the simulations.
+\begin{itemize}[itemsep=.25em]
+  \item \textbf{Member 1 -- Data lead:} import, inspect, and document the data and variables.
+  \item \textbf{Member 2 -- OLS lead:} fit the planned model and interpret the target coefficient or prediction.
+  \item \textbf{Member 3 -- Bootstrap lead:} compute bootstrap intervals and compare them with classical intervals.
+  \item \textbf{Member 4 -- Diagnostics editor:} connect assumptions, diagnostics, and conclusions in the shared report.
+\end{itemize}
+
+\subsection*{In-Class Work}
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.5em]
+  \item \textbf{Load and explore.} Import the real data set and inspect the response, predictors, missing values, and variable types.
+  \item \textbf{Fit OLS.} Fit the planned regression model and interpret the main coefficient or prediction target.
+  \item \textbf{Classical versus bootstrap.} Compare classical and bootstrap intervals for the target quantity.
+  \item \textbf{Diagnostics.} Check residual patterns and connect them to assumptions from the simulation design.
+  \item \textbf{Check-in.} Do the real-data diagnostics resemble one of your simulation scenarios?
+\end{enumerate}
+
+\subsection*{Deliverable}
+Submit the Project 2 progress report through \submissionplatform{} by \duedate{}. Include the real-data analysis, diagnostics, shared Google Doc link, and reproducible code files.
+
+\end{document}

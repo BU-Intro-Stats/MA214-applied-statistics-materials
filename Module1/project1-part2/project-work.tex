@@ -1,0 +1,66 @@
+\documentclass{article}
+\usepackage[margin=1.25in]{geometry}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{enumitem}
+
+\newcommand{\coursename}{MA 214: Applied Statistics}
+\newcommand{\termname}{Fall 2026}
+\newcommand{\activitydate}{Week 4}
+\newcommand{\projecttitle}{Project 1 Data Cleaning and EDA}
+\newcommand{\submissionplatform}{Gradescope or Blackboard}
+\newcommand{\duedate}{Tuesday, September 29 at 10:00 PM}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\coursename{} (\termname{})}
+\rhead{\activitydate{}}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{.4mm}
+\newcommand{\blankline}{\underline{\phantom{XXXXXXXXXXXXXXXXXXXXXXXX}}}
+\newcommand{\blankid}{\underline{\phantom{XXXXXXXXXXXXXXX}}}
+
+\begin{document}
+\noindent\textbf{Group:}\blankline{}\hfill\textbf{Section:}\blankid{}
+
+\medskip
+\noindent\textbf{Member 1:}\blankline{}\hfill\textbf{BUID:}\blankid{}
+
+\medskip
+\noindent\textbf{Member 2:}\blankline{}\hfill\textbf{BUID:}\blankid{}
+
+\medskip
+\noindent\textbf{Member 3:}\blankline{}\hfill\textbf{BUID:}\blankid{}
+
+\medskip
+\noindent\textbf{Member 4:}\blankline{}\hfill\textbf{BUID:}\blankid{}
+
+\begin{center}
+  {\Large \textbf{\projecttitle{}}}
+\end{center}
+
+\subsection*{Purpose}
+Today you will turn the Project 1 outline into an analysis-ready data workflow. The focus is importing, inspecting, cleaning, transforming, and summarizing your project data.
+
+\subsection*{Shared Group Workflow}
+Create or open one shared Google Doc for the group. Assign the four roles below, but have every member review and contribute to the same document and analysis files.
+\begin{itemize}[itemsep=.25em]
+  \item \textbf{Member 1 -- Data manager:} import the data and document its structure and provenance.
+  \item \textbf{Member 2 -- Cleaning lead:} record missing-value, recoding, and transformation decisions.
+  \item \textbf{Member 3 -- EDA lead:} produce summaries and exploratory plots linked to the research question.
+  \item \textbf{Member 4 -- Integration editor:} combine the work, check reproducibility, and update the shared outline.
+\end{itemize}
+
+\subsection*{In-Class Work}
+\begin{enumerate}[label={\bfseries (\Alph*)},itemsep=.5em]
+  \item \textbf{Import and inspect.} Load the project data and check dimensions, variable types, missing values, and unusual entries.
+  \item \textbf{Clean and transform.} Rename variables, recode categories, create useful derived variables, and document all decisions.
+  \item \textbf{Exploratory summaries.} Summarize the response variable and the main candidate predictors.
+  \item \textbf{Exploratory plots.} Make plots that connect predictors to the response and reveal possible model assumptions.
+  \item \textbf{Check-in.} What cleaning decision matters most for your analysis, and why?
+\end{enumerate}
+
+\subsection*{Deliverable}
+Submit the Project 1 progress materials through \submissionplatform{} by \duedate{}. Include cleaned-data notes, initial EDA, revised research questions, and the accessible shared Google Doc link.
+
+\end{document}

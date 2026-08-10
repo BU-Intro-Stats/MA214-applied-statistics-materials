@@ -16,6 +16,11 @@ CALENDAR_WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 DEFAULT_LECTURE_WEEKDAYS = [0, 2, 4]
 DEFAULT_LAB_WEEKDAYS = [1]
 DEFAULT_LAB_DELIVERABLE_WEEKDAYS = [1]
+# Weeks between a lab or project session and its deliverable deadline. 1 keeps the
+# deadline after the session even when its weekday falls earlier in the week.
+DEFAULT_LAB_DELIVERABLE_WEEK_OFFSET = 1
+# The tutorial hash is due before its own lab, so it stays in the session's own week.
+DEFAULT_TUTORIAL_HASH_WEEK_OFFSET = 0
 DEFAULT_DISCUSSION_WEEKDAYS = [3]
 DEFAULT_OFFICE_HOURS_WEEKDAYS = [4]
 DEFAULT_HOMEWORK_WEEKDAYS = [6]
@@ -23,6 +28,8 @@ DEFAULT_EVENT_TIMES = {
     "lecture": ("11:15 AM", "12:05 PM"),
     "lab": ("", ""),
     "lab_deliverable": ("9:55 PM", "10:00 PM"),
+    "tutorial_hash": ("9:55 PM", "10:00 PM"),
+    "project_deliverable": ("9:55 PM", "10:00 PM"),
     "discussion": ("12:20 PM", "1:10 PM"),
     "office_hours": ("3:00 PM", "5:00 PM"),
     "homework": ("", "3:00 PM"),
@@ -256,6 +263,19 @@ def read_row_time(row, fallback):
     return start, end
 
 
+def read_week_offset(row, fallback: int, source_name: str = "the lab schedule"):
+    text = clean_text(row.get("weeks after", "") or row.get("weeks after session", ""))
+    if not text:
+        return fallback
+    try:
+        return int(text)
+    except ValueError:
+        raise ValueError(
+            f"Could not read 'Weeks After' for {row.get('event type', 'the deliverable row')!r} "
+            f"in {source_name}: {text!r}. Use a whole number such as 0 or 1."
+        ) from None
+
+
 def event_time_range(meeting_patterns, event_key: str):
     return meeting_patterns.get("times", {}).get(event_key, DEFAULT_EVENT_TIMES[event_key])
 
@@ -275,11 +295,72 @@ def time_for_ics(event_date: date, time_text: str):
     return datetime.combine(event_date, parsed.time())
 
 
-def parse_meeting_patterns(lecture_path: Path, lab_path: Path):
+TUTORIAL_DELIVERABLE_PATTERN = re.compile(r"\btutorial\s+\d+\s+hash\b", re.IGNORECASE)
+
+
+def split_tutorial_deliverables(deliverables: str):
+    """Separate tutorial-hash items from the rest, since the two have different deadlines."""
+    tutorial_items, other_items = [], []
+    for item in (part.strip() for part in (deliverables or "").split("|")):
+        if not item:
+            continue
+        (tutorial_items if TUTORIAL_DELIVERABLE_PATTERN.search(item) else other_items).append(item)
+    return tutorial_items, other_items
+
+
+def normalize_session_key(text: str) -> str:
+    """Match a session name loosely, so "Project1-1", "project 1-1" and "P1-1" agree."""
+    key = re.sub(r"[^a-z0-9]+", "", clean_text(text).lower())
+    return re.sub(r"^project", "p", key)
+
+
+def parse_session_overrides(lab_path: Path, default_year: int):
+    """Read the optional "Session Overrides" table, where an instructor pins exact dates.
+
+    Returns {session key: {"date": date | None, "deliverable_date": date | None}}. A blank
+    cell means "keep deriving this one from the meeting pattern".
+    """
+    overrides = {}
+    rows = extract_table_after_heading(
+        lab_path.read_text(encoding="utf-8").splitlines(),
+        "Session Overrides",
+    )
+    for row in rows:
+        key = normalize_session_key(row.get("session", ""))
+        if not key:
+            continue
+        entry = {}
+        for column, field in (
+            ("meets", "date"),
+            ("deliverable due", "deliverable_date"),
+            ("tutorial due", "tutorial_date"),
+        ):
+            text = clean_text(row.get(column, ""))
+            if not text:
+                continue
+            try:
+                entry[field] = parse_schedule_date(text, default_year)
+            except (ValueError, TypeError):
+                raise ValueError(
+                    f"Could not read {column!r} for session {row.get('session', '')!r} "
+                    f"in {lab_path.name}: {text!r}. Use a form like 2026-09-08 or 9/8/2026."
+                ) from None
+        if entry:
+            overrides[key] = entry
+    return overrides
+
+
+def parse_meeting_patterns(lecture_path: Path, lab_path: Path, default_year: int = DEFAULT_TERM_YEAR):
     patterns = {
         "lecture": DEFAULT_LECTURE_WEEKDAYS,
         "lab": DEFAULT_LAB_WEEKDAYS,
         "lab_deliverable": DEFAULT_LAB_DELIVERABLE_WEEKDAYS,
+        "lab_deliverable_week_offset": DEFAULT_LAB_DELIVERABLE_WEEK_OFFSET,
+        "tutorial_hash": None,
+        "tutorial_hash_week_offset": DEFAULT_TUTORIAL_HASH_WEEK_OFFSET,
+        "project_deliverable": None,
+        "project_deliverable_week_offset": None,
+        "session_overrides": {},
         "discussion": DEFAULT_DISCUSSION_WEEKDAYS,
         "office_hours": DEFAULT_OFFICE_HOURS_WEEKDAYS,
         "times": DEFAULT_EVENT_TIMES.copy(),
@@ -335,6 +416,34 @@ def parse_meeting_patterns(lecture_path: Path, lab_path: Path):
         elif weekdays and event_type in {"lab deliverable", "lab deliverables", "deliverable", "deliverables"}:
             patterns["lab_deliverable"] = weekdays
             patterns["times"]["lab_deliverable"] = read_row_time(row, DEFAULT_EVENT_TIMES["lab_deliverable"])
+            patterns["lab_deliverable_week_offset"] = read_week_offset(
+                row, DEFAULT_LAB_DELIVERABLE_WEEK_OFFSET, lab_path.name
+            )
+        elif weekdays and event_type in {"project deliverable", "project deliverables"}:
+            patterns["project_deliverable"] = weekdays
+            patterns["times"]["project_deliverable"] = read_row_time(row, DEFAULT_EVENT_TIMES["lab_deliverable"])
+            patterns["project_deliverable_week_offset"] = read_week_offset(
+                row, DEFAULT_LAB_DELIVERABLE_WEEK_OFFSET, lab_path.name
+            )
+        elif weekdays and event_type in {"tutorial hash", "tutorial hashes", "tutorial"}:
+            patterns["tutorial_hash"] = weekdays
+            patterns["times"]["tutorial_hash"] = read_row_time(row, DEFAULT_EVENT_TIMES["lab_deliverable"])
+            patterns["tutorial_hash_week_offset"] = read_week_offset(
+                row, DEFAULT_TUTORIAL_HASH_WEEK_OFFSET, lab_path.name
+            )
+
+    # The tutorial-hash and project deadlines share the lab deliverable weekday, time,
+    # and offset unless their own rows override them.
+    if patterns["tutorial_hash"] is None:
+        patterns["tutorial_hash"] = patterns["lab_deliverable"]
+        patterns["times"]["tutorial_hash"] = patterns["times"]["lab_deliverable"]
+    if patterns["project_deliverable"] is None:
+        patterns["project_deliverable"] = patterns["lab_deliverable"]
+        patterns["times"]["project_deliverable"] = patterns["times"]["lab_deliverable"]
+    if patterns["project_deliverable_week_offset"] is None:
+        patterns["project_deliverable_week_offset"] = patterns["lab_deliverable_week_offset"]
+
+    patterns["session_overrides"] = parse_session_overrides(lab_path, default_year)
 
     return patterns
 
@@ -689,9 +798,13 @@ def annotate_prerequisite_flags(
     term_start, _ = term_bounds(important_dates, default_year)
     suspended = class_suspended_dates(important_dates)
     lab_weekday = meeting_patterns["lab"][0]
+    session_overrides = meeting_patterns.get("session_overrides", {})
     for lab in lab_rows:
-        if lab["week"] is not None:
-            lab_date = scheduled_weekday_date(term_start, lab["week"], lab_weekday, suspended)
+        override = session_overrides.get(normalize_session_key(lab["title"]), {})
+        if lab["week"] is not None or override.get("date"):
+            lab_date = override.get("date") or scheduled_weekday_date(
+                term_start, lab["week"], lab_weekday, suspended
+            )
             lab["date"] = lab_date
             lab.setdefault("flags", []).extend(nearby_important_dates(lab_date, important_dates))
         tag = lab_prerequisite_tag(lab["title"])
@@ -989,6 +1102,7 @@ def split_combined_lab_titles(title: str):
 
 LAB_FIELD_ALIASES = {
     "week": "week",
+    "materials": "materials",
     "lecture anchor": "lecture_anchor",
     "purpose": "purpose",
     "primary objectives": "objectives",
@@ -1346,6 +1460,22 @@ def build_calendar_events(
     suspended = class_suspended_dates(important_dates)
     lab_weekday = meeting_patterns["lab"][0]
     lab_deliverable_weekday = meeting_patterns["lab_deliverable"][0]
+    lab_deliverable_week_offset = meeting_patterns.get(
+        "lab_deliverable_week_offset", DEFAULT_LAB_DELIVERABLE_WEEK_OFFSET
+    )
+    tutorial_hash_weekday = (meeting_patterns.get("tutorial_hash") or meeting_patterns["lab_deliverable"])[0]
+    tutorial_hash_week_offset = meeting_patterns.get(
+        "tutorial_hash_week_offset", DEFAULT_TUTORIAL_HASH_WEEK_OFFSET
+    )
+    project_deliverable_weekday = (
+        meeting_patterns.get("project_deliverable") or meeting_patterns["lab_deliverable"]
+    )[0]
+    project_deliverable_week_offset = (
+        meeting_patterns.get("project_deliverable_week_offset")
+        if meeting_patterns.get("project_deliverable_week_offset") is not None
+        else lab_deliverable_week_offset
+    )
+    session_overrides = meeting_patterns.get("session_overrides", {})
 
     for row in lecture_rows:
         meeting_date = row.get("date")
@@ -1368,9 +1498,12 @@ def build_calendar_events(
         )
 
     for lab in lab_rows:
-        if lab["week"] is None:
+        override = session_overrides.get(normalize_session_key(lab["title"]), {})
+        if lab["week"] is None and not override.get("date"):
             continue
-        lab_date = lab.get("date") or scheduled_weekday_date(term_start, lab["week"], lab_weekday, suspended)
+        lab_date = override.get("date") or lab.get("date") or scheduled_weekday_date(
+            term_start, lab["week"], lab_weekday, suspended
+        )
         lab["date"] = lab_date
         existing_flags = list(lab.get("flags", []))
         lab["flags"] = list(dict.fromkeys(existing_flags + nearby_important_dates(lab_date, important_dates)))
@@ -1390,20 +1523,52 @@ def build_calendar_events(
             }
         )
 
-        if lab["deliverables"]:
-            deliverable_date = scheduled_weekday_date(
-                term_start,
-                lab["week"],
-                lab_deliverable_weekday,
-                suspended,
+        # The tutorial hash is due before its own lab, the rest of the deliverables
+        # after it, so they become two deadlines. Offsets and per-session dates are
+        # instructor-editable in instructor_inputs/Lab_schedules.md.
+        tutorial_items, deliverable_items = split_tutorial_deliverables(lab["deliverables"])
+
+        def deadline(override_key, week_offset, weekday):
+            pinned = override.get(override_key)
+            if pinned is not None:
+                return pinned
+            if lab["week"] is None:
+                return None
+            return scheduled_weekday_date(
+                term_start, lab["week"] + week_offset, weekday, suspended
             )
-            if term_start <= deliverable_date <= term_end:
-                start_time, end_time = event_time_range(meeting_patterns, "lab_deliverable")
+
+        if tutorial_items:
+            tutorial_date = deadline("tutorial_date", tutorial_hash_week_offset, tutorial_hash_weekday)
+            if tutorial_date is not None and term_start <= tutorial_date <= term_end:
+                start_time, end_time = event_time_range(meeting_patterns, "tutorial_hash")
+                events[tutorial_date].append(
+                    {
+                        "kind": "lab-deliverable",
+                        "title": f"{lab['title']} Tutorial Hash Due",
+                        "details": " | ".join(tutorial_items),
+                        "start_time": start_time,
+                        "end_time": end_time,
+                    }
+                )
+
+        if deliverable_items:
+            # Project deliverables keep their own weekday and offset, so changing when
+            # lab worksheets are due does not move the project milestones with them.
+            is_project = bool(re.match(r"project", lab["title"], re.IGNORECASE))
+            deliverable_key = "project_deliverable" if is_project else "lab_deliverable"
+            deliverable_date = deadline(
+                "deliverable_date",
+                project_deliverable_week_offset if is_project else lab_deliverable_week_offset,
+                project_deliverable_weekday if is_project else lab_deliverable_weekday,
+            )
+            if deliverable_date is not None and term_start <= deliverable_date <= term_end:
+                start_time, end_time = event_time_range(meeting_patterns, deliverable_key)
                 events[deliverable_date].append(
                     {
                         "kind": "lab-deliverable",
                         "title": f"{lab['title']} Deliverables Due",
-                        "details": lab["deliverables"],
+                        "details": " | ".join(deliverable_items),
                         "start_time": start_time,
                         "end_time": end_time,
                     }
