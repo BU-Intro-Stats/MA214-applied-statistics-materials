@@ -1,0 +1,313 @@
+% MA 214 Discussion 13 -- covers Lectures 19 and 20.
+%
+% Student handout. Page 1 is the concept review; the question set runs from page 2.
+% Compile from inside this folder:  pdflatex Discussion13.tex
+
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{tabularx}
+\usepackage{listings}
+
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\rhead{Discussion 13}
+\lhead{MA 214: Applied Statistics}
+\renewcommand{\headrulewidth}{.4mm}
+
+\newcommand{\blankline}[1]{\underline{\hspace{#1}}}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  frame=single,
+  framerule=0.4pt,
+  breaklines=true,
+  showstringspaces=false,
+  aboveskip=8pt,
+  belowskip=8pt
+}
+
+% Section header: bold title over a hairline rule.
+\newcommand{\parttitle}[1]{%
+  \par\medskip\noindent
+  {\large\bfseries #1}\par
+  \vspace{-.5em}\noindent\rule{\linewidth}{0.4pt}\par\smallskip}
+
+% Writing space.
+\newcommand{\answerspace}[1]{\vspace{#1}}
+
+% Flush-left question list: the label runs in at the margin and the body wraps
+% back to the margin, so nothing is pushed far to the right.
+\newlist{questions}{enumerate}{1}
+\setlist[questions]{label=\textbf{Question \arabic*.}, wide=0pt, itemsep=1.4em, topsep=.8em}
+
+\newlist{parts}{enumerate}{1}
+\setlist[parts]{label=\textbf{(\Alph*)}, leftmargin=1.6em, labelsep=.45em,
+  itemsep=.7em, topsep=.5em}
+
+\begin{document}
+
+\noindent\textbf{Name:}\blankline{2.3in}\hfill\textbf{BUID:}\blankline{1.6in}
+
+\begin{center}
+  {\Large\bfseries Discussion 13: Once You Have Samples, Everything Is Counting}
+\end{center}
+
+\noindent\textbf{Goals:} \textbf{(1)} say why a conjugate shortcut is not always available and what
+grid approximation costs, \textbf{(2)} diagnose a chain from its trace plot and acceptance rate,
+\textbf{(3)} use $\widehat{R}$, ESS, and MCSE for what each is for, \textbf{(4)} answer every
+posterior question by counting draws, \textbf{(5)} tell a plug-in prediction from a posterior
+predictive one.
+
+\parttitle{Part 1: Concept Review}
+
+{\small
+
+\noindent Everything in Part 2 can be answered from this page. Keep it in front of you.
+
+\begin{enumerate}[label=\textbf{\arabic*.}, wide=0pt, itemsep=.4em, topsep=.5em]
+
+\item \textbf{When the shortcut runs out, and the grid.} Conjugate priors give a closed-form
+posterior for only a few prior shapes; choose another, or add parameters, and
+$\int f(\theta)L(\theta;x)\,d\theta$ has no formula. \textbf{Grid approximation} is the Lecture 17
+hand calculation with more rows: lay a grid over the plausible range, evaluate prior $\times$
+likelihood at each point, divide by the total, read summaries off the weighted grid. Two costs: a
+coarse grid can get the center about right while getting a \emph{tail} probability badly wrong, and
+the number of cells is (points per axis)$^{\,k}$, which collapses past two or three parameters.
+
+\item \textbf{MCMC.} A random-walk Metropolis sampler proposes a step, computes the ratio of
+posterior heights, and accepts with that probability, so it lingers where the posterior is high. The
+draws are \emph{dependent} and the early ones remember the starting value, so discard a
+\textbf{burn-in}.
+
+\item \textbf{Reading a chain.} Healthy: a horizontal band of noise with no drift. \textbf{Step too
+small:} nearly every proposal is accepted but the chain inches along, so the trace wanders slowly and
+neighbouring draws are almost identical. \textbf{Step too large:} nearly everything is rejected, so
+the trace shows long flat runs. A \emph{high acceptance rate is not a good sign}.
+
+\item \textbf{Three numbers.} $\widehat{R}$ compares spread \emph{between} chains with spread
+\emph{within} them, so near $1.00$ means the chains agree and much above about $1.01$ means they do
+not. \textbf{ESS} is how many independent draws your dependent ones are worth. \textbf{MCSE}
+$= \text{posterior sd}/\sqrt{\text{ESS}}$ is the simulation error in a summary, so halving it takes
+four times the ESS. $\widehat{R}$ answers ``have I converged''; ESS and MCSE answer ``have I run long
+enough''.
+
+\item \textbf{With samples in hand, every question is counting.} Given draws
+$\theta^{(1)},\dots,\theta^{(B)}$ from the posterior:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{ll}
+\toprule
+\textbf{Question} & \textbf{Answer from the draws} \\
+\midrule
+Point estimate & their mean, or their median \\
+95\% \textbf{credible interval} & their $2.5$th and $97.5$th percentiles \\
+Is $\theta > c$? & the \emph{proportion} of draws above $c$ \\
+Predict a new observation & draw one $y$ from the model at \emph{each} $\theta^{(i)}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+A credible interval means what students want a confidence interval to mean: given the prior and the
+data, there is a $95\%$ posterior probability that $\theta$ lies in it. A Bayesian hypothesis test is
+just the third row, so there is \textbf{no null distribution and no $p$-value}.
+
+\item \textbf{Prediction: plug in, or average.} The \textbf{plug-in} prediction uses one value,
+$\hat\theta$, and ignores the fact that you are unsure about it. The \textbf{posterior predictive}
+draws $y$ at every posterior draw of $\theta$, so it carries both the noise in $y$ and the
+uncertainty in $\theta$. It is therefore always the wider of the two.
+
+\item \textbf{Four traps.} Treating a high acceptance rate as evidence the sampler is good. Using the
+draws before discarding burn-in. Reporting the posterior sd where the MCSE was asked for. Calling a
+posterior probability a $p$-value.
+
+\end{enumerate}
+
+}
+
+\newpage
+
+\parttitle{Part 2: Question Set}
+
+\noindent\textbf{Scenario.} A whale-watching station counts sightings per night. With a
+Gamma$(4,2)$ prior and $18$ sightings over $6$ nights, Lecture 18's conjugate rule gives the
+posterior $\lambda \sim$ Gamma$(22, 8)$ exactly: mean $2.750$, standard deviation $0.586$, median
+$2.708$, and a $95\%$ credible interval of $[\,1.723,\; 4.013\,]$, with
+$P(\lambda > 3) = 0.314$. Because the exact answer is known here, it can be used to grade the
+approximations.
+
+\begin{questions}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Grid approximation, and what it costs.} The station's ecologist prefers a Log-Normal
+prior, for which no conjugate rule exists. You approximate on a grid over $\lambda \in [0.5, 6]$.
+
+\begin{parts}
+\item State the four steps of grid approximation in order.
+\answerspace{4em}
+
+\item Applied to the \emph{known} Gamma$(22,8)$ posterior, grids of different sizes give:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Grid points} & 6 & 11 & 501 \\
+\midrule
+Posterior mean & 2.782 & 2.750 & 2.750 \\
+$P(\lambda > 3)$ & 0.155 & 0.321 & 0.313 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The exact values are $2.750$ and $0.314$. Which summary does the 6-point grid get about right, and
+which does it get badly wrong? Explain why a tail probability is the more fragile of the two.
+\answerspace{4.5em}
+
+\item A later model has $4$ parameters. With $100$ grid points per axis, how many cells is that?
+Write the arithmetic, and say what this rules out.
+\answerspace{4em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Tuning the sampler.} You run a random-walk Metropolis sampler on the same posterior
+three times, changing only the step size. Each run is $6000$ draws with the first $1000$ discarded.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{cccc}
+\toprule
+\textbf{Step size} & \textbf{Acceptance rate} & \textbf{ESS} & \textbf{Posterior mean from draws} \\
+\midrule
+0.05 & 0.987 & 14.2 & 2.678 \\
+1.20 & 0.611 & 867.0 & 2.750 \\
+8.00 & 0.116 & 480.5 & 2.770 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{parts}
+\item Which run would you use, and why is it \emph{not} the one with the highest acceptance rate?
+\answerspace{4em}
+
+\item Describe what the trace plot looks like for the step of $0.05$, and separately for the step of
+$8.00$. The two look nothing alike even though both are bad.
+\answerspace{4.5em}
+
+\item The step of $0.05$ accepted $98.7\%$ of its proposals yet is worth only $14$ independent
+draws. Explain how both facts can be true at once.
+\answerspace{4em}
+
+\item Why is a burn-in discarded at all, and which of the three runs would suffer most from
+\emph{not} discarding it?
+\answerspace{4em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{The three numbers.} Use posterior sd $= 0.586$ throughout.
+
+\begin{parts}
+\item Compute the MCSE of the posterior mean for the good run (ESS $867$) and for the bad one
+(ESS $14.2$).
+\answerspace{4em}
+
+\item You want the MCSE of the good run cut in half. What ESS do you need, and roughly how much
+longer must you run the chain?
+\answerspace{3.5em}
+
+\item Four chains from spread-out starting values give $\widehat{R} = 1.574$ at a step of $0.05$, and
+$\widehat{R} = 1.001$ at a step of $1.20$. Say what $\widehat{R}$ compares, and what the first value
+tells you that ESS alone would not.
+\answerspace{4.5em}
+
+\item Which of the three numbers answers ``have I converged?'' and which answer ``have I run long
+enough?''
+\answerspace{3.5em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Everything by counting.} The good run leaves $5000$ retained draws of $\lambda$. Of
+them, $1570$ exceed $3$, the $2.5$th percentile is $1.72$, and the $97.5$th is $4.01$.
+
+\begin{parts}
+\item Give the point estimate, the $95\%$ credible interval, and $P(\lambda > 3)$, saying for each
+what you did to the draws.
+\answerspace{4.5em}
+
+\item Compare all three with the exact values in the scenario. Are the approximations good enough to
+report?
+\answerspace{3.5em}
+
+\item Write the one-sentence interpretation of the credible interval. Then say what makes it a
+different claim from a frequentist confidence interval with the same endpoints.
+\answerspace{4.5em}
+
+\item The station manager asks: ``Can we reject the claim that we average at most $3$ sightings a
+night, at the $5\%$ level?'' Answer the question a Bayesian can actually answer, and say what is
+missing from hers.
+\answerspace{4.5em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Predicting tomorrow night, and find the bugs.} Two predictions for the count on one
+new night:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lccc}
+\toprule
+ & $P(Y \ge 5)$ & \textbf{SD} & \textbf{95\% interval} \\
+\midrule
+Plug-in: Poisson$(2.750)$ & 0.145 & 1.658 & $[\,0,\; 6\,]$ \\
+Posterior predictive & 0.154 & 1.768 & $[\,0,\; 7\,]$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{parts}
+\item Explain in one sentence why the predictive column is the wider one. Name the source of
+uncertainty the plug-in row leaves out.
+\answerspace{3.5em}
+
+\item Describe the recipe that produced the predictive row, in terms of the $5000$ draws.
+\answerspace{3.5em}
+
+\item The code below is meant to fit and predict. It runs, prints plausible numbers, and is wrong in
+\textbf{three} separate ways.
+
+\begin{lstlisting}[language=R]
+chain  <- rwmh(step = 0.05, n = 6000)   # acceptance 0.987, looks great
+lambda <- chain$x
+
+mean(lambda)
+quantile(lambda, c(0.025, 0.975))
+
+rpois(5000, mean(lambda))
+\end{lstlisting}
+
+Bug 1 is the step size chosen, bug 2 is what never happens to \texttt{lambda}, and bug 3 is the last
+line. Name all three and give the corrections.
+\answerspace{5.5em}
+
+\item The same classmate's write-up ends with the two sentences below. Mark each \textbf{defensible}
+or \textbf{not}, and rewrite the ones that are not.
+\begin{enumerate}[label=\textbf{S\arabic*.}, leftmargin=2.2em, itemsep=.25em, topsep=.35em]
+\item ``Our sampler accepted $98.7\%$ of proposals, so it explored the posterior very well.''
+\item ``The posterior probability that $\lambda > 3$ is $0.31$, so we reject $\lambda \le 3$ at the
+$5\%$ level.''
+\end{enumerate}
+\answerspace{5em}
+\end{parts}
+
+\end{questions}
+
+\end{document}

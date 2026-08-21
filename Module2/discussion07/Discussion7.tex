@@ -1,0 +1,299 @@
+% MA 214 Discussion 7 -- covers Lectures 9 and 10.
+%
+% Student handout. Page 1 is the concept review; the question set runs from page 2.
+% Compile from inside this folder:  pdflatex Discussion7.tex
+
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{tabularx}
+\usepackage{listings}
+
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\rhead{Discussion 7}
+\lhead{MA 214: Applied Statistics}
+\renewcommand{\headrulewidth}{.4mm}
+
+\newcommand{\blankline}[1]{\underline{\hspace{#1}}}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  frame=single,
+  framerule=0.4pt,
+  breaklines=true,
+  showstringspaces=false,
+  aboveskip=8pt,
+  belowskip=8pt
+}
+
+% Section header: bold title over a hairline rule.
+\newcommand{\parttitle}[1]{%
+  \par\medskip\noindent
+  {\large\bfseries #1}\par
+  \vspace{-.5em}\noindent\rule{\linewidth}{0.4pt}\par\smallskip}
+
+% Writing space.
+\newcommand{\answerspace}[1]{\vspace{#1}}
+
+% Flush-left question list: the label runs in at the margin and the body wraps
+% back to the margin, so nothing is pushed far to the right.
+\newlist{questions}{enumerate}{1}
+\setlist[questions]{label=\textbf{Question \arabic*.}, wide=0pt, itemsep=1.4em, topsep=.8em}
+
+\newlist{parts}{enumerate}{1}
+\setlist[parts]{label=\textbf{(\Alph*)}, leftmargin=1.6em, labelsep=.45em,
+  itemsep=.7em, topsep=.5em}
+
+\begin{document}
+
+\noindent\textbf{Name:}\blankline{2.3in}\hfill\textbf{BUID:}\blankline{1.6in}
+
+\begin{center}
+  {\Large\bfseries Discussion 7: The Same Interval, Three Ways}
+\end{center}
+
+\noindent\textbf{Goals:} \textbf{(1)} build one confidence interval by bootstrap and by formula and
+compare them, \textbf{(2)} say what does and does not change an interval's width, \textbf{(3)}
+recognize when the two bootstrap recipes disagree and why, \textbf{(4)} connect an interval to last
+week's test, \textbf{(5)} tell paired data from two samples.
+
+\parttitle{Part 1: Concept Review}
+
+{\small
+
+\noindent Everything in Part 2 can be answered from this page. Keep it in front of you.
+
+\begin{enumerate}[label=\textbf{\arabic*.}, wide=0pt, itemsep=.45em, topsep=.5em]
+
+\item \textbf{Three roads to a sampling distribution.} Every interval and $p$-value in this module
+comes from one of these.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lll}
+\toprule
+\textbf{Road} & \textbf{How you get it} & \textbf{What it needs} \\
+\midrule
+Simulate & bootstrap: resample $n$ \emph{with replacement}, $B$ times & a sample that is not tiny \\
+Formula & the CLT: $\text{SE} = s/\sqrt{n}$ & $n$ large enough for the CLT \\
+Exact & compute from the model, e.g.\ binomial & the model to be exactly right \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\item \textbf{The bootstrap.} Draw a resample of size $n$ \emph{with replacement} from your sample,
+compute the statistic, repeat $B$ times. The spread of those $B$ values estimates the sampling
+distribution's spread. Resampling \emph{without} replacement just returns your data, and resampling
+a size other than $n$ estimates the wrong sampling distribution.
+
+\item \textbf{Two recipes for a bootstrap interval.} With $\hat\theta$ the observed statistic:
+\[
+\textbf{percentile: } \big[q_{0.025},\, q_{0.975}\big] \text{ of the bootstrap values},
+\qquad
+\textbf{standard error: } \hat\theta \pm 2\,\text{SE}_{\text{boot}} .
+\]
+They nearly coincide when the bootstrap distribution is symmetric. When it is skewed, prefer the
+percentile interval, because the SE recipe forces symmetry that is not there.
+
+\item \textbf{The formula interval.} For a mean,
+\[
+\bar{x} \pm t^{\ast}\,\frac{s}{\sqrt{n}},
+\qquad \text{df} = n-1 .
+\]
+Use $t^{\ast}$, not $z^{\ast}$, whenever $\sigma$ is estimated by $s$. The two are close for large
+$n$ ($t^{\ast}_{59} = 2.001$ against $z^{\ast} = 1.96$) and far apart for small $n$
+($t^{\ast}_{7} = 2.365$, about 21\% wider).
+
+\item \textbf{What changes the width.} Raising $n$ narrows it like $1/\sqrt{n}$, so four times the
+data halves the width. Raising the confidence level widens it. Raising $B$ does \textbf{not} narrow
+it: more simulations only pin down the interval you already had.
+
+\item \textbf{Interval and test are two views of one thing.} A 95\% interval for a difference that
+excludes $0$ corresponds to rejecting $H_0: \text{difference} = 0$ at the 5\% level. The test says
+whether; the interval says how big, and in what units.
+
+\item \textbf{Paired or two samples.} If each number in one group is tied to a specific number in
+the other, the data are \textbf{paired}: reduce to one difference per pair and analyze those
+differences. Treating paired data as two independent samples throws away the pairing and usually
+overstates the uncertainty.
+
+\end{enumerate}
+
+}
+
+\newpage
+
+\parttitle{Part 2: Question Set}
+
+\noindent\textbf{Scenario.} For the $n = 60$ library branches, annual visits (in thousands) have
+$\bar{x} = 75.202$ and $s = 29.709$. A bootstrap with $B = 2000$ resamples gives a bootstrap
+standard error of $3.695$, bootstrap percentiles $q_{0.025} = 67.91$ and $q_{0.975} = 82.55$, and a
+bootstrap distribution whose mean ($75.167$) and median ($75.125$) are nearly equal. Useful values:
+$t^{\ast}_{59} = 2.001$, \; $z^{\ast} = 1.96$, \; $\sqrt{60} = 7.746$.
+
+\begin{questions}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Three roads, one interval.}
+
+\begin{parts}
+\item Compute the formula standard error $s/\sqrt{n}$, then the 95\% $t$ interval for the mean.
+\answerspace{4.5em}
+
+\item Write down the bootstrap percentile interval, and compute the bootstrap standard-error
+interval $\bar{x} \pm 2\,\text{SE}_{\text{boot}}$.
+\answerspace{4em}
+
+\item You now have three intervals. Fill in their widths and comment on how close they are.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.6}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Method} & \textbf{Interval} & \textbf{Width} \\
+\midrule
+$t$ formula & \blankline{1.7in} & \blankline{.9in} \\
+Bootstrap percentile & \blankline{1.7in} & \blankline{.9in} \\
+Bootstrap standard error & \blankline{1.7in} & \blankline{.9in} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\item The two bootstrap recipes agree to within about $0.1$. Which fact given in the scenario tells
+you in advance that they would?
+\answerspace{3.5em}
+
+\item The formula SE and the bootstrap SE are $3.835$ and $3.695$. Should you be troubled that they
+are not identical? Explain what each one is.
+\answerspace{4em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{What moves the width.}
+
+\begin{parts}
+\item The city funds a survey of $240$ branches instead of $60$, with the same $s$. Compute the new
+SE and the new interval width, and state the general rule you just used.
+\answerspace{4.5em}
+
+\item A colleague reruns the bootstrap with $B = 100{,}000$ instead of $2000$ and expects a narrower
+interval. What actually happens, and what does raising $B$ buy?
+\answerspace{4em}
+
+\item Write a one-sentence interpretation of your interval from Question 1 that mentions the
+\emph{procedure} and \emph{repeated samples}.
+\answerspace{4em}
+
+\item All 60 branches are in one city. Does any of the three methods let you claim an interval for
+mean visits at branches nationwide? What would?
+\answerspace{4em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{When the recipes disagree.} The director asks about the \emph{busiest} branches, so
+the statistic is the $90$th percentile of visits. The observed value is $116.87$.
+Bootstrapping it gives a bootstrap standard error of $6.681$, with percentiles
+$q_{0.025} = 99.43$ and $q_{0.975} = 123.70$.
+
+\begin{parts}
+\item Write the percentile interval, then the standard-error interval
+$116.87 \pm 2(6.681)$. Compare them.
+\answerspace{4.5em}
+
+\item The percentile interval reaches $17.4$ below the estimate but only $6.8$ above it. What does
+that asymmetry say about the bootstrap distribution of this statistic?
+\answerspace{4em}
+
+\item The two intervals disagree here but agreed in Question 1. Which do you report for the $90$th
+percentile, and why?
+\answerspace{4em}
+
+\item Which of the three roads in the review is unavailable for this statistic, and what does that
+tell you about when the bootstrap earns its keep?
+\answerspace{4em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Back to last week's test.} The Saturday-hours comparison from Discussion 6 had
+$12$ program branches and $12$ controls, with an observed difference in mean weekly visits of
+$0.983$ hundreds. The permutation test gave a two-sided $p = 0.024$. Now estimate the effect:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{ll}
+\toprule
+$t$ interval for the difference & $[\,0.149,\; 1.817\,]$ \\
+Bootstrap percentile interval & $[\,0.225,\; 1.734\,]$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{parts}
+\item Both intervals exclude $0$, and last week's $p$ was $0.024$. State the general connection
+between those two facts.
+\answerspace{3.5em}
+
+\item Interpret the $t$ interval for the director, in visits per week rather than hundreds.
+\answerspace{4em}
+
+\item The test told the director something the interval does not, and the interval tells her
+something the test does not. Say what each contributes.
+\answerspace{4em}
+
+\item Now suppose instead that the \emph{same} 12 branches had been measured before and after the
+program, with no control group. What would the data be, what would you analyze, and why is the
+two-sample interval above no longer the right tool?
+\answerspace{4.5em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Find the bugs.} A classmate wants a 95\% bootstrap interval for mean visits. The
+vector \texttt{v} holds all $n = 60$ values. The code runs, prints two plausible numbers, and is
+wrong in \textbf{three} separate ways.
+
+\begin{lstlisting}[language=R]
+boot <- replicate(2000,
+  mean(sample(v, size = 30, replace = FALSE)))
+
+quantile(v, c(0.025, 0.975))
+\end{lstlisting}
+
+\begin{parts}
+\item Bug 1 is \texttt{replace = FALSE}. What does each resample then consist of, and what does
+that do to the $2000$ values in \texttt{boot}?
+\answerspace{4em}
+
+\item Bug 2 is \texttt{size = 30}. Which sampling distribution is this estimating, and would the
+resulting interval be too wide or too narrow?
+\answerspace{4em}
+
+\item Bug 3 is the last line. It reports $[29.39,\; 136.61]$, which is about $7.3$ times as wide as
+the correct interval. Say precisely what quantity that line has taken the percentiles of, and what
+it should have taken them of.
+\answerspace{4.5em}
+
+\item Rewrite the block correctly.
+\answerspace{4em}
+
+\item The same classmate reports the correct interval $[\,67.5,\; 82.9\,]$ and then writes the two
+sentences below. Mark each \textbf{defensible} or \textbf{not}, and rewrite the ones that are not.
+Your answer to bug 3 is a useful check on the first one.
+\begin{enumerate}[label=\textbf{S\arabic*.}, leftmargin=2.2em, itemsep=.25em, topsep=.35em]
+\item ``95\% of branches have annual visits between $67.5$ and $82.9$ thousand.''
+\item ``There is a 95\% probability that $\mu$ lies between $67.5$ and $82.9$.''
+\end{enumerate}
+\answerspace{5em}
+\end{parts}
+
+\end{questions}
+
+\end{document}

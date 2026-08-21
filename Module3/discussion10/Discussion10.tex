@@ -1,0 +1,306 @@
+% MA 214 Discussion 10 -- covers Lectures 14 and 15.
+%
+% Student handout. Page 1 is the concept review; the question set runs from page 2.
+% Compile from inside this folder:  pdflatex Discussion10.tex
+
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{tabularx}
+\usepackage{listings}
+
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\rhead{Discussion 10}
+\lhead{MA 214: Applied Statistics}
+\renewcommand{\headrulewidth}{.4mm}
+
+\newcommand{\blankline}[1]{\underline{\hspace{#1}}}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  frame=single,
+  framerule=0.4pt,
+  breaklines=true,
+  showstringspaces=false,
+  aboveskip=8pt,
+  belowskip=8pt
+}
+
+% Section header: bold title over a hairline rule.
+\newcommand{\parttitle}[1]{%
+  \par\medskip\noindent
+  {\large\bfseries #1}\par
+  \vspace{-.5em}\noindent\rule{\linewidth}{0.4pt}\par\smallskip}
+
+% Writing space.
+\newcommand{\answerspace}[1]{\vspace{#1}}
+
+% Flush-left question list: the label runs in at the margin and the body wraps
+% back to the margin, so nothing is pushed far to the right.
+\newlist{questions}{enumerate}{1}
+\setlist[questions]{label=\textbf{Question \arabic*.}, wide=0pt, itemsep=1.4em, topsep=.8em}
+
+\newlist{parts}{enumerate}{1}
+\setlist[parts]{label=\textbf{(\Alph*)}, leftmargin=1.6em, labelsep=.45em,
+  itemsep=.7em, topsep=.5em}
+
+\begin{document}
+
+\noindent\textbf{Name:}\blankline{2.3in}\hfill\textbf{BUID:}\blankline{1.6in}
+
+\begin{center}
+  {\Large\bfseries Discussion 10: Interactions, Two Intervals, and the Cliff}
+\end{center}
+
+\noindent\textbf{Goals:} \textbf{(1)} read an interaction coefficient as a change in a slope,
+\textbf{(2)} judge whether an extra term earned its place, \textbf{(3)} tell a confidence interval
+from a prediction interval and name the three sources of doubt, \textbf{(4)} explain why
+cross-validation sees overfitting that $R^2$ and AIC do not.
+
+\parttitle{Part 1: Concept Review}
+
+{\small
+
+\noindent Everything in Part 2 can be answered from this page. Keep it in front of you.
+
+\begin{enumerate}[label=\textbf{\arabic*.}, wide=0pt, itemsep=.4em, topsep=.5em]
+
+\item \textbf{Every row is a conditional claim.} In a multiple regression each coefficient is the
+predicted change in $y$ per one unit of that predictor, \emph{holding the others fixed}. Its
+$t = \hat\beta/\text{SE}$ has df $= n - p - 1$, and its interval is
+$\hat\beta \pm t^{\ast}\text{SE}$.
+
+\item \textbf{An interaction is a slope that depends on something else.} In
+$\hat{y} = \hat\beta_0 + \hat\beta_1 x + \hat\beta_2 g + \hat\beta_3 xg$ with $g$ an indicator,
+\[
+\text{slope in } x \text{ when } g=0 \;=\; \hat\beta_1,
+\qquad
+\text{slope in } x \text{ when } g=1 \;=\; \hat\beta_1 + \hat\beta_3 .
+\]
+So $\hat\beta_3$ is a \emph{difference of slopes}, not a difference of levels. And once an
+interaction is present, $\hat\beta_2$ is only the group gap at $x = 0$; if $x = 0$ is outside the
+data, that coefficient is a nonsense point and its $p$-value says nothing about whether the group
+matters.
+
+\item \textbf{Did the term earn its place?} Compare adjusted $R^2$ or AIC between the models, and
+look at whether the interaction's own interval excludes $0$. A larger $R^2$ alone never settles it.
+
+\item \textbf{Two intervals, two questions.} At a chosen $x^{\ast}$ both are centered on the same
+$\hat{y}$:
+\[
+\textbf{CI for the mean: } \hat{y} \pm t^{\ast}\,\text{SE}_{\text{fit}},
+\qquad
+\textbf{PI for one new case: } \hat{y} \pm t^{\ast}\sqrt{\hat\sigma^2 + \text{SE}_{\text{fit}}^2}.
+\]
+The CI answers ``where is the average for branches like this?'' The PI answers ``where will
+\emph{this one} land?'' The PI is always wider.
+
+\item \textbf{Three sources of doubt, and what infinite data buys.} A prediction carries
+(1) irreducible scatter $\hat\sigma^2$, (2) uncertainty in the fitted level, and (3) uncertainty in
+the slope, which grows with distance from $\bar{x}$. More data shrinks (2) and (3) toward zero but
+leaves (1) untouched, so the CI can shrink to nothing while the PI cannot get narrower than about
+$\pm t^{\ast}\hat\sigma$.
+
+\item \textbf{Overfitting and cross-validation.} $R^2$ can only rise as terms are added, so it
+always prefers the biggest model. Adjusted $R^2$ and AIC charge for parameters and do better, but
+both are computed on the \emph{same} data that fitted the model. In $k$-fold cross-validation each
+observation is predicted by a model that never saw it, which is why CV can detect a model that fits
+better and predicts worse. You cannot grade a model on the data that trained it.
+
+\item \textbf{Four traps.} Reading an interaction coefficient as a group difference. Concluding a
+group does not matter from the $p$-value of its main effect in an interaction model. Reporting a CI
+when a single new case was asked about. Choosing among models of different size by $R^2$.
+
+\end{enumerate}
+
+}
+
+\newpage
+
+\parttitle{Part 2: Question Set}
+
+\noindent\textbf{Scenario.} For $n = 90$ branches, annual visits (thousands) are modelled from
+weekly open \texttt{hours} (range $20$ to $70$) and \texttt{type} (Branch or Central, with Branch as
+the reference). Fitting \texttt{visits} $\sim$ \texttt{hours} $\ast$ \texttt{type}:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lcccc}
+\toprule
+ & \textbf{Estimate} & \textbf{Std. Error} & \textbf{$t$} & \textbf{$p$-value} \\
+\midrule
+(Intercept) & $17.036$ & 3.579 & $4.76$ & $<0.001$ \\
+\texttt{hours} & $1.0303$ & 0.0782 & $13.18$ & $<0.001$ \\
+\texttt{type}Central & $-3.219$ & 7.427 & $-0.43$ & $0.666$ \\
+\texttt{hours:type}Central & $0.9588$ & 0.1535 & $6.25$ & $<0.001$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent Also: $\hat\sigma = 9.297$, df $= 86$, $t^{\ast}_{86} = 1.9879$, adjusted
+$R^2 = 0.907$. The main-effects model without the interaction has adjusted $R^2 = 0.867$ and
+AIC $694.33$; this model has AIC $662.66$.
+
+\begin{questions}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Two slopes, not one.}
+
+\begin{parts}
+\item Write the fitted equation for a Branch branch and for a Central branch, then give the slope
+in \texttt{hours} for each.
+\answerspace{4.5em}
+
+\item Interpret $0.9588$ in context. Your sentence must make clear that it is a difference of
+\emph{slopes}.
+\answerspace{4em}
+
+\item Compute the 95\% interval for the interaction coefficient. Does it exclude $0$?
+\answerspace{3.5em}
+
+\item The \texttt{type}Central coefficient has $p = 0.666$. A classmate concludes that branch type
+does not matter. Given your answer to (A), explain why that is badly wrong, and say what
+$-3.219$ actually refers to.
+\answerspace{4.5em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Did the interaction earn its place?}
+
+\begin{parts}
+\item Compare the two models on adjusted $R^2$ and on AIC. What does each comparison say?
+\answerspace{4em}
+
+\item You are told the plain $R^2$ also rose when the interaction was added. Why is that fact
+worthless on its own?
+\answerspace{3.5em}
+
+\item Give a third piece of evidence, already computed in Question 1, that supports keeping the term.
+\answerspace{3em}
+
+\item Suppose instead the interaction's interval had been $[-0.10,\; 0.42]$ and AIC had risen by
+$1.4$. What would you report, and would you say the slopes are equal across types?
+\answerspace{4em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Two intervals at one point.} For a \textbf{Branch} branch open $50$ hours a week, the
+fitted value is $68.552$ with $\text{SE}_{\text{fit}} = 1.2845$.
+
+\begin{parts}
+\item Compute the 95\% confidence interval for the mean, and its width.
+\answerspace{4em}
+
+\item Compute $\sqrt{\hat\sigma^2 + \text{SE}_{\text{fit}}^2}$, then the 95\% prediction interval
+for a single new branch, and its width.
+\answerspace{4.5em}
+
+\item The PI is about seven times as wide as the CI. Which of the two terms under the square root
+is responsible, and why does it dominate here?
+\answerspace{4em}
+
+\item The city funds a census of every branch in the country, so $n$ becomes enormous. What happens
+to each interval's width? Give the number the PI half-width cannot go below, using
+$t^{\ast}\hat\sigma$.
+\answerspace{4.5em}
+
+\item The director asks: ``If I extend one branch to 50 hours, how many visits will \emph{it} get?''
+Which interval do you hand her?
+\answerspace{3em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Four criteria, four answers.} A separate study of $n = 30$ branches fits polynomials
+of increasing degree. The true relationship is quadratic. Cross-validation is 6-fold.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{ccccc}
+\toprule
+\textbf{Degree} & \textbf{$R^2$} & \textbf{Adj.\ $R^2$} & \textbf{AIC} & \textbf{CV RMSE} \\
+\midrule
+1 & 0.4447 & 0.4249 & 145.54 & 2.686 \\
+2 & 0.5781 & 0.5469 & 139.30 & 2.471 \\
+3 & 0.6131 & 0.5685 & 138.70 & 2.539 \\
+5 & 0.6305 & 0.5535 & 141.32 & 2.855 \\
+8 & 0.6319 & 0.4916 & 147.21 & 4.673 \\
+9 & 0.7080 & 0.5766 & 142.26 & 4.117 \\
+10 & 0.7145 & 0.5643 & 143.58 & 4.008 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{parts}
+\item Fill in which degree each criterion selects.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.6}
+\begin{tabular}{lc}
+\toprule
+\textbf{Criterion} & \textbf{Degree chosen} \\
+\midrule
+$R^2$ & \blankline{1.1in} \\
+Adjusted $R^2$ & \blankline{1.1in} \\
+AIC & \blankline{1.1in} \\
+CV RMSE & \blankline{1.1in} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\item Only one criterion recovers the truth. Which, and what does it do that the other three
+do not?
+\answerspace{4em}
+
+\item The in-sample residual standard error is $2.275$ at degree $2$ and $2.231$ at degree $10$, so
+the degree-10 model fits slightly \emph{better}. Its CV RMSE is $4.008$ against $2.471$. Explain
+how both statements can hold.
+\answerspace{4.5em}
+
+\item AIC picked a lower degree than adjusted $R^2$ did, but still not the truth. What does that
+tell you about the difference between charging for parameters and holding data back?
+\answerspace{4em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Find the bugs.} A classmate answers the director's question and then picks a
+polynomial degree. The code runs, prints plausible numbers, and is wrong in \textbf{three} separate
+ways.
+
+\begin{lstlisting}[language=R]
+fit <- lm(visits ~ hours * type, data = st)
+
+predict(fit, newdata = data.frame(hours = 50, type = "Branch"),
+        interval = "confidence")
+
+for (dg in 1:10) {
+  f <- lm(y ~ poly(x, dg), data = dd)
+  cat(dg, summary(f)$r.squared, "\n")
+}
+\end{lstlisting}
+
+\begin{parts}
+\item Bug 1 is \texttt{interval = "confidence"}, given what the director asked in Question 3(E).
+What should it be, and roughly how much wider is the right answer?
+\answerspace{4em}
+
+\item Bug 2 is choosing the degree by \texttt{r.squared}. Which degree will this loop always pick,
+and why is that guaranteed before you run it?
+\answerspace{4em}
+
+\item Bug 3 is what the loop never does. Name it, and say what the loop would have to look like
+instead.
+\answerspace{4.5em}
+\end{parts}
+
+\end{questions}
+
+\end{document}

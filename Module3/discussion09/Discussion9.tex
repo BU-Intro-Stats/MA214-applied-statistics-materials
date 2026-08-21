@@ -1,0 +1,297 @@
+% MA 214 Discussion 9 -- covers Lecture 13.
+%
+% Student handout. Page 1 is the concept review; the question set runs from page 2.
+% Compile from inside this folder:  pdflatex Discussion9.tex
+
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{tabularx}
+\usepackage{listings}
+
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\rhead{Discussion 9}
+\lhead{MA 214: Applied Statistics}
+\renewcommand{\headrulewidth}{.4mm}
+
+\newcommand{\blankline}[1]{\underline{\hspace{#1}}}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  frame=single,
+  framerule=0.4pt,
+  breaklines=true,
+  showstringspaces=false,
+  aboveskip=8pt,
+  belowskip=8pt
+}
+
+% Section header: bold title over a hairline rule.
+\newcommand{\parttitle}[1]{%
+  \par\medskip\noindent
+  {\large\bfseries #1}\par
+  \vspace{-.5em}\noindent\rule{\linewidth}{0.4pt}\par\smallskip}
+
+% Writing space.
+\newcommand{\answerspace}[1]{\vspace{#1}}
+
+% Flush-left question list: the label runs in at the margin and the body wraps
+% back to the margin, so nothing is pushed far to the right.
+\newlist{questions}{enumerate}{1}
+\setlist[questions]{label=\textbf{Question \arabic*.}, wide=0pt, itemsep=1.4em, topsep=.8em}
+
+\newlist{parts}{enumerate}{1}
+\setlist[parts]{label=\textbf{(\Alph*)}, leftmargin=1.6em, labelsep=.45em,
+  itemsep=.7em, topsep=.5em}
+
+\begin{document}
+
+\noindent\textbf{Name:}\blankline{2.3in}\hfill\textbf{BUID:}\blankline{1.6in}
+
+\begin{center}
+  {\Large\bfseries Discussion 9: The Slope Is Just Another Statistic}
+\end{center}
+
+\noindent\textbf{Goals:} \textbf{(1)} read a slope, its standard error, and its interval off
+\texttt{lm()} output, \textbf{(2)} say what gets shuffled to test a slope, \textbf{(3)} test a slope
+against a value other than zero, \textbf{(4)} diagnose which LINE condition has failed,
+\textbf{(5)} apply a transformation and read the new slope.
+
+\parttitle{Part 1: Concept Review}
+
+{\small
+
+\noindent Everything in Part 2 can be answered from this page. Keep it in front of you.
+
+\begin{enumerate}[label=\textbf{\arabic*.}, wide=0pt, itemsep=.4em, topsep=.5em]
+
+\item \textbf{The slope has a sampling distribution.} $\hat\beta_1$ is computed from data, so a new
+sample gives a different value. Everything from Module 2 applies to it unchanged: it has a sampling
+distribution, a standard error, a null distribution, and a confidence interval.
+
+\item \textbf{Two roads, now for the slope.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lll}
+\toprule
+ & \textbf{Road A: simulate} & \textbf{Road B: formula} \\
+\midrule
+Test $H_0: \beta_1 = 0$ & shuffle the \emph{pairing} of $y$ to $x$ & $t = \hat\beta_1/\text{SE}$, df $= n-2$ \\
+Interval & bootstrap the $(x,y)$ \emph{pairs} & $\hat\beta_1 \pm t^{\ast}\,\text{SE}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Shuffling $y$ against a fixed $x$ destroys any relationship while keeping both marginal
+distributions, which is exactly what $\beta_1 = 0$ claims. For the interval you must resample whole
+\emph{pairs}; resampling $x$ and $y$ separately would test the null instead of estimating.
+
+\item \textbf{Reading the output.} From an \texttt{lm()} coefficient table,
+\[
+t = \frac{\hat\beta_1}{\text{SE}},
+\qquad
+\text{95\% CI} = \hat\beta_1 \pm t^{\ast}\,\text{SE},
+\qquad \text{df} = n-2 .
+\]
+The reported $p$-value always tests $H_0: \beta_1 = 0$, which is often not the question you care
+about. The intercept is the fitted value at $x = 0$; if $x = 0$ lies outside the data, do not
+interpret it.
+
+\item \textbf{Testing against a value other than zero.} To test $H_0: \beta_1 = c$, build the
+statistic yourself:
+\[
+t = \frac{\hat\beta_1 - c}{\text{SE}}, \qquad \text{df} = n-2 .
+\]
+Equivalently, ask whether $c$ lies inside the confidence interval. A slope can be
+overwhelmingly different from $0$ and perfectly consistent with $c = 1.5$ at the same time.
+
+\item \textbf{LINE.} Road B's formula needs: \textbf{L}inear mean response, \textbf{I}ndependent
+observations, \textbf{N}ormal residuals, \textbf{E}qual variance. Check L and E on a plot of
+residuals against fitted values, and N on a Q--Q plot. A \emph{funnel} in the residual plot means E
+has failed; a \emph{curve} means L has failed.
+
+\item \textbf{When a condition fails.} Comparing the two roads is \emph{not} a reliable way to
+detect it: a $t$ interval for a slope is fairly robust, so the two roads can agree closely while a
+condition is plainly broken. Diagnose from the residuals, not from agreement. The usual remedy for
+a funnel is to transform $y$; if the relationship is multiplicative, take logs of both. A
+\textbf{log--log} slope is an elasticity: a $1\%$ rise in $x$ goes with a $\hat\beta_1\%$ rise in
+$y$, and more precisely $y$ multiplies by $1.10^{\hat\beta_1}$ when $x$ rises $10\%$.
+
+\item \textbf{Four traps.} Reading the printed $p$-value as a test of the slope you actually care
+about. Interpreting an intercept outside the data. Bootstrapping $x$ and $y$ separately when you
+wanted an interval. Concluding the conditions are fine because Road A and Road B agree.
+
+\end{enumerate}
+
+}
+
+\newpage
+
+\parttitle{Part 2: Question Set}
+
+\noindent\textbf{Scenario A.} For $n = 28$ neighbourhood branches, annual visits (thousands) are
+regressed on weekly open hours. Open hours run from $22$ to $67$.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lccc}
+\toprule
+ & \textbf{Estimate} & \textbf{Std. Error} & \textbf{$p$-value} \\
+\midrule
+(Intercept) & $19.695$ & 5.383 & 0.0011 \\
+\texttt{hours} & $1.3548$ & 0.1149 & $<0.001$ \\
+\bottomrule
+\end{tabular}
+\qquad $R^2 = 0.843$, \quad $t^{\ast}_{26} = 2.0555$
+\end{center}
+
+\begin{questions}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Reading the slope.}
+
+\begin{parts}
+\item Verify the $t$ statistic for \texttt{hours} from the estimate and standard error, and state
+its degrees of freedom.
+\answerspace{3.5em}
+
+\item Compute the 95\% confidence interval for the slope.
+\answerspace{4em}
+
+\item Interpret both the slope and its interval in context, with units.
+\answerspace{4em}
+
+\item The intercept has $p = 0.0011$, so it is ``significant.'' Explain why you would still refuse
+to interpret it.
+\answerspace{3.5em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Two roads for the slope.} Road A shuffled the pairing $1000$ times; \textbf{none} of
+the $1000$ shuffled slopes was as far from $0$ as $1.3548$. Bootstrapping the pairs $2000$ times
+gave a percentile interval of $[\,1.168,\; 1.549\,]$.
+
+\begin{parts}
+\item Exactly what is shuffled, and why does that operation encode $H_0: \beta_1 = 0$? Say what
+stays fixed.
+\answerspace{4em}
+
+\item Report Road A's $p$-value. It is not $0$; explain what you write instead.
+\answerspace{3em}
+
+\item Compare the bootstrap interval with your $t$ interval from Question 1(B). Do they agree?
+\answerspace{3.5em}
+
+\item For the interval you must resample whole $(x,y)$ pairs. What would you be computing instead
+if you resampled \texttt{hours} and \texttt{visits} separately?
+\answerspace{3.5em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{A different null value.} The director's budget model assumes each extra weekly open
+hour brings exactly $1.5$ thousand annual visits. She wants that assumption tested.
+
+\begin{parts}
+\item Build the appropriate $t$ statistic and compute it.
+\answerspace{4em}
+
+\item With df $= 26$, this gives $p = 0.217$. State the conclusion about the director's assumption.
+\answerspace{3.5em}
+
+\item The same fit rejects $H_0: \beta_1 = 0$ with $p < 0.001$ and fails to reject
+$H_0: \beta_1 = 1.5$ with $p = 0.217$. Explain to the director how both can be true at once.
+\answerspace{4.5em}
+
+\item Answer (B) again without any new arithmetic, using only your interval from Question 1(B).
+\answerspace{3em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Scenario B: a condition fails.} A second regression uses \texttt{pop}, the population
+served in thousands (range $9.6$ to $85.5$), to predict visits (range $10.5$ to $310.2$).
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lcc}
+\toprule
+ & \textbf{Estimate} & \textbf{Std. Error} \\
+\midrule
+(Intercept) & $1.073$ & 22.629 \\
+\texttt{pop} & $2.4939$ & 0.5661 \\
+\bottomrule
+\end{tabular}
+\qquad $R^2 = 0.427$
+\end{center}
+
+\noindent Diagnostics: the residual standard deviation is $36.2$ among branches below the median
+population and $77.9$ among those above it. The formula interval for the slope is
+$[\,1.330,\; 3.657\,]$ and the bootstrap interval is $[\,1.131,\; 3.692\,]$.
+
+\begin{parts}
+\item Which letter of LINE has failed, and which diagnostic number told you?
+\answerspace{3.5em}
+
+\item Sketch, in words, what the residuals-against-fitted plot looks like here.
+\answerspace{3em}
+
+\item The two intervals have widths $2.33$ and $2.56$, within about $10\%$ of each other. A
+classmate concludes the conditions must be fine. Explain why that reasoning fails, and say what you
+should have looked at instead.
+\answerspace{4.5em}
+
+\item Even setting the interval aside, why is ``each extra thousand people brings $2.49$ thousand
+visits'' a poor description of this relationship?
+\answerspace{4em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{The remedy, and find the bugs.} Refitting with both variables logged gives a
+\texttt{log(pop)} slope of $0.9567$ with standard error $0.1942$, an interval of
+$[\,0.558,\; 1.356\,]$, and residual standard deviations of $0.595$ and $0.688$ in the two halves.
+$R^2$ rises to $0.483$.
+
+\begin{parts}
+\item Compare the two residual standard deviations with those in Question 4. Did the transformation
+do its job?
+\answerspace{3em}
+
+\item Interpret the log--log slope for a $10\%$ increase in population served. You may use
+$1.10^{0.9567} = 1.0955$.
+\answerspace{3.5em}
+
+\item A classmate wrote this randomization test for Scenario A's slope. It runs, prints a plausible
+number, and is wrong in \textbf{three} separate ways.
+
+\begin{lstlisting}[language=R]
+obs <- coef(lm(visits ~ hours))[2]
+
+perm <- replicate(1000, {
+  vs <- sample(visits, replace = TRUE)
+  coef(lm(visits ~ hours))[2]
+})
+
+mean(perm > obs)
+\end{lstlisting}
+
+Bug 1 is inside \texttt{coef(lm(...))}. What does every one of the $1000$ values equal, and what
+does the last line then print?
+\answerspace{4em}
+
+\item Bug 2 is \texttt{replace = TRUE} and bug 3 is the last line. Name both, then rewrite the
+whole block correctly.
+\answerspace{5.5em}
+\end{parts}
+
+\end{questions}
+
+\end{document}

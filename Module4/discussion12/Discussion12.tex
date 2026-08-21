@@ -1,0 +1,292 @@
+% MA 214 Discussion 12 -- covers Lectures 17 and 18.
+%
+% Student handout. Page 1 is the concept review; the question set runs from page 2.
+% Compile from inside this folder:  pdflatex Discussion12.tex
+
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{tabularx}
+\usepackage{listings}
+
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\rhead{Discussion 12}
+\lhead{MA 214: Applied Statistics}
+\renewcommand{\headrulewidth}{.4mm}
+
+\newcommand{\blankline}[1]{\underline{\hspace{#1}}}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  frame=single,
+  framerule=0.4pt,
+  breaklines=true,
+  showstringspaces=false,
+  aboveskip=8pt,
+  belowskip=8pt
+}
+
+% Section header: bold title over a hairline rule.
+\newcommand{\parttitle}[1]{%
+  \par\medskip\noindent
+  {\large\bfseries #1}\par
+  \vspace{-.5em}\noindent\rule{\linewidth}{0.4pt}\par\smallskip}
+
+% Writing space.
+\newcommand{\answerspace}[1]{\vspace{#1}}
+
+% Flush-left question list: the label runs in at the margin and the body wraps
+% back to the margin, so nothing is pushed far to the right.
+\newlist{questions}{enumerate}{1}
+\setlist[questions]{label=\textbf{Question \arabic*.}, wide=0pt, itemsep=1.4em, topsep=.8em}
+
+\newlist{parts}{enumerate}{1}
+\setlist[parts]{label=\textbf{(\Alph*)}, leftmargin=1.6em, labelsep=.45em,
+  itemsep=.7em, topsep=.5em}
+
+\begin{document}
+
+\noindent\textbf{Name:}\blankline{2.3in}\hfill\textbf{BUID:}\blankline{1.6in}
+
+\begin{center}
+  {\Large\bfseries Discussion 12: From a Grid to a Curve}
+\end{center}
+
+\noindent\textbf{Goals:} \textbf{(1)} apply Bayes' rule to events and explain why a base rate can
+dominate a positive test, \textbf{(2)} update sequentially and see that order does not matter,
+\textbf{(3)} normalize a discrete posterior by hand, \textbf{(4)} use the conjugate update rule and
+read the posterior mean as a weighted average, \textbf{(5)} say what a prior is worth in
+observations.
+
+\parttitle{Part 1: Concept Review}
+
+{\small
+
+\noindent Everything in Part 2 can be answered from this page. Keep it in front of you.
+
+\begin{enumerate}[label=\textbf{\arabic*.}, wide=0pt, itemsep=.4em, topsep=.5em]
+
+\item \textbf{What is random, and Bayes' rule for events.} Frequentist: the parameter is fixed, the
+data random. Bayesian: the data are what you have and the \emph{parameter} gets a distribution, a
+\textbf{prior} before and a \textbf{posterior} after. For a hypothesis $H$ and evidence $E$,
+\[
+P(H \mid E) = \frac{P(E \mid H)\,P(H)}{P(E)},
+\qquad
+P(E) = P(E \mid H)P(H) + P(E \mid H^c)P(H^c).
+\]
+When $P(H)$ is small, one positive result often leaves $P(H\mid E)$ small too: the false positives
+from the large $H^c$ group swamp the true positives. The prior does the work.
+
+\item \textbf{Sequential updating.} Feed each posterior in as the next prior. The final answer does
+not depend on the order the observations arrive in, because the product of prior and likelihoods is
+the same either way.
+
+\item \textbf{Bayes' rule for a parameter.} Over a discrete set of candidate values,
+$f(\theta \mid x) \propto f(\theta)L(\theta;x)$: multiply prior by likelihood, total the products,
+divide through by that total. The denominator is only a normalizing constant, which is why the
+proportionality is enough to identify the posterior.
+
+\item \textbf{The three conjugate families.} A \textbf{conjugate} prior makes the posterior come
+from the same family, so no normalizing is needed: you just update the parameters.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{llll}
+\toprule
+\textbf{Data} & \textbf{Prior} & \textbf{Posterior} & \textbf{Prior is worth} \\
+\midrule
+$y$ of $n$ successes & Beta$(a,b)$ & Beta$(a+y,\; b+n-y)$ & $a+b$ trials \\
+$n$ obs, $\sigma$ known & N$(\theta_0, \tau^2)$ & N(weighted mean, $1/\text{precision}$) & $\sigma^2/\tau^2$ obs \\
+counts over $t$ units & Gamma$(s,r)$ & Gamma$(s+\sum y,\; r+t)$ & $r$ units \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+In the Normal--Normal case precision adds, $1/\tau^2 + n/\sigma^2$, and the posterior mean is
+$\big(\theta_0/\tau^2 + n\bar{x}/\sigma^2\big)$ divided by that precision.
+
+\item \textbf{The posterior mean is a weighted average.} In all three,
+$\text{posterior mean} = (w \cdot \text{prior mean} + n \cdot \text{data estimate})/(w + n)$, where
+the prior weight $w$ is $a+b$, $\sigma^2/\tau^2$, or $r$, and the data weight is $n$ or $t$. So the
+posterior always lands \emph{between} the prior mean and the data, nearer whichever carries more
+weight, and as $n$ grows different priors converge.
+
+\item \textbf{Four traps.} Reporting prior $\times$ likelihood without dividing by the total.
+Reusing the original prior at every step of a sequential update instead of the latest posterior.
+Swapping the counts in the Beta update. Saying a posterior probability is a $p$-value.
+
+\end{enumerate}
+
+}
+
+\newpage
+
+\parttitle{Part 2: Question Set}
+
+\begin{questions}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{A detector, and a base rate.} A field station runs an automated detector for the call
+of a rare frog. On any given night the species is actually present at a monitoring site with
+probability $0.03$. The detector has sensitivity $0.92$ and specificity $0.88$.
+
+\begin{parts}
+\item Compute $P(\text{fires})$ by the law of total probability, then
+$P(\text{frog} \mid \text{fires})$.
+\answerspace{5em}
+
+\item The detector is good, yet your answer to (A) is under $0.20$. Explain where the probability
+went, in terms of the two groups of sites.
+\answerspace{3.2em}
+
+\item The detector fires on a \emph{second} independent night at the same site. Using your answer to
+(A) as the new prior, compute the updated probability. A third firing gives $0.933$; what is the
+pattern across the three numbers?
+\answerspace{3.5em}
+
+\item Suppose instead the detector fires once and then fails to fire once. Someone claims the answer
+depends on which happened first. Explain why it does not.
+\answerspace{3.2em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{A grid, normalized by hand.} Now the unknown is a number: let $\theta$ be the
+probability that a randomly chosen site holds the frog. Restrict $\theta$ to four values. You survey
+$10$ sites and find the frog at $3$ of them.
+
+\begin{parts}
+\item Complete the table. The likelihoods are given.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{ccccc}
+\toprule
+$\theta$ & Prior $f(\theta)$ & $L(\theta; x=3)$ & Product & Posterior $f(\theta \mid x)$ \\
+\midrule
+0.10 & 0.30 & 0.0574 & \blankline{1in} & \blankline{1in} \\
+0.20 & 0.40 & 0.2013 & \blankline{1in} & \blankline{1in} \\
+0.30 & 0.20 & 0.2668 & \blankline{1in} & \blankline{1in} \\
+0.40 & 0.10 & 0.2150 & \blankline{1in} & \blankline{1in} \\
+\midrule
+ & & Total: & \blankline{1in} & 1.000 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\item The products total $0.1726$, not $1$. Say what that total is called and why dividing by it is
+required.
+\answerspace{3.5em}
+
+\item Compute the prior mean and the posterior mean of $\theta$. The data on its own suggest
+$3/10 = 0.30$. Where does the posterior mean sit relative to $0.21$ and $0.30$, and why?
+\answerspace{3.5em}
+
+\item You only allowed four values of $\theta$, but $\theta$ could be anything in $[0,1]$. What
+does Lecture 18 replace the four rows with, and what happens to the ``Total'' column?
+\answerspace{3.2em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{The same rule, three times.} Each row is a different conjugate model. Fill in the
+posterior and the weights.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabularx}{\linewidth}{LLL}
+\toprule
+\textbf{Setting} & \textbf{Posterior} & \textbf{Prior / data weight} \\
+\midrule
+Beta$(2,8)$; $5$ of $20$ sites & & \\
+N$(3000,200^2)$; $n=25$, $\bar{x}=2850$, $\sigma=400$ & & \\
+Gamma$(4,2)$; $18$ calls in $6$ nights & & \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{parts}
+\item Give the posterior \emph{mean} in each of the three rows.
+\answerspace{3.2em}
+
+\item For each row, state what the prior is worth in observations, and check it against the weights
+you wrote. In the Normal--Normal row that worth is only $4$ observations against $n = 25$, which is
+why the posterior mean $2870.7$ sits much nearer $2850$ than $3000$.
+\answerspace{3.5em}
+
+\item What single feature makes all three of these ``the same rule''?
+\answerspace{3em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Five people, one data set.} Five researchers hold different Beta priors for $\theta$.
+All see the same data: the frog at $5$ of $20$ sites, a proportion of $0.25$.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Prior} & \textbf{Prior mean} & \textbf{Post.\ mean, $n=20$} & \textbf{Post.\ mean, $n=200$} \\
+\midrule
+Beta$(2,8)$, skeptical & 0.200 & 0.2333 & 0.2476 \\
+Beta$(8,2)$, optimistic & 0.800 & 0.4333 & 0.2762 \\
+Beta$(20,80)$, firm skeptic & 0.200 & 0.2083 & 0.2333 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent The $n = 200$ column uses $50$ of $200$ sites, the same proportion $0.25$.
+
+\begin{parts}
+\item At $n = 20$ the posterior means run from $0.208$ to $0.433$, a spread of $0.225$. At
+$n = 200$ they run from $0.233$ to $0.276$, a spread of $0.043$. State the general principle.
+\answerspace{3.2em}
+
+\item Beta$(2,8)$ and Beta$(20,80)$ have the \emph{same} prior mean of $0.200$ but reach different
+posteriors. Explain why, using what each prior is worth. Then say whether the optimistic
+researcher's $0.433$, well above the observed $0.25$, is an arithmetic mistake, a method mistake,
+or neither.
+\answerspace{5em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Find the bugs.} The code below is meant to reproduce Question 2, then the Beta update
+from Question 3, then two sequential detector firings. It runs, prints plausible numbers, and is
+wrong in \textbf{three} separate ways.
+
+\begin{lstlisting}[language=R]
+lik <- dbinom(3, 10, theta)
+posterior <- prior * lik
+posterior
+
+a <- 2; b <- 8; y <- 5; n <- 20
+c(a + n, b + y)
+
+p <- 0.03
+for (i in 1:2) post <- 0.92*p / (0.92*p + 0.12*(1-p))
+post
+\end{lstlisting}
+
+\begin{parts}
+\item Bug 1 is the \texttt{posterior} line: what do those four numbers sum to, and what is missing?
+Bug 2 is \texttt{c(a + n, b + y)}: give the numbers it prints and the numbers it should print.
+\answerspace{4.5em}
+
+\item Bug 3 is in the loop. What does \texttt{post} equal after two iterations, and what should it
+equal? Name the line that has to change.
+\answerspace{3.5em}
+
+\item Which of the three bugs would still be invisible if the loop ran only \emph{one} iteration?
+\answerspace{3em}
+\end{parts}
+
+\end{questions}
+
+\end{document}

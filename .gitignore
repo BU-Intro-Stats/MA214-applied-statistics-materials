@@ -20,6 +20,7 @@
 *.xdv
 *-converted-to.*
 Lecture*.pdf
+Discussion*.pdf
 beamer.cls
 
 # R

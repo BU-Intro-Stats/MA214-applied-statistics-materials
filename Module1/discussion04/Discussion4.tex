@@ -1,0 +1,338 @@
+% MA 214 Discussion 4 -- covers Lectures 6 and 7.
+%
+% Student handout. Page 1 is the concept review; the question set runs from page 2.
+% Compile from inside this folder:  pdflatex Discussion4.tex
+
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{tabularx}
+\usepackage{listings}
+
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\rhead{Discussion 4}
+\lhead{MA 214: Applied Statistics}
+\renewcommand{\headrulewidth}{.4mm}
+
+\newcommand{\blankline}[1]{\underline{\hspace{#1}}}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  frame=single,
+  framerule=0.4pt,
+  breaklines=true,
+  showstringspaces=false,
+  aboveskip=8pt,
+  belowskip=8pt
+}
+
+% Section header: bold title over a hairline rule.
+\newcommand{\parttitle}[1]{%
+  \par\medskip\noindent
+  {\large\bfseries #1}\par
+  \vspace{-.5em}\noindent\rule{\linewidth}{0.4pt}\par\smallskip}
+
+% Writing space.
+\newcommand{\answerspace}[1]{\vspace{#1}}
+
+% Flush-left question list: the label runs in at the margin and the body wraps
+% back to the margin, so nothing is pushed far to the right.
+\newlist{questions}{enumerate}{1}
+\setlist[questions]{label=\textbf{Question \arabic*.}, wide=0pt, itemsep=1.4em, topsep=.8em}
+
+\newlist{parts}{enumerate}{1}
+\setlist[parts]{label=\textbf{(\Alph*)}, leftmargin=1.6em, labelsep=.45em,
+  itemsep=.7em, topsep=.5em}
+
+\begin{document}
+
+\noindent\textbf{Name:}\blankline{2.3in}\hfill\textbf{BUID:}\blankline{1.6in}
+
+\begin{center}
+  {\Large\bfseries Discussion 4: Odds Ratios and Choosing a Model}
+\end{center}
+
+\noindent\textbf{Goals:} \textbf{(1)} read a logistic coefficient as an odds ratio,
+\textbf{(2)} move between log odds, odds, and probability, \textbf{(3)} use AIC to choose among
+candidate models, \textbf{(4)} recognize what multicollinearity does to a coefficient table,
+\textbf{(5)} explain why accuracy can be worthless on unbalanced data.
+
+\parttitle{Part 1: Concept Review}
+
+{\small
+
+\noindent Everything in Part 2 can be answered from this page. Keep it in front of you.
+
+\begin{enumerate}[label=\textbf{\arabic*.}, wide=0pt, itemsep=.5em, topsep=.5em]
+
+\item \textbf{Three scales for the same thing.} With $p = P(Y = 1)$,
+\[
+\text{odds} = \frac{p}{1-p},
+\qquad
+\text{log odds} \;=\; \eta \;=\; \log\!\frac{p}{1-p},
+\qquad
+p = \frac{e^{\eta}}{1+e^{\eta}} .
+\]
+Logistic regression is linear in the \emph{log odds}:
+$\eta = \beta_0 + \beta_1 x_1 + \cdots + \beta_p x_p$. It is not linear in $p$, which is why the
+same coefficient moves the probability by different amounts at different starting points.
+
+\item \textbf{Coefficients are odds ratios.} Exponentiating a coefficient gives the multiplicative
+effect on the \emph{odds}, holding the other predictors fixed:
+$\text{OR} = e^{\beta}$ for a one-unit increase, and $e^{c\beta}$ for a $c$-unit increase. An
+$\text{OR} > 1$ raises the odds, $\text{OR} < 1$ lowers them, and
+$100(e^{\beta}-1)\%$ is the percent change in the odds. A confidence interval for the odds ratio
+is found by exponentiating the endpoints of the interval for $\beta$, not the other way around.
+
+\item \textbf{Fitting.} There is no least squares here. The model is fit by maximum likelihood on
+the Bernoulli likelihood $\prod_i p_i^{y_i}(1-p_i)^{1-y_i}$, solved numerically.
+
+\item \textbf{From a probability to a decision.} Choose a threshold, predict $1$ above it, and
+cross-tabulate against the truth:
+\[
+\text{accuracy} = \frac{TP+TN}{n},
+\qquad
+\text{sensitivity} = \frac{TP}{TP+FN},
+\qquad
+\text{specificity} = \frac{TN}{TN+FP}.
+\]
+On \textbf{unbalanced} data, always predicting the majority class already scores an accuracy equal
+to the majority share, so accuracy alone cannot show a model is useful. Lowering the threshold
+raises sensitivity and lowers specificity; the right threshold depends on which error costs more.
+
+\item \textbf{Choosing a model with AIC.} There is no $R^2$ for logistic regression, so use
+\[
+\text{AIC} = -2\,\ell(\hat\theta) + 2k,
+\]
+where $k$ counts the estimated parameters. \textbf{Lower is better.} The first term rewards fit,
+the second charges for complexity. Differences below about 2 are not meaningful.
+
+\item \textbf{Multicollinearity.} When two predictors carry nearly the same information, the data
+cannot separate their individual contributions. Standard errors inflate, so $t$ or $z$ statistics
+shrink and $p$-values grow, and each predictor can look useless while the pair jointly matters.
+What it does \emph{not} damage is the fitted values or predictions. Interpretation breaks;
+prediction survives.
+
+\item \textbf{Four traps.} Reading $e^{\beta}$ as a ratio of probabilities, or as a probability.
+Reporting accuracy without the base rate beside it. Comparing AIC across models fit to
+\emph{different} data sets or different numbers of rows. Concluding a predictor does not matter
+from a large $p$-value when a collinear twin is sitting in the same model.
+
+\end{enumerate}
+
+}
+
+\newpage
+
+\parttitle{Part 2: Question Set}
+
+\noindent\textbf{Scenario.} For each of $n = 200$ bike-share stations you record whether it
+\textbf{ran empty} at least once during the day ($1$ = yes), along with \texttt{docks} (docks in
+tens, ranging 4 to 12) and \texttt{type} (Campus, Downtown, Residential). In the data,
+\textbf{32 of the 200 stations ran empty}. Fitting \texttt{empty} $\sim$ \texttt{docks} $+$
+\texttt{type} by logistic regression gives
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lcccc}
+\toprule
+ & \textbf{Estimate} & \textbf{Std. Error} & \textbf{$z$} & \textbf{$p$-value} \\
+\midrule
+(Intercept) & $0.1137$ & 0.7074 & $0.16$ & 0.872 \\
+\texttt{docks} & $-0.3152$ & 0.0927 & $-3.40$ & 0.0007 \\
+\texttt{type}Downtown & $1.3892$ & 0.5085 & $2.73$ & 0.0063 \\
+\texttt{type}Residential & $-0.3101$ & 0.6299 & $-0.49$ & 0.623 \\
+\bottomrule
+\end{tabular}
+\qquad AIC $= 157.23$
+\end{center}
+
+\noindent You may use: $e^{-0.3152} = 0.730$, \; $e^{1.3892} = 4.012$, \;
+$e^{-0.3101} = 0.733$, \; $e^{-1.7775} = 0.169$, \; $e^{-0.3883} = 0.678$, \;
+$e^{-1.6492} = 0.192$.
+
+\begin{questions}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Coefficients as odds ratios.}
+
+\begin{parts}
+\item Convert the \texttt{docks} coefficient to an odds ratio, and interpret it in context.
+Remember that one unit of \texttt{docks} is ten docks.
+\answerspace{4.5em}
+
+\item Express the same effect as a percent change in the odds.
+\answerspace{3em}
+
+\item Interpret the \texttt{type}Downtown odds ratio. Your sentence must say what the comparison
+group is, and must include the conditional phrase.
+\answerspace{4em}
+
+\item A classmate writes: ``Downtown stations are 4.01 times as likely to run empty.'' That is not
+what $4.012$ says. Correct the sentence.
+\answerspace{3.5em}
+
+\item The 95\% confidence interval for the \texttt{docks} coefficient is $[-0.497,\; -0.134]$.
+Give the 95\% interval for its odds ratio, and say why the interval does not contain 1.
+\answerspace{4em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{From log odds to a probability.} Use the fitted model above.
+
+\begin{parts}
+\item Fill in the table for a station with \texttt{docks} $= 6$.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.7}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Type} & \textbf{Log odds $\eta$} & \textbf{Odds} & \textbf{Probability $p$} \\
+\midrule
+Campus & \blankline{1.2in} & \blankline{.9in} & \blankline{.9in} \\
+Downtown & \blankline{1.2in} & \blankline{.9in} & \blankline{.9in} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\item A Downtown station with \texttt{docks} $= 10$ has $\eta = -1.6492$. Compute its probability.
+\answerspace{3em}
+
+\item Going from 6 to 10 tens of docks at a Downtown station, the log odds changed by a fixed
+$4 \times (-0.3152)$. Did the \emph{probability} drop by a fixed amount too? Compare your answers
+in (A) and (B) and explain what this shows about the model.
+\answerspace{4.5em}
+
+\item \texttt{type}Residential has $p$-value $0.623$. Does that mean Residential stations run
+empty at the same rate as Campus stations? Answer carefully.
+\answerspace{4em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Choosing among four models.} All four are fit to the same 200 stations. The variable
+\texttt{capacity} is the station's total capacity, which is essentially \texttt{docks} measured in
+single docks rather than tens.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{llcc}
+\toprule
+\textbf{Model} & \textbf{Predictors} & \textbf{$k$} & \textbf{AIC} \\
+\midrule
+1 & \texttt{docks} & 2 & 167.35 \\
+2 & \texttt{docks} $+$ \texttt{type} & 4 & 157.23 \\
+3 & \texttt{docks} $+$ \texttt{type} $+$ \texttt{capacity} & 5 & 158.91 \\
+4 & \texttt{capacity} $+$ \texttt{type} & 4 & 157.52 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{parts}
+\item Which model does AIC select? By how much does it beat the runner-up, and is that difference
+meaningful?
+\answerspace{4em}
+
+\item Model 1 to Model 2 costs two extra parameters and AIC still improves by more than 10. What
+does that tell you about \texttt{type}?
+\answerspace{3.5em}
+
+\item Models 2 and 4 have almost identical AIC. Explain why, using what \texttt{capacity} is. Is
+this a case of two competing explanations, or something else?
+\answerspace{4.5em}
+
+\item Model 3 contains everything Models 2 and 4 contain, yet its AIC is the worst of the three.
+How is that possible?
+\answerspace{4em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{What collinearity did to the table.} Here is Model 3, the one with both
+\texttt{docks} and \texttt{capacity}. In this data set their correlation is $0.998$.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lcccc}
+\toprule
+ & \textbf{Estimate} & \textbf{Std. Error} & \textbf{$z$} & \textbf{$p$-value} \\
+\midrule
+(Intercept) & $0.1028$ & 0.7073 & $0.15$ & 0.884 \\
+\texttt{docks} & $-1.1484$ & 1.4617 & $-0.79$ & 0.432 \\
+\texttt{type}Downtown & $1.4029$ & 0.5099 & $2.75$ & 0.0059 \\
+\texttt{type}Residential & $-0.2926$ & 0.6311 & $-0.46$ & 0.643 \\
+\texttt{capacity} & $0.0833$ & 0.1456 & $0.57$ & 0.568 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{parts}
+\item Compare the \texttt{docks} row here with the \texttt{docks} row in Model 2. By what factor
+did its standard error change, and what happened to its $p$-value?
+\answerspace{3.5em}
+
+\item In Model 3, \emph{both} \texttt{docks} and \texttt{capacity} have large $p$-values. Has the
+number of docks stopped mattering? Explain what the data cannot do here.
+\answerspace{4.5em}
+
+\item The \texttt{capacity} coefficient is \emph{positive} while the \texttt{docks} coefficient is
+strongly negative, even though more capacity and more docks are the same thing. Why should you not
+try to interpret either number?
+\answerspace{4.5em}
+
+\item What would you do about it, and what part of the analysis would be unaffected by the problem?
+\answerspace{4em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Accuracy, and find the bugs.} A classmate evaluates Model 2 at a threshold of $0.5$
+and gets this table.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lcc}
+\toprule
+ & \textbf{Actually ran empty} & \textbf{Did not run empty} \\
+\midrule
+Predicted ``ran empty'' & 3 & 3 \\
+Predicted ``did not'' & 29 & 165 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{parts}
+\item Compute the accuracy, the sensitivity, and the specificity.
+\answerspace{4.5em}
+
+\item Compute the accuracy of the rule ``predict that no station ever runs empty.'' Compare it with
+your answer in (A) and say what that comparison establishes.
+\answerspace{4em}
+
+\item The city wants to find stations to send more bikes to. Which of the three numbers in (A)
+matters most to them, and which way should the threshold move?
+\answerspace{4em}
+
+\item Their code is below. They intended to fit the logistic model from Question 2 and report its
+accuracy. It runs with no error and prints a plausible number, and two separate lines need fixing.
+Find both and give the correction.
+
+\begin{lstlisting}[language=R]
+fit <- glm(empty ~ docks + type, data = st)
+
+phat <- predict(fit, newdata = st)
+
+mean((phat > 0.5) == st$empty)
+\end{lstlisting}
+\answerspace{5.5em}
+\end{parts}
+
+\end{questions}
+
+\end{document}

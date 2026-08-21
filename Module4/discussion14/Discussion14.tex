@@ -1,0 +1,297 @@
+% MA 214 Discussion 14 -- covers Lecture 21, and doubles as Quiz 4 / Module 4 review
+% and the course-wide final review.
+%
+% Student handout. Page 1 is the Module 4 concept review; the question set runs from page 2.
+% Questions are tagged with the Module 4 objective they test; Question 5 spans the whole course.
+%
+% Compile from inside this folder:  pdflatex Discussion14.tex
+
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{tabularx}
+\usepackage{listings}
+
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\rhead{Discussion 14}
+\lhead{MA 214: Applied Statistics}
+\renewcommand{\headrulewidth}{.4mm}
+
+\newcommand{\blankline}[1]{\underline{\hspace{#1}}}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  frame=single,
+  framerule=0.4pt,
+  breaklines=true,
+  showstringspaces=false,
+  aboveskip=8pt,
+  belowskip=8pt
+}
+
+% Section header: bold title over a hairline rule.
+\newcommand{\parttitle}[1]{%
+  \par\medskip\noindent
+  {\large\bfseries #1}\par
+  \vspace{-.5em}\noindent\rule{\linewidth}{0.4pt}\par\smallskip}
+
+% Writing space.
+\newcommand{\answerspace}[1]{\vspace{#1}}
+
+% Objective tag printed after a question title.
+\newcommand{\lo}[1]{{\normalfont\small (#1)}}
+
+% Flush-left question list: the label runs in at the margin and the body wraps
+% back to the margin, so nothing is pushed far to the right.
+\newlist{questions}{enumerate}{1}
+\setlist[questions]{label=\textbf{Question \arabic*.}, wide=0pt, itemsep=1.4em, topsep=.8em}
+
+\newlist{parts}{enumerate}{1}
+\setlist[parts]{label=\textbf{(\Alph*)}, leftmargin=1.6em, labelsep=.45em,
+  itemsep=.7em, topsep=.5em}
+
+\begin{document}
+
+\noindent\textbf{Name:}\blankline{2.3in}\hfill\textbf{BUID:}\blankline{1.6in}
+
+\begin{center}
+  {\Large\bfseries Discussion 14: Bayesian Regression, and the Whole Course}
+\end{center}
+
+\noindent\textbf{Goals:} run Module 4's last model, then the module, then the course. Questions 1--4
+are labelled with the objective they test; Question 5 spans everything.
+
+\parttitle{Part 1: Module 4 Concept Review}
+
+{\small
+
+\noindent The whole module on one page. Everything in Part 2 can be answered from it.
+
+\begin{enumerate}[label=\textbf{\arabic*.}, wide=0pt, itemsep=.4em, topsep=.5em]
+
+\item \textbf{M4.L01 Bayesian inference.} The parameter gets a distribution: a \textbf{prior} before
+the data, a \textbf{posterior} after, with
+$f(\theta \mid x) \propto f(\theta)\,L(\theta;x)$. Feed each posterior in as the next prior to update
+sequentially; the final answer does not depend on the order the data arrived in. When $P(H)$ is
+small, one positive test can still leave $P(H \mid E)$ small, because false positives from the large
+$H^c$ group swamp the true ones.
+
+\item \textbf{M4.L02 Bayesian and frequentist.} A frequentist interval is a statement about the
+\emph{procedure} across repeated samples; a \textbf{credible interval} is a statement about
+$\theta$ given this prior and these data. A Bayesian test reports the posterior probability of a
+claim, so there is no null distribution and no $p$-value.
+
+\item \textbf{M4.L03 Conjugate models.} Beta--Binomial, Normal--Normal, Gamma--Poisson: the posterior
+stays in the prior's family, so you update parameters instead of normalizing. In all three the
+posterior mean is a weighted average,
+$(w\cdot\text{prior mean} + n\cdot\text{data estimate})/(w+n)$, with prior weight $w$ equal to
+$a+b$, $\sigma^2/\tau^2$, or $r$. The posterior always lands between the prior and the data.
+
+\item \textbf{M4.L05 Approximation.} When no conjugate rule applies, use a \textbf{grid} (evaluate
+prior $\times$ likelihood, normalize) or \textbf{MCMC}. A grid needs (points per axis)$^{k}$ cells, so
+it collapses past a few parameters. For a chain: discard \textbf{burn-in}; a high acceptance rate is
+\emph{not} a good sign; $\widehat{R}$ near $1.00$ says the chains agree; ESS is how many independent
+draws you effectively have; $\text{MCSE} = \text{posterior sd}/\sqrt{\text{ESS}}$.
+
+\item \textbf{M4.L04 With samples, everything is counting.} From posterior draws: the point estimate
+is their mean or median, a $95\%$ credible interval is their $2.5$th and $97.5$th percentiles, and
+$P(\theta > c)$ is the \emph{proportion} of draws above $c$. To predict a new observation, draw one
+$y$ at \emph{each} posterior draw of $\theta$; that \textbf{posterior predictive} is always wider
+than plugging in a single $\hat\theta$.
+
+\item \textbf{M4.L06 Bayesian linear regression.} Same line, now with a prior on each of
+$\beta_0$, $\beta_1$, and $\sigma$. \textbf{Check the prior before the data} with a \emph{prior
+predictive check}: simulate parameters from the prior alone and look at the responses they imply. If
+they are impossible, the prior is wrong no matter how ``uninformative'' it looks. After fitting, the
+posterior is a compromise between prior and likelihood, and with a genuinely diffuse prior the
+credible interval nearly coincides with the frequentist interval, even though the two mean different
+things. Predicting still asks two questions: an interval for the \emph{mean line} at $x^{\ast}$, or a
+wider one for \emph{one new case}.
+
+\item \textbf{Four traps.} Calling a prior uninformative without checking what it implies. Reading a
+posterior probability as a $p$-value. Predicting with a single $\hat\theta$ when the question was
+about one new case. Trusting a chain because its acceptance rate is high.
+
+\end{enumerate}
+
+}
+
+\newpage
+
+\parttitle{Part 2: Question Set}
+
+\noindent\textbf{Scenario.} For $n = 40$ penguins you model body \texttt{mass} in grams on
+\texttt{flipper} length in mm. Flipper lengths run $172$ to $231$; masses run $2849$ to $6313$. The
+likelihood alone (ordinary least squares) gives slope $47.640$ with standard error $3.335$,
+$\hat\sigma = 380.6$, and a $95\%$ interval of $[\,40.889,\; 54.392\,]$.
+
+\begin{questions}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Check the prior before the data.} \lo{M4.L06} Two candidate priors for the slope, each
+paired with $\beta_0 \sim$ N$(0, 2000^2)$. Simulating from the prior \emph{alone} and reading off the
+body mass implied at a flipper length of $200$ mm gives:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lc}
+\toprule
+\textbf{Prior on $\beta_1$} & \textbf{Implied mass at 200 mm, middle 95\%} \\
+\midrule
+N$(0, 100^2)$, called ``uninformative'' & $[\,-38{,}912,\;\; 41{,}024\,]$ g \\
+N$(20, 5^2)$ & $[\,-337,\;\; 8{,}332\,]$ g \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{parts}
+\item Name the three parameters a Bayesian version of this model needs priors for.
+\answerspace{3em}
+
+\item The first prior is the one people reach for when they want to ``let the data speak.'' Point at
+the single feature of its implied range that shows it is indefensible.
+\answerspace{3.5em}
+
+\item Both rows contain impossible values. Which row is nonetheless the more usable prior, and why?
+\answerspace{4em}
+
+\item Describe the prior predictive check as a recipe, and say why it must happen \emph{before} the
+data are used.
+\answerspace{4em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{The posterior is a compromise.} \lo{M4.L06, M4.L03} Fitting with each prior gives:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Prior on $\beta_1$} & \textbf{Prior mean} & \textbf{Posterior mean} & \textbf{Posterior sd} & \textbf{95\% credible interval} \\
+\midrule
+N$(0, 100^2)$ & 0 & 47.587 & 3.333 & $[\,41.05,\; 54.12\,]$ \\
+N$(20, 5^2)$ & 20 & 39.130 & 2.774 & $[\,33.69,\; 44.57\,]$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent Under the first prior the prior carries weight $0.0011$ of the total; under the second it
+carries $0.308$.
+
+\begin{parts}
+\item The first posterior mean is $47.587$ and the likelihood alone gave $47.640$. Explain why they
+are so close, using the weight.
+\answerspace{3.5em}
+
+\item The second posterior mean, $39.130$, sits between $20$ and $47.640$. Verify that it is roughly
+the weighted average the review describes, and say which way the prior pulled it.
+\answerspace{4em}
+
+\item The second posterior has the \emph{smaller} standard deviation. Is a narrower posterior
+automatically better here? Explain.
+\answerspace{4em}
+
+\item A bootstrap of the same data gives a $95\%$ interval of $[\,42.06,\; 54.30\,]$, almost the
+first row's credible interval. State what each of the two intervals claims, and why nearly equal
+endpoints do not make them the same statement.
+\answerspace{5em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Two questions at one flipper length.} \lo{M4.L04} At $\texttt{flipper} = 200$ the
+fitted mass is $4753.8$ g, with $\text{SE}_{\text{fit}} = 61.7$ and $\hat\sigma = 380.6$.
+
+\begin{parts}
+\item One interval is $[\,4628.8,\; 4878.7\,]$ and the other is $[\,3973.3,\; 5534.3\,]$. Label each
+with the question it answers.
+\answerspace{3.5em}
+
+\item Compute $\sqrt{\hat\sigma^2 + \text{SE}_{\text{fit}}^2}$ and use it to say which term makes
+the second interval about six times as wide.
+\answerspace{4em}
+
+\item In the Bayesian version, both intervals come from the same posterior draws. Describe the two
+different recipes, in terms of what you do at each draw.
+\answerspace{4.5em}
+
+\item A colleague catches one penguin with a $200$ mm flipper and reports the narrower interval.
+What have they claimed, and what should they have reported?
+\answerspace{3.5em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{The rest of Module 4.} \lo{M4.L01, L03, L05} Short answers.
+
+\begin{parts}
+\item A detector with sensitivity $0.92$ and specificity $0.88$ fires at a site where the species is
+present $3\%$ of the time. Without computing, say whether the posterior probability is nearer $0.2$
+or $0.9$, and name the quantity that decides it.
+\answerspace{3.5em}
+
+\item A Beta$(2,8)$ prior meets $5$ successes in $20$ trials. Give the posterior and its mean, and
+say what the prior was worth in trials.
+\answerspace{3.5em}
+
+\item Two samplers on the same posterior: one accepts $98.7\%$ of proposals with ESS $14$, the other
+accepts $61\%$ with ESS $867$. Which do you keep, and what is wrong with the other?
+\answerspace{4em}
+
+\item Four chains give $\widehat{R} = 1.57$. What does that number compare, and what must you do
+before reporting anything?
+\answerspace{3.5em}
+
+\item With posterior sd $0.586$ and ESS $867$, compute the MCSE. Then say what ESS you would need to
+halve it.
+\answerspace{3.5em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{The whole course, side by side.} \lo{all four modules} Complete the translation table.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.9}
+\begin{tabularx}{\linewidth}{LLL}
+\toprule
+\textbf{Question} & \textbf{Frequentist answer} & \textbf{Bayesian answer} \\
+\midrule
+What is treated as random? & & \\
+A range for a parameter & & \\
+Evidence against a claim & & \\
+Where prior knowledge enters & & \\
+Predicting one new case & & \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{parts}
+\item Two rows have answers that can be numerically almost identical while meaning different things.
+Which two, and what is the difference in what is being claimed?
+\answerspace{4.5em}
+
+\item A classmate's final report ends with the four sentences below. Mark each \textbf{defensible} or
+\textbf{not}, and rewrite the ones that are not.
+\begin{enumerate}[label=\textbf{S\arabic*.}, leftmargin=2.2em, itemsep=.25em, topsep=.35em]
+\item ``Our $95\%$ confidence interval for the slope is $[40.9, 54.4]$, so there is a $95\%$
+probability the true slope is in that range.''
+\item ``We used an uninformative N$(0, 100^2)$ prior, so our conclusions are not affected by any
+prior beliefs.''
+\item ``The posterior probability that $\beta_1 > 45$ is $0.78$, which is not significant at the
+$5\%$ level.''
+\item ``Our credible interval and our bootstrap interval nearly agree, which proves the prior was
+correct.''
+\end{enumerate}
+\answerspace{7em}
+\end{parts}
+
+\end{questions}
+
+\end{document}

@@ -1,0 +1,287 @@
+% MA 214 Discussion 1 -- covers Lecture 1.
+%
+% Student handout. Page 1 is the concept review; the question set runs from page 2.
+% Compile from inside this folder:  pdflatex Discussion1.tex
+
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{tabularx}
+
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\rhead{Discussion 1}
+\lhead{MA 214: Applied Statistics}
+\renewcommand{\headrulewidth}{.4mm}
+
+\newcommand{\blankline}[1]{\underline{\hspace{#1}}}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+
+% Section header: bold title over a hairline rule.
+\newcommand{\parttitle}[1]{%
+  \par\medskip\noindent
+  {\large\bfseries #1}\par
+  \vspace{-.5em}\noindent\rule{\linewidth}{0.4pt}\par\smallskip}
+
+% Writing space.
+\newcommand{\answerspace}[1]{\vspace{#1}}
+
+% Flush-left question list: the label runs in at the margin and the body wraps
+% back to the margin, so nothing is pushed far to the right.
+\newlist{questions}{enumerate}{1}
+\setlist[questions]{label=\textbf{Question \arabic*.}, wide=0pt, itemsep=1.4em, topsep=.8em}
+
+\newlist{parts}{enumerate}{1}
+\setlist[parts]{label=\textbf{(\Alph*)}, leftmargin=1.6em, labelsep=.45em,
+  itemsep=.7em, topsep=.5em}
+
+\begin{document}
+
+\noindent\textbf{Name:}\blankline{2.3in}\hfill\textbf{BUID:}\blankline{1.6in}
+
+\begin{center}
+  {\Large\bfseries Discussion 1: Randomness, Data, and the Language of Inference}
+\end{center}
+
+\noindent\textbf{Goals:} \textbf{(1)} use the notation of population and sample correctly,
+\textbf{(2)} say what the sampling distribution is a distribution \emph{of}, \textbf{(3)}
+separate what a probability claims from what one sample shows, \textbf{(4)} tell an
+observational study from an experiment, \textbf{(5)} recognize the limits of a sampling frame.
+
+\parttitle{Part 1: Concept Review}
+
+{\small
+
+\noindent Everything in Part 2 can be answered from this page. Keep it in front of you.
+
+\begin{enumerate}[label=\textbf{\arabic*.}, wide=0pt, itemsep=.55em, topsep=.5em]
+
+\item \textbf{Random process, outcome, event.} A \textbf{random process} is a repeatable action
+whose result is not determined in advance. An \textbf{outcome} is one complete result of running
+it once. An \textbf{event} is a \emph{set} of outcomes, which is why a probability attaches to it.
+For one bike-share trip: the process is taking a trip, an outcome is one trip with all its
+recorded values, and ``the trip lasted over 30 minutes'' is an event.
+
+\item \textbf{Population and sample.} A \textbf{parameter} describes the population and is fixed
+but unknown. A \textbf{statistic} is computed from the sample: known, but it changes with every
+new sample. You only ever get to see the statistic. An \textbf{inference} is a claim about a
+parameter made using a statistic.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{lcccc}
+\toprule
+ & Mean & SD & Proportion & Size \\
+\midrule
+Population (parameter) & $\mu$ & $\sigma$ & $p$ & $N$ \\
+Sample (statistic) & $\bar{x}$ & $s$ & $\hat{p}$ & $n$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\item \textbf{Probability facts.} For an event $A$, and for independent events $A_1,\dots,A_k$,
+\[
+P(\text{not } A) = 1 - P(A),
+\qquad
+P(A_1 \text{ and } \cdots \text{ and } A_k) = \prod_{i=1}^{k} P(A_i).
+\]
+The \textbf{law of large numbers} says that as $n$ grows, $\hat{p} \to p$ and $\bar{x} \to \mu$.
+It promises the statistic \emph{settles toward} the parameter, not that it equals the parameter
+at any particular $n$.
+
+\item \textbf{Sampling variability and the sampling distribution.} Draw a new sample and every
+statistic changes: that is \textbf{sampling variability}. The \textbf{sampling distribution} of
+$\bar{x}$ is the distribution of $\bar{x}$ across all possible samples of size $n$ from the
+population. One draw from it is one \emph{whole sample}, not one observation, and it does not
+depend on which sample you happened to get. As $n$ grows the sampling distribution gets
+\emph{narrower}, while the spread of the data, $\sigma$, does not change at all.
+
+\item \textbf{Observational study or experiment.} In an \textbf{experiment} the researcher
+\emph{assigns} the explanatory variable, ideally at random. In an \textbf{observational study}
+the units arrive with their values already set. A \textbf{confounder} is a variable associated
+with both the explanatory variable and the response, which can produce an association with no
+causal link behind it. Randomized assignment breaks that link, which is why only an experiment
+supports a causal claim.
+
+\item \textbf{Three traps.} \textbf{(a)} Writing $\mu = 14.2$ when $14.2$ came from a sample; it
+is $\bar{x} = 14.2$. \textbf{(b)} Calling the histogram of your $n$ observations ``the sampling
+distribution''; that is the distribution of the \emph{data}. \textbf{(c)} Believing a larger $n$
+fixes a bad sample. It does not: $n$ controls \textbf{variance}, the sampling frame controls
+\textbf{bias}, and no amount of the first cures the second.
+
+\end{enumerate}
+
+}
+
+\newpage
+
+\parttitle{Part 2: Question Set}
+
+\noindent\textbf{Scenario.} A city bike-share system recorded every trip taken last year, about
+4.2 million of them. You cannot work with all of them, so you take a random sample of
+\textbf{250 trips} and record, for each one, the duration in minutes, whether the rider held a
+monthly membership, and the station the trip started from. In your sample: $n = 250$ trips, mean
+duration $14.2$ min, standard deviation of duration $9.6$ min, and a proportion $0.68$ holding a
+membership.
+
+\begin{questions}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Notation.} Answer in symbols, not prose.
+
+\begin{parts}
+\item Write the symbol for each quantity, for all 4.2 million trips and for your 250, and give
+the value where you know one.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.6}
+\begin{tabularx}{\linewidth}{Lccc}
+\toprule
+\textbf{Quantity} & \textbf{All 4.2M trips} & \textbf{Your 250 trips} & \textbf{Value known} \\
+\midrule
+Mean duration & & & \\
+SD of duration & & & \\
+Proportion with membership & & & \\
+Number of units & & & \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\item Which quantities are \textbf{fixed but unknown}, and which are \textbf{known but would
+change} if you drew a new sample of 250?
+\answerspace{4em}
+
+\item A classmate writes: ``We found that $\mu = 14.2$ minutes.'' Rewrite the sentence
+correctly, and say in one clause what is wrong with the original.
+\answerspace{4em}
+
+\item Write, in symbols, the claim ``the true mean trip duration for the whole system is
+somewhere near 14 minutes.'' Is that claim a parameter, a statistic, or an inference?
+\answerspace{3.5em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Sampling variability.} Three teaching fellows each independently draw their own
+random sample of 250 trips from the same year of data.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lccc}
+\toprule
+ & \textbf{TF 1} & \textbf{TF 2} & \textbf{TF 3} \\
+\midrule
+Sample mean duration (min) & 14.2 & 13.6 & 15.1 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{parts}
+\item Why are the three numbers different? Name the phenomenon.
+\answerspace{3em}
+
+\item Mark each row \textbf{varies} or \textbf{fixed} across the three TFs.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.6}
+\begin{tabularx}{\linewidth}{Lc}
+\toprule
+ & \textbf{Varies / fixed} \\
+\midrule
+The true mean duration of all 4.2M trips & \\
+The sample mean duration & \\
+The sample size & \\
+The sampling distribution of the sample mean & \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\item Complete the sentence precisely: ``The sampling distribution of the sample mean is the
+distribution of \blankline{2.7in}\,.''
+
+Then say what is wrong with each of these two answers:
+\begin{enumerate}[label=\arabic*., leftmargin=1.8em, itemsep=.15em, topsep=.3em]
+\item ``the distribution of the 250 trip durations.''
+\item ``the distribution of the true mean.''
+\end{enumerate}
+\answerspace{5em}
+
+\item The three TFs pool their work and take \textbf{2500} trips instead of 250. For each of the
+following answer \emph{increases}, \emph{decreases}, or \emph{stays about the same}: the sample
+mean; the SD of trip durations; the spread of the sampling distribution of the sample mean. Give
+a reason for the third.
+\answerspace{5em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{What a probability claims.} A model for this system reports
+\[
+P(\text{a randomly chosen trip lasts more than 30 minutes}) = 0.08 .
+\]
+
+\begin{parts}
+\item Restate this as a long-run frequency claim about many trips.
+\answerspace{3em}
+
+\item Of your 250 sampled trips, 26 lasted more than 30 minutes. Is the model refuted? Name the
+idea you are using.
+\answerspace{4.5em}
+
+\item A rider says: ``My last four trips were all under 30 minutes, so my next one is more
+likely to go over.'' What is wrong with this reasoning? Name the error.
+\answerspace{4em}
+
+\item Under the model, and assuming trips are independent, write an expression for the
+probability that \textbf{none} of the next 3 trips lasts more than 30 minutes. Do not evaluate it.
+\answerspace{3em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Observational or experiment.} Someone notices in your sample that \textbf{members
+average 11.8 minutes per trip and non-members average 19.3 minutes}, and concludes:
+\emph{buying a membership makes people take shorter trips.}
+
+\begin{parts}
+\item Is this an observational study or an experiment? How do you know?
+\answerspace{3em}
+
+\item Name one plausible confounding variable, and say which direction it would push the
+comparison.
+\answerspace{4.5em}
+
+\item Design an experiment that \emph{would} support the causal claim. Say what you randomize,
+to whom, and what you measure.
+\answerspace{4.5em}
+
+\item Could the bike-share company actually run your experiment? If not, what stops it?
+\answerspace{4em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{What this sample can and cannot answer.} Every trip in your sample started from a
+station in the \textbf{downtown core}, because that is where the sampling was done. Write
+\textbf{yes} if your sample can address the question and \textbf{no} if it cannot, with a short
+reason.
+
+\begin{center}
+\renewcommand{\arraystretch}{2}
+\begin{tabularx}{\linewidth}{Lcp{2in}}
+\toprule
+\textbf{Question} & \textbf{Yes / no} & \textbf{Reason} \\
+\midrule
+Mean trip duration for downtown trips? & & \\
+Mean trip duration system-wide? & & \\
+Do members take shorter trips than non-members downtown? & & \\
+Would adding a suburban station increase ridership? & & \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\end{questions}
+
+\end{document}

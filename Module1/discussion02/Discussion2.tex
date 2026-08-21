@@ -1,0 +1,336 @@
+% MA 214 Discussion 2 -- covers Lectures 2 and 3.
+%
+% Student handout. Page 1 is the concept review; the question set runs from page 2.
+% Compile from inside this folder:  pdflatex Discussion2.tex
+
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{tabularx}
+\usepackage{listings}
+
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\rhead{Discussion 2}
+\lhead{MA 214: Applied Statistics}
+\renewcommand{\headrulewidth}{.4mm}
+
+\newcommand{\blankline}[1]{\underline{\hspace{#1}}}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  frame=single,
+  framerule=0.4pt,
+  breaklines=true,
+  showstringspaces=false,
+  aboveskip=8pt,
+  belowskip=8pt
+}
+
+% Section header: bold title over a hairline rule.
+\newcommand{\parttitle}[1]{%
+  \par\medskip\noindent
+  {\large\bfseries #1}\par
+  \vspace{-.5em}\noindent\rule{\linewidth}{0.4pt}\par\smallskip}
+
+% Writing space.
+\newcommand{\answerspace}[1]{\vspace{#1}}
+
+% Flush-left question list: the label runs in at the margin and the body wraps
+% back to the margin, so nothing is pushed far to the right.
+\newlist{questions}{enumerate}{1}
+\setlist[questions]{label=\textbf{Question \arabic*.}, wide=0pt, itemsep=1.4em, topsep=.8em}
+
+\newlist{parts}{enumerate}{1}
+\setlist[parts]{label=\textbf{(\Alph*)}, leftmargin=1.6em, labelsep=.45em,
+  itemsep=.7em, topsep=.5em}
+
+\begin{document}
+
+\noindent\textbf{Name:}\blankline{2.3in}\hfill\textbf{BUID:}\blankline{1.6in}
+
+\begin{center}
+  {\Large\bfseries Discussion 2: One Estimation Principle, Three Models}
+\end{center}
+
+\noindent\textbf{Goals:} \textbf{(1)} write a likelihood and log-likelihood for a given model,
+\textbf{(2)} find an MLE by differentiating, \textbf{(3)} compute least squares estimates by hand
+and interpret them with units, \textbf{(4)} explain why least squares \emph{is} maximum
+likelihood, \textbf{(5)} find statistical bugs in R code that runs without error.
+
+\parttitle{Part 1: Concept Review}
+
+{\small
+
+\noindent Everything in Part 2 can be answered from this page. Keep it in front of you.
+
+\begin{enumerate}[label=\textbf{\arabic*.}, ref=\arabic*, wide=0pt, itemsep=.55em, topsep=.5em]
+
+\item \textbf{A statistical model, and the MLE recipe.} ``Trip duration is 14.2 minutes'' is not a
+statistical model: it states no randomness and has no parameter to estimate. A statistical model
+specifies a \textbf{distribution} for the data, with unknown parameters. To estimate one:
+\textbf{(a)} write the \textbf{likelihood} $L(\theta)$, the probability or density of the data you
+actually observed, read as a function of $\theta$; \textbf{(b)} take logs,
+$\ell(\theta) = \log L(\theta)$, dropping constants free of $\theta$ because they shift $\ell$
+without moving where its maximum sits; \textbf{(c)} set $\ell'(\theta) = 0$ and solve for
+$\hat\theta$.
+
+\item \textbf{Three models, three MLEs.} Independence across observations is assumed in all three,
+which is what lets the likelihood be a product.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{llll}
+\toprule
+\textbf{Data} & \textbf{Model} & \textbf{Likelihood} & \textbf{MLE} \\
+\midrule
+$y$ of $n$ successes & Binomial$(n,\theta)$ & $\propto \theta^{y}(1-\theta)^{n-y}$ & $\hat\theta = y/n$ \\
+$x_1,\dots,x_n > 0$ & Exponential$(\lambda)$ & $\lambda^{n}e^{-\lambda\sum x_i}$ & $\hat\lambda = 1/\bar{x}$ \\
+$(x_i, y_i)$ pairs & Normal regression & see item~\ref{cr:mle} & least squares \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\item\label{cr:model} \textbf{The simple linear regression model.} Written as a statement about a
+distribution,
+\[
+Y_i \mid x_i \;\sim\; \text{Normal}\big(\beta_0 + \beta_1 x_i,\; \sigma^2\big),
+\qquad \text{independently across } i .
+\]
+Three parameters: $\beta_0$, $\beta_1$, $\sigma^2$. Four assumptions ride on that one line: the
+mean response is \textbf{linear} in $x$; observations are \textbf{independent}; the
+\textbf{variance} $\sigma^2$ is the same at every $x$; the errors are \textbf{normal}.
+
+\item \textbf{Least squares, by hand.} With $S_{xy} = \sum (x_i-\bar{x})(y_i-\bar{y})$ and
+$S_{xx} = \sum (x_i-\bar{x})^2$,
+\[
+\hat\beta_1 = \frac{S_{xy}}{S_{xx}},
+\qquad
+\hat\beta_0 = \bar{y} - \hat\beta_1\bar{x},
+\qquad
+\hat{y}_i = \hat\beta_0 + \hat\beta_1 x_i,
+\qquad
+e_i = y_i - \hat{y}_i ,
+\]
+and $\text{RSS} = \sum e_i^2$. Note that $\sum e_i = 0$ always, for any fitted model with an
+intercept.
+
+\item\label{cr:mle} \textbf{Least squares \emph{is} maximum likelihood.} For the model in
+item~\ref{cr:model}, dropping terms free of $\beta_0$ and $\beta_1$,
+\[
+\ell(\beta_0,\beta_1) \;\propto\; -\frac{1}{2\sigma^2}\sum_{i=1}^{n}\big(y_i - \beta_0 - \beta_1 x_i\big)^2 .
+\]
+Maximizing a negative multiple of the RSS is the same as minimizing the RSS. The squared error
+appears only because the normal density carries $e^{-(\,\cdot\,)^2/2\sigma^2}$.
+
+\item \textbf{Four traps.} Using $\sum e_i$ to judge fit, when it is zero for every model.
+Swapping the response and the predictor, since regressing $y$ on $x$ and $x$ on $y$ are different
+fits and the second slope is not the reciprocal of the first. Reporting a slope without units,
+because ``2.2 more'' is not an interpretation. Interpreting an intercept that sits outside the
+data or describes an impossible case.
+
+\end{enumerate}
+
+}
+
+\newpage
+
+\parttitle{Part 2: Question Set}
+
+\noindent\textbf{Scenario.} You are still working with the city bike-share system. Three separate
+questions have landed on your desk, and each one needs a different model. All three are answered
+the same way: \emph{write down the likelihood, then maximize it.} The third turns out to be the
+first two in disguise.
+
+\begin{questions}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{A proportion.} The city audits 20 randomly chosen stations for a broken dock.
+\textbf{7 of the 20} have at least one. Let $\theta$ be the probability that a station has a
+broken dock.
+
+\begin{parts}
+\item Name the distribution and its parameter, and state the assumption that lets you use it
+across all 20 stations.
+\answerspace{3.5em}
+
+\item Write $L(\theta)$, then $\ell(\theta)$. You may drop the binomial coefficient; say why you
+are allowed to.
+\answerspace{3.5em}
+
+\item Differentiate, set $\ell'(\theta) = 0$, and solve.
+\answerspace{3.5em}
+
+\item Report $\hat\theta$ as a number, and say in one sentence what it estimates, in context.
+\answerspace{3.5em}
+
+\item Suppose instead 70 of 200 stations were broken. What is $\hat\theta$ now? Since the estimate
+did not change, what \emph{did} change about the likelihood function?
+\answerspace{3.5em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{A rate.} A rider waits at an empty station until a bike is returned. Five such
+waits, in minutes:
+\[
+2.5, \qquad 1.0, \qquad 4.0, \qquad 0.5, \qquad 2.0
+\]
+Model each wait as exponential with rate $\lambda$, so $f(x) = \lambda e^{-\lambda x}$ for
+$x > 0$, and treat the waits as independent.
+
+\begin{parts}
+\item Write $L(\lambda)$ for all five observations as a single expression.
+\answerspace{3.5em}
+
+\item Write $\ell(\lambda)$, differentiate, and solve. Express $\hat\lambda$ in terms of $\bar{x}$
+before plugging in numbers.
+\answerspace{3.5em}
+
+\item Give $\hat\lambda$ as a number, with units.
+\answerspace{3em}
+
+\item The mean of an exponential distribution is $1/\lambda$. What is the estimated mean wait, and
+why should that not surprise you given (B)?
+\answerspace{3.5em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{A regression slope.} Five stations. Here $x$ is the number of docks in tens, and $y$
+is daily trips started, in tens.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Station} & A & B & C & D & E \\
+\midrule
+$x$ (tens of docks) & 6 & 7 & 8 & 9 & 10 \\
+$y$ (tens of trips) & 12 & 14 & 15 & 18 & 21 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{parts}
+\item Compute $\bar{x}$ and $\bar{y}$, then fill in the table and total the last two columns.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.6}
+\begin{tabular}{cccc}
+\toprule
+$x_i - \bar{x}$ & $y_i - \bar{y}$ & $(x_i-\bar{x})(y_i-\bar{y})$ & $(x_i-\bar{x})^2$ \\
+\midrule
+\blankline{.8in} & \blankline{.8in} & \blankline{1.1in} & \blankline{1.1in} \\
+\blankline{.8in} & \blankline{.8in} & \blankline{1.1in} & \blankline{1.1in} \\
+\blankline{.8in} & \blankline{.8in} & \blankline{1.1in} & \blankline{1.1in} \\
+\blankline{.8in} & \blankline{.8in} & \blankline{1.1in} & \blankline{1.1in} \\
+\blankline{.8in} & \blankline{.8in} & \blankline{1.1in} & \blankline{1.1in} \\
+\midrule
+ & & $S_{xy} = $\blankline{.7in} & $S_{xx} = $\blankline{.7in} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\item Compute $\hat\beta_1$ and $\hat\beta_0$, and write the fitted equation.
+\answerspace{3.5em}
+
+\item Fill in the fitted values and residuals.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.55}
+\begin{tabular}{cccc}
+\toprule
+\textbf{Station} & $y_i$ & $\hat{y}_i$ & $e_i = y_i - \hat{y}_i$ \\
+\midrule
+A & 12 & \blankline{1.1in} & \blankline{1.1in} \\
+B & 14 & \blankline{1.1in} & \blankline{1.1in} \\
+C & 15 & \blankline{1.1in} & \blankline{1.1in} \\
+D & 18 & \blankline{1.1in} & \blankline{1.1in} \\
+E & 21 & \blankline{1.1in} & \blankline{1.1in} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\item Add up your residuals: what do you get, and is that a coincidence? Then compute the RSS.
+\answerspace{4em}
+
+\item Interpret $\hat\beta_1$ in context, \emph{with units}. Then interpret $\hat\beta_0$ in
+context and say whether that interpretation is worth reporting.
+\answerspace{5em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{The bridge.} You have now maximized two likelihoods. In Question 3 you never wrote
+one down.
+
+\begin{parts}
+\item Using item~\ref{cr:mle} of the concept review, explain in one sentence why \emph{maximizing}
+\[
+-\frac{1}{2\sigma^2}\sum_{i=1}^{n}\big(y_i - \beta_0 - \beta_1 x_i\big)^2
+\]
+is the same as \emph{minimizing} the RSS.
+\answerspace{3.5em}
+
+\item Which model assumption puts the \emph{square} in least squares? Circle one and justify.
+\begin{enumerate}[label=\arabic*., leftmargin=1.8em, itemsep=.15em, topsep=.3em]
+\item the errors are independent
+\item the errors are normally distributed
+\item the errors have constant variance
+\item the relationship is linear
+\end{enumerate}
+\answerspace{3.5em}
+
+\item If the errors were strongly right-skewed instead of normal, would least squares still be the
+maximum likelihood estimator? Would $S_{xy}/S_{xx}$ still be \emph{computable}?
+\answerspace{3.5em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Find the bugs.} A classmate wants the slope and the RSS for the station data. The
+code runs with no error message and prints plausible-looking numbers. It is wrong in
+\textbf{three} separate ways.
+
+\begin{lstlisting}[language=R]
+fit <- lm(docks ~ trips, data = stations)
+
+b1 <- coef(fit)[1]
+
+rss <- sum(resid(fit))
+
+c(slope = b1, rss = rss)
+\end{lstlisting}
+
+\begin{parts}
+\item Bug 1 is in the formula. What did it fit instead, and why is the answer not simply the
+reciprocal of the slope they wanted?
+\answerspace{3.5em}
+
+\item Bug 2 is in the indexing. What does \texttt{coef(fit)[1]} return?
+\answerspace{3em}
+
+\item Bug 3 is in the \texttt{rss} line. What number does it print for \emph{any} fitted model
+with an intercept, and what should the line be?
+\answerspace{3.5em}
+
+\item Rewrite all three lines correctly.
+\answerspace{3.5em}
+
+\item The same classmate writes the two sentences below. Mark each \textbf{defensible} or
+\textbf{not}, and rewrite the ones that are not.
+\begin{enumerate}[label=\textbf{S\arabic*.}, leftmargin=2.2em, itemsep=.25em, topsep=.35em]
+\item ``Our residuals sum to zero, so the line fits the stations well.''
+\item ``Least squares works here because the errors are normally distributed.''
+\end{enumerate}
+\answerspace{5em}
+\end{parts}
+
+\end{questions}
+
+\end{document}

@@ -1,0 +1,291 @@
+% MA 214 Discussion 11 -- covers Lecture 16, and doubles as Quiz 3 / Module 3 review.
+%
+% Student handout. Page 1 is the Module 3 concept review; the question set runs from page 2.
+% Questions are tagged with the Module 3 objective they test.
+%
+% Compile from inside this folder:  pdflatex Discussion11.tex
+
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{tabularx}
+\usepackage{listings}
+
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\rhead{Discussion 11}
+\lhead{MA 214: Applied Statistics}
+\renewcommand{\headrulewidth}{.4mm}
+
+\newcommand{\blankline}[1]{\underline{\hspace{#1}}}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  frame=single,
+  framerule=0.4pt,
+  breaklines=true,
+  showstringspaces=false,
+  aboveskip=8pt,
+  belowskip=8pt
+}
+
+% Section header: bold title over a hairline rule.
+\newcommand{\parttitle}[1]{%
+  \par\medskip\noindent
+  {\large\bfseries #1}\par
+  \vspace{-.5em}\noindent\rule{\linewidth}{0.4pt}\par\smallskip}
+
+% Writing space.
+\newcommand{\answerspace}[1]{\vspace{#1}}
+
+% Objective tag printed after a question title.
+\newcommand{\lo}[1]{{\normalfont\small (#1)}}
+
+% Flush-left question list: the label runs in at the margin and the body wraps
+% back to the margin, so nothing is pushed far to the right.
+\newlist{questions}{enumerate}{1}
+\setlist[questions]{label=\textbf{Question \arabic*.}, wide=0pt, itemsep=1.4em, topsep=.8em}
+
+\newlist{parts}{enumerate}{1}
+\setlist[parts]{label=\textbf{(\Alph*)}, leftmargin=1.6em, labelsep=.45em,
+  itemsep=.7em, topsep=.5em}
+
+\begin{document}
+
+\noindent\textbf{Name:}\blankline{2.3in}\hfill\textbf{BUID:}\blankline{1.6in}
+
+\begin{center}
+  {\Large\bfseries Discussion 11: Logistic Inference, and All of Module 3}
+\end{center}
+
+\noindent\textbf{Goals:} run Module 3's last tool and then the whole module. Each question is
+labelled with the objective it tests, so you can see which one to go back to before the quiz.
+
+\parttitle{Part 1: Module 3 Concept Review}
+
+{\small
+
+\noindent The whole module on one page. Everything in Part 2 can be answered from it.
+
+\begin{enumerate}[label=\textbf{\arabic*.}, wide=0pt, itemsep=.4em, topsep=.5em]
+
+\item \textbf{M3.L01 Inference for a slope.} $\hat\beta_1$ is a statistic. \emph{Road A:} shuffle the
+pairing of $y$ to $x$ to test $\beta_1 = 0$; bootstrap whole $(x,y)$ pairs for an interval.
+\emph{Road B:} $t = \hat\beta_1/\text{SE}$ with df $= n-p-1$, and
+$\hat\beta_1 \pm t^{\ast}\text{SE}$. To test against a value other than zero, use
+$t = (\hat\beta_1 - c)/\text{SE}$, or ask whether $c$ lies in the interval.
+
+\item \textbf{M3.L02 Conditions and remedies.} Road B needs \textbf{LINE}: linear mean, independent
+observations, normal residuals, equal variance. Check L and E on residuals against fitted values, N
+on a Q--Q plot. A funnel means E failed, a curve means L failed. Remedy by transforming, then
+\emph{re-check}. Agreement between the two roads is not evidence that the conditions hold.
+
+\item \textbf{M3.L03 Reading multiple regression output.} Every coefficient is a change in $y$ per
+unit of that predictor \emph{holding the others fixed}. Collinear predictors inflate standard errors,
+so each can look useless while the pair matters; interpretation breaks, prediction survives.
+
+\item \textbf{M3.L04 Interactions and transformations.} With an indicator $g$, the slope in $x$ is
+$\hat\beta_1$ when $g=0$ and $\hat\beta_1+\hat\beta_3$ when $g=1$, so the interaction coefficient is
+a \emph{difference of slopes}. Once an interaction is present, $g$'s main effect is only the gap at
+$x=0$. A log--log slope is an elasticity.
+
+\item \textbf{M3.L05 Prediction and cross-validation.} At $x^{\ast}$,
+\[
+\text{CI (mean): } \hat{y} \pm t^{\ast}\text{SE}_{\text{fit}},
+\qquad
+\text{PI (one case): } \hat{y} \pm t^{\ast}\sqrt{\hat\sigma^2 + \text{SE}_{\text{fit}}^2}.
+\]
+More data shrinks the CI toward nothing but never takes the PI below about
+$\pm t^{\ast}\hat\sigma$. $R^2$ always prefers the biggest model; adjusted $R^2$ and AIC charge for
+parameters but are still computed on the training data. Only cross-validation predicts each point
+from a model that never saw it.
+
+\item \textbf{M3.L06 Logistic inference.} Coefficients are on the log-odds scale, so
+$\text{OR} = e^{\hat\beta}$ and $e^{c\hat\beta}$ for a $c$-unit change. Build every interval on the
+\textbf{log-odds scale first}, then transform: exponentiate the endpoints for an odds ratio, or apply
+$p = e^{\eta}/(1+e^{\eta})$ for a probability. The result is asymmetric, and that is correct;
+building a symmetric interval directly on the probability scale can produce impossible values below
+$0$ or above $1$. Judge predictions with accuracy \emph{next to the base rate}, plus the Brier score
+$\overline{(\hat{p}-y)^2}$ and the log-loss
+$-\overline{y\log\hat{p} + (1-y)\log(1-\hat{p})}$; log-loss punishes confident and wrong far harder.
+
+\item \textbf{Four traps.} Averaging or halving probabilities where you should work in log odds.
+Reading a main effect's $p$-value as ``the group does not matter'' in an interaction model. Reporting
+a CI when a single new case was asked about. Quoting in-sample accuracy as if it were out-of-sample.
+
+\end{enumerate}
+
+}
+
+\newpage
+
+\parttitle{Part 2: Question Set}
+
+\noindent\textbf{Scenario.} For $n = 120$ branches, whether the branch \textbf{met} its annual
+target is modelled on annual \texttt{visits} (thousands) and \texttt{type} (Branch, Central, Kiosk;
+Branch is the reference). $67$ branches missed the target and $53$ met it.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lccccc}
+\toprule
+ & \textbf{Estimate} & \textbf{SE} & \textbf{$p$} & \textbf{OR} & \textbf{95\% CI for OR} \\
+\midrule
+(Intercept) & $-6.1881$ & 1.0969 & $<0.001$ & --- & --- \\
+\texttt{visits} & $0.0739$ & 0.0132 & $<0.001$ & 1.077 & $[1.049,\; 1.105]$ \\
+\texttt{type}Central & $1.4141$ & 0.6359 & 0.026 & 4.113 & $[1.183,\; 14.303]$ \\
+\texttt{type}Kiosk & $-0.0798$ & 0.6029 & 0.895 & 0.923 & $[0.283,\; 3.010]$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{questions}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Reading the table.} \lo{M3.L03, M3.L06}
+
+\begin{parts}
+\item The \texttt{visits} odds ratio is $1.077$ per thousand. Give the odds ratio for ten thousand
+more visits, using $e^{0.739} = 2.093$, and interpret it in one sentence.
+\answerspace{4em}
+
+\item The interval for the \texttt{type}Central odds ratio is $[1.183,\; 14.303]$, which is wildly
+lopsided about $4.113$. Explain why an odds-ratio interval comes out asymmetric even though the
+interval it came from was symmetric.
+\answerspace{4em}
+
+\item The \texttt{type}Kiosk interval is $[0.283,\; 3.010]$. What does it mean that this interval
+contains $1$, and what would you tell the director about kiosks?
+\answerspace{4em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{An interval for a predicted probability.} \lo{M3.L06} For a \textbf{Central} branch
+with \texttt{visits} $= 70$, the model gives $\hat\eta = 0.3975$ with
+$\text{SE}(\hat\eta) = 0.4628$. You may use $e^{0.3975} = 1.488$, \; $e^{-0.5095} = 0.601$, \;
+$e^{1.3045} = 3.686$.
+
+\begin{parts}
+\item Compute $\hat{p}$ for this branch.
+\answerspace{3em}
+
+\item Build the 95\% interval on the \textbf{log-odds} scale, then convert both endpoints to
+probabilities.
+\answerspace{5em}
+
+\item How far does your interval reach below $\hat{p}$, and how far above? Why is the asymmetry
+correct rather than a mistake?
+\answerspace{4em}
+
+\item A classmate skips the log-odds step and builds a symmetric interval directly on the
+probability scale. For a \textbf{Kiosk} branch with $\texttt{visits} = 20$, where
+$\hat{p} = 0.0082$, their method returns $[-0.0066,\; 0.0231]$ while the correct method returns
+$[0.0014,\; 0.0485]$. Name the fatal defect in their answer, and state the rule it violates.
+\answerspace{4.5em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Judging the predictions.} \lo{M3.L05, M3.L06} At a threshold of $0.5$ the model
+predicts correctly for $97$ of the $120$ branches, with sensitivity $0.792$ and specificity
+$0.821$.
+
+\begin{parts}
+\item Compute the accuracy, then the base rate for this data set. Does the model beat it?
+\answerspace{4em}
+
+\item Complete the loss table for four illustrative branches.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.6}
+\begin{tabular}{ccccc}
+\toprule
+$\hat{p}$ & $y$ & $(\hat{p}-y)^2$ & $-\log$ of the probability given to the truth \\
+\midrule
+0.90 & 1 & \blankline{.9in} & \blankline{1.1in} \\
+0.70 & 1 & \blankline{.9in} & \blankline{1.1in} \\
+0.30 & 0 & \blankline{.9in} & \blankline{1.1in} \\
+0.20 & 1 & \blankline{.9in} & \blankline{1.1in} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent You may use $\log 0.9 = -0.105$, $\log 0.7 = -0.357$, $\log 0.2 = -1.609$.
+
+\item The last branch was given $0.20$ and met its target. Compare how hard the two losses punish
+that one case, and say which loss you would use if confident wrong answers are especially costly.
+\answerspace{4em}
+
+\item In-sample the Brier score is $0.131$ and the log-loss $0.415$; under 10-fold
+cross-validation they are $0.147$ and $0.471$, and accuracy falls from $0.808$ to $0.775$. Why do
+all three get worse, and which set of numbers do you report?
+\answerspace{4.5em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{The linear side of Module 3.} \lo{M3.L01, M3.L02, M3.L04} Short answers.
+
+\begin{parts}
+\item A residual-versus-fitted plot for a linear model fans out to the right. Which LINE condition
+failed, what do you do about it, and what must you do after that?
+\answerspace{4em}
+
+\item A model has $\hat\beta_{\texttt{hours}} = 1.03$ and
+$\hat\beta_{\texttt{hours}:\texttt{Central}} = 0.96$. Give the slope for each group, and say what
+the second coefficient is a difference of.
+\answerspace{4em}
+
+\item You want a plausible range for the slope but the residuals are clearly not normal. Which road
+do you take, and what exactly do you resample?
+\answerspace{3.5em}
+
+\item A slope is $1.35$ with SE $0.115$ and a 95\% interval of $[1.119,\; 1.591]$. Without further
+arithmetic, what do you conclude about $H_0: \beta_1 = 1.5$?
+\answerspace{3.5em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Side by side.} \lo{all of Module 3} Complete the comparison.
+
+\begin{center}
+\renewcommand{\arraystretch}{2}
+\begin{tabularx}{\linewidth}{LLL}
+\toprule
+ & \textbf{Linear regression} & \textbf{Logistic regression} \\
+\midrule
+The response is & & \\
+The model is linear in & & \\
+Fitted by & & \\
+One coefficient means & & \\
+Interval for a coefficient & & \\
+Conditions are checked by & & \\
+Predictions are judged by & & \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{parts}
+\item One row differs more than the others between the two columns. Which, and why is that the
+row where students most often go wrong?
+\answerspace{3em}
+
+\item A classmate's write-up ends with the two sentences below. Mark each \textbf{defensible} or
+\textbf{not}, and rewrite the ones that are not.
+\begin{enumerate}[label=\textbf{S\arabic*.}, leftmargin=2.2em, itemsep=.25em, topsep=.35em]
+\item ``Central branches are $4.11$ times as likely to meet their target as ordinary branches.''
+\item ``Cross-validation gave $77.5\%$ accuracy against $80.8\%$ in-sample, so the
+cross-validated figure is too pessimistic and we report the in-sample one.''
+\end{enumerate}
+\answerspace{5em}
+\end{parts}
+
+\end{questions}
+
+\end{document}

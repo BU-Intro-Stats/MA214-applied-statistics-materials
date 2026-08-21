@@ -1,0 +1,289 @@
+% MA 214 Discussion 6 -- covers Lecture 8.
+%
+% Student handout. Page 1 is the concept review; the question set runs from page 2.
+% Compile from inside this folder:  pdflatex Discussion6.tex
+
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{tabularx}
+\usepackage{listings}
+
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\rhead{Discussion 6}
+\lhead{MA 214: Applied Statistics}
+\renewcommand{\headrulewidth}{.4mm}
+
+\newcommand{\blankline}[1]{\underline{\hspace{#1}}}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  frame=single,
+  framerule=0.4pt,
+  breaklines=true,
+  showstringspaces=false,
+  aboveskip=8pt,
+  belowskip=8pt
+}
+
+% Section header: bold title over a hairline rule.
+\newcommand{\parttitle}[1]{%
+  \par\medskip\noindent
+  {\large\bfseries #1}\par
+  \vspace{-.5em}\noindent\rule{\linewidth}{0.4pt}\par\smallskip}
+
+% Writing space.
+\newcommand{\answerspace}[1]{\vspace{#1}}
+
+% Flush-left question list: the label runs in at the margin and the body wraps
+% back to the margin, so nothing is pushed far to the right.
+\newlist{questions}{enumerate}{1}
+\setlist[questions]{label=\textbf{Question \arabic*.}, wide=0pt, itemsep=1.4em, topsep=.8em}
+
+\newlist{parts}{enumerate}{1}
+\setlist[parts]{label=\textbf{(\Alph*)}, leftmargin=1.6em, labelsep=.45em,
+  itemsep=.7em, topsep=.5em}
+
+\begin{document}
+
+\noindent\textbf{Name:}\blankline{2.3in}\hfill\textbf{BUID:}\blankline{1.6in}
+
+\begin{center}
+  {\Large\bfseries Discussion 6: What Exactly Gets Shuffled}
+\end{center}
+
+\noindent\textbf{Goals:} \textbf{(1)} say what the null distribution is a distribution \emph{of},
+\textbf{(2)} match a null hypothesis to the shuffling operation that encodes it, \textbf{(3)} turn
+simulation counts into one- and two-sided $p$-values and $s$-values, \textbf{(4)} judge how many
+simulations are enough, \textbf{(5)} name the two decision errors in context.
+
+\parttitle{Part 1: Concept Review}
+
+{\small
+
+\noindent Everything in Part 2 can be answered from this page. Keep it in front of you.
+
+\begin{enumerate}[label=\textbf{\arabic*.}, wide=0pt, itemsep=.45em, topsep=.5em]
+
+\item \textbf{Three distributions, three meanings of ``one dot.''} In the distribution of the
+\textbf{data}, one dot is one observation. In the \textbf{sampling distribution} of a statistic,
+one dot is one whole sample. In the \textbf{null distribution}, one dot is one whole
+\emph{simulated} data set, built so that the null hypothesis is true by construction. The first is
+observable, the second usually is not, and the third you can always generate.
+
+\item \textbf{The procedure.} State $H_0$ and $H_A$. Choose a test statistic. Build the null
+distribution of that statistic. Locate the observed value in it. Report the $p$-value, then decide.
+
+\item \textbf{The $p$-value and the $s$-value.} The $p$-value is the probability of a statistic
+\emph{at least as extreme} as the observed one, computed assuming $H_0$. From a simulation with $B$
+draws,
+\[
+p \;\approx\; \frac{\#\{\text{draws at least as extreme}\}}{B},
+\qquad
+s = -\log_2 p \;\;\text{bits}.
+\]
+The $s$-value says how many consecutive coin flips coming up heads would be equally surprising:
+$p=0.05$ is about $4.3$ bits, $p=0.01$ is about $6.6$ bits.
+
+\item \textbf{What you shuffle \emph{is} the null hypothesis.} The physical operation encodes what
+you are willing to assume.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lll}
+\toprule
+\textbf{Question} & \textbf{$H_0$} & \textbf{What you shuffle or simulate} \\
+\midrule
+One proportion vs a claim & $\theta = \theta_0$ & nothing; draw from Binomial$(n,\theta_0)$ \\
+Two groups, compare means & no group difference & the \emph{group labels} \\
+Paired before and after & no within-pair effect & the \emph{sign} of each pair's difference \\
+Two categorical variables & independence & one variable's labels \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\item \textbf{How many simulations.} The simulated $p$ is itself an estimate, with Monte Carlo
+standard error
+\[
+\text{MCSE} = \sqrt{\frac{p(1-p)}{B}} .
+\]
+Quartering the error takes $16$ times the simulations. A simulated $p$ is never exactly $0$; report
+$(\text{count}+1)/(B+1)$, or just say $p < 1/B$.
+
+\item \textbf{Decision errors.} A \textbf{Type I} error rejects a true $H_0$; its long-run rate is
+$\alpha$, which you choose. A \textbf{Type II} error fails to reject a false $H_0$. Lowering
+$\alpha$ trades Type I risk for Type II risk. Which one to fear depends on what each mistake costs.
+
+\item \textbf{Four traps.} Saying the null distribution is centered at the observed statistic; it
+is centered where $H_0$ puts it. Reporting a one-sided $p$ for a two-sided question. Treating
+$p = 0.05$ as a cliff. Believing more simulations can change the answer to a question about the
+data rather than about the simulation.
+
+\end{enumerate}
+
+}
+
+\newpage
+
+\parttitle{Part 2: Question Set}
+
+\noindent\textbf{Scenario.} The library system tried a Saturday-hours program at $12$ of its
+branches, chosen at random; $12$ comparable branches kept their old schedule. The outcome is the
+change in weekly visits, in hundreds, over the following term.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{ll}
+\toprule
+\textbf{Program (12 branches)} & 4.1 \; 2.8 \; 3.6 \; 3.9 \; 1.7 \; 4.0 \; 2.2 \; 3.1 \; 2.4 \; 3.4 \; 1.6 \; 4.4 \\
+\textbf{Old schedule (12)} & 1.9 \; 3.2 \; 0.8 \; 2.6 \; 1.1 \; 3.7 \; 2.1 \; 0.5 \; 2.9 \; 1.4 \; 3.0 \; 2.2 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent Group means are $3.100$ and $2.117$, so the observed difference is
+$\bar{x}_{\text{prog}} - \bar{x}_{\text{old}} = 0.983$. The question the director asks is whether
+the program \textbf{changed} visits.
+
+\begin{questions}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{What the null distribution is a distribution of.} You shuffle the 24 branch labels
+$B = 1000$ times, each time recomputing the difference in group means. The resulting null
+distribution has mean $-0.012$ and standard deviation $0.438$.
+
+\begin{parts}
+\item What is one dot in that histogram? Be precise: it is not one branch and not one group.
+\answerspace{3.5em}
+
+\item The null distribution is centered essentially at $0$. Explain what forces that, and why it
+is \emph{not} evidence that the program did nothing.
+\answerspace{4em}
+
+\item Suppose the program had been twice as effective, so the observed difference were $1.97$.
+Which moves more, the observed statistic or the center of the null distribution? Name the one
+feature of the null distribution that stays the same no matter how effective the program was, and
+say what guarantees it.
+\answerspace{4.5em}
+
+\item How many standard deviations from the center does the observed $0.983$ sit? What does that
+number tell you before you compute any $p$-value?
+\answerspace{3.5em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Design the shuffle.} Four different questions the library could ask. For each, state
+$H_0$ in words or symbols, and say exactly what you would shuffle or simulate. One of them involves
+no shuffling at all.
+
+\begin{center}
+\renewcommand{\arraystretch}{2.2}
+\begin{tabularx}{\linewidth}{LLL}
+\toprule
+\textbf{Question} & \textbf{$H_0$} & \textbf{What you shuffle or simulate} \\
+\midrule
+Did the Saturday program change mean visits? & & \\
+Is the share of branches meeting target really $0.40$, as the board claims? & & \\
+For the same 12 branches, did visits change from fall to spring? & & \\
+Does meeting the target depend on branch type? & & \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{parts}
+\item Two of the four rows shuffle a \emph{label}, and they are not the same label. Say which is
+shuffled in each.
+\answerspace{4em}
+
+\item In the third row, why is shuffling the group labels the wrong operation?
+\answerspace{4em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{From counts to a decision.} Of the $1000$ shuffles, \textbf{10} gave a difference
+of $0.983$ or larger, and \textbf{24} gave an absolute difference of $0.983$ or larger.
+
+\begin{parts}
+\item Give the one-sided $p$-value and the two-sided $p$-value. Which one answers the director's
+question as stated, and why?
+\answerspace{4em}
+
+\item Compute the $s$-value for the two-sided $p$. Interpret it as a number of coin flips.
+\answerspace{3.5em}
+
+\item If the null distribution were perfectly symmetric, the two-sided count would be exactly
+twice the one-sided count. It is $24$, not $20$. What does that discrepancy come from, and should
+it worry you?
+\answerspace{4.5em}
+
+\item Suppose instead that \emph{zero} of the 1000 shuffles had been at least as extreme. Why
+would it be wrong to report $p = 0$, and what would you report?
+\answerspace{4em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Enough simulations, and the two errors.} Use $p = 0.024$ throughout.
+
+\begin{parts}
+\item Compute the Monte Carlo standard error of that $p$ at $B = 1000$. Then give it for
+$B = 100$ and $B = 10{,}000$.
+\answerspace{4.5em}
+
+\item A classmate reports $p = 0.024$ from $B = 100$ shuffles and concludes the program worked.
+Using your answer to (A), explain what is fragile about that.
+\answerspace{4em}
+
+\item The board will fund the program city-wide if the test is significant. Describe the Type I
+error and the Type II error \emph{in this context}, in terms of money and readers.
+\answerspace{4.5em}
+
+\item Which error would you rather make here, and what would you do to $\alpha$ as a result?
+\answerspace{3.5em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Find the bugs.} A classmate writes the two-sided permutation test below.
+\texttt{all} holds all 24 outcomes, with the 12 program branches first. The code runs, prints a
+plausible number, and is wrong in \textbf{three} separate ways.
+
+\begin{lstlisting}[language=R]
+obs <- mean(all[1:12]) - mean(all[13:24])
+
+perm <- replicate(20, {
+  prog <- sample(all, 12, replace = TRUE)
+  old  <- sample(all, 12, replace = TRUE)
+  mean(prog) - mean(old)
+})
+
+mean(perm > obs)
+\end{lstlisting}
+
+\begin{parts}
+\item Bug 1 is \texttt{replace = TRUE}. What procedure is this code actually carrying out, and why
+does it break the logic of a permutation test? Mention what can happen to a single branch's value.
+\answerspace{4.5em}
+
+\item Bug 2 is the number $20$. What is wrong with it, and roughly what is the smallest $p$-value
+this code could ever report?
+\answerspace{4em}
+
+\item Bug 3 is the last line, given that the director asked whether the program \emph{changed}
+visits. Fix it.
+\answerspace{3.5em}
+
+\item Rewrite the whole block correctly.
+\answerspace{6em}
+\end{parts}
+
+\end{questions}
+
+\end{document}

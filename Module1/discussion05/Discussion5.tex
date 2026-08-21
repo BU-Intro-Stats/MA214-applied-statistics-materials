@@ -1,0 +1,323 @@
+% MA 214 Discussion 5 -- Module 1 synthesis and Quiz 1 review.
+%
+% Student handout. Page 1 is the Module 1 concept review; the question set runs from page 2.
+% One data set, every Module 1 objective. Each question is tagged with the objective it tests,
+% so students can see which one to go back to.
+%
+% Compile from inside this folder:  pdflatex Discussion5.tex
+
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{tabularx}
+\usepackage{listings}
+
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\rhead{Discussion 5}
+\lhead{MA 214: Applied Statistics}
+\renewcommand{\headrulewidth}{.4mm}
+
+\newcommand{\blankline}[1]{\underline{\hspace{#1}}}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  frame=single,
+  framerule=0.4pt,
+  breaklines=true,
+  showstringspaces=false,
+  aboveskip=8pt,
+  belowskip=8pt
+}
+
+% Section header: bold title over a hairline rule.
+\newcommand{\parttitle}[1]{%
+  \par\medskip\noindent
+  {\large\bfseries #1}\par
+  \vspace{-.5em}\noindent\rule{\linewidth}{0.4pt}\par\smallskip}
+
+% Writing space.
+\newcommand{\answerspace}[1]{\vspace{#1}}
+
+% Objective tag printed after a question title.
+\newcommand{\lo}[1]{{\normalfont\small (#1)}}
+
+% Flush-left question list: the label runs in at the margin and the body wraps
+% back to the margin, so nothing is pushed far to the right.
+\newlist{questions}{enumerate}{1}
+\setlist[questions]{label=\textbf{Question \arabic*.}, wide=0pt, itemsep=1.4em, topsep=.8em}
+
+\newlist{parts}{enumerate}{1}
+\setlist[parts]{label=\textbf{(\Alph*)}, leftmargin=1.6em, labelsep=.45em,
+  itemsep=.7em, topsep=.5em}
+
+\begin{document}
+
+\noindent\textbf{Name:}\blankline{2.3in}\hfill\textbf{BUID:}\blankline{1.6in}
+
+\begin{center}
+  {\Large\bfseries Discussion 5: All of Module 1 on One Data Set}
+\end{center}
+
+\noindent\textbf{Goals:} run every Module 1 tool on a single data set, and find out which
+objective you still need to go back to before the quiz. Each question is labelled with the
+objective it tests.
+
+\parttitle{Part 1: Module 1 Concept Review}
+
+{\small
+
+\noindent The whole module on one page. Everything in Part 2 can be answered from it.
+
+\begin{enumerate}[label=\textbf{\arabic*.}, wide=0pt, itemsep=.45em, topsep=.5em]
+
+\item \textbf{M1.L01 Models, likelihood, and maximum likelihood.} A statistical model gives the
+data a \emph{distribution} with unknown parameters. To estimate: write the likelihood $L(\theta)$,
+take logs, set $\ell'(\theta)=0$, solve. For $y$ successes in $n$ trials,
+$\hat\theta = y/n$; for exponential waits, $\hat\lambda = 1/\bar{x}$. For the linear model,
+maximizing the likelihood under \emph{normal errors with constant variance} is exactly
+minimizing $\sum e_i^2$, which is why least squares is a maximum likelihood estimator.
+
+\item \textbf{M1.L02 The linear model and its coefficients.} The model is
+$Y_i \mid x_i \sim \text{Normal}(\beta_0 + \beta_1 x_{1i} + \cdots, \sigma^2)$, independently, so
+it assumes linearity, independence, constant variance, and normality. In multiple regression each
+coefficient is the predicted change in $y$ per one-unit increase in that predictor
+\textbf{holding the others fixed}. Always report units. $R^2$ is the fraction of variability in
+$y$ explained by the model; it says nothing about whether the model is \emph{right}, and nothing
+about steepness.
+
+\item \textbf{M1.L03 Using a model: collinearity and extrapolation.} When predictors carry nearly
+the same information, standard errors inflate and each can look useless while the pair matters.
+Interpretation breaks; prediction survives. Predicting inside the observed range of the predictors
+is \textbf{interpolation}; outside it is \textbf{extrapolation}, and the arithmetic never warns you.
+
+\item \textbf{M1.L04 Model selection.} With $p$ predictors and $n$ observations,
+\[
+R^2_{\text{adj}} = 1 - (1-R^2)\,\frac{n-1}{n-p-1},
+\qquad
+\text{AIC} = -2\,\ell(\hat\theta) + 2k \;\; (\text{lower is better}).
+\]
+$R^2$ can only rise when a predictor is added, so it cannot compare models of different sizes.
+Adjusted $R^2$ and AIC both charge for complexity and can move either way. AIC differences under
+about 2 are not meaningful.
+
+\item \textbf{M1.L05 Indicator variables.} A categorical predictor with $k$ levels enters as
+$k-1$ indicators. The omitted level is the \textbf{reference}: the intercept describes it, and
+each indicator coefficient is a \emph{difference} from it, holding the other predictors fixed.
+Changing the reference changes the coefficients but not the fitted values.
+
+\item \textbf{M1.L06 Logistic regression.} For a binary response, model the log odds as linear:
+$\eta = \log\frac{p}{1-p} = \beta_0 + \beta_1x_1 + \cdots$, so
+$p = e^{\eta}/(1+e^{\eta})$. Fit by maximum likelihood, not least squares. Exponentiating gives an
+\textbf{odds ratio}: $e^{\beta}$ per one unit, $e^{c\beta}$ per $c$ units. To judge a classifier,
+put accuracy next to the \textbf{base rate}, and report sensitivity and specificity too.
+
+\end{enumerate}
+
+}
+
+\newpage
+
+\parttitle{Part 2: Question Set}
+
+\noindent\textbf{Scenario.} A city library system has $n = 60$ branches. For each branch you have
+\texttt{hours} (weekly open hours, ranging 21 to 70), \texttt{staff} (staff FTE),
+\texttt{type} (Branch, Central, or Kiosk), \texttt{visits} (annual visits in thousands, ranging
+18.4 to 153.3), and \texttt{met} (whether the branch met its annual program target, $1$ = yes).
+\textbf{18 of the 60 branches met the target.} In this data set \texttt{hours} and \texttt{staff}
+are correlated at $0.77$.
+
+\begin{questions}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Model and estimate.} \lo{M1.L01}
+
+\begin{parts}
+\item Treat the number of branches meeting the target as $Y \sim \text{Binomial}(60, \theta)$.
+Write $L(\theta)$ and $\ell(\theta)$, then find $\hat\theta$ and report it as a number.
+\answerspace{5em}
+
+\item State the assumption about branches that the binomial model requires, and say whether you
+believe it here.
+\answerspace{3.5em}
+
+\item You now fit a linear model for \texttt{visits} by least squares. Which model assumption
+makes least squares the \emph{maximum likelihood} estimator, and what would still be true about
+$S_{xy}/S_{xx}$ if that assumption failed?
+\answerspace{4em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Reading the coefficient table.} \lo{M1.L02, M1.L05} Regressing \texttt{visits} on
+\texttt{hours} and \texttt{type}:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lccc}
+\toprule
+ & \textbf{Estimate} & \textbf{Std. Error} & \textbf{$p$-value} \\
+\midrule
+(Intercept) & $1.791$ & 3.090 & 0.564 \\
+\texttt{hours} & $1.506$ & 0.065 & $<0.001$ \\
+\texttt{type}Central & $40.826$ & 2.212 & $<0.001$ \\
+\texttt{type}Kiosk & $-11.802$ & 2.043 & $<0.001$ \\
+\bottomrule
+\end{tabular}
+\qquad $R^2 = 0.951$
+\end{center}
+
+\begin{parts}
+\item Which level is the reference, and how do you know from the table alone?
+\answerspace{2.5em}
+
+\item Interpret $1.506$ in context, with units and the conditional phrase.
+\answerspace{3.5em}
+
+\item Interpret $-11.802$. Your sentence must name the comparison group.
+\answerspace{3.5em}
+
+\item Predict annual visits for each type at \texttt{hours} $= 40$.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.7}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Type} & \textbf{Arithmetic} & \textbf{Predicted \texttt{visits}} \\
+\midrule
+Branch & \blankline{2.1in} & \blankline{.9in} \\
+Central & \blankline{2.1in} & \blankline{.9in} \\
+Kiosk & \blankline{2.1in} & \blankline{.9in} \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Choosing and misusing the model.} \lo{M1.L03, M1.L04} Three models on the same 60
+branches.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{llccccc}
+\toprule
+\textbf{Model} & \textbf{Predictors} & \textbf{$p$} & \textbf{$R^2$} & \textbf{$R^2_{\text{adj}}$}
+ & \textbf{AIC} & \textbf{SE of \texttt{hours}} \\
+\midrule
+1 & \texttt{hours} & 1 & 0.4965 & 0.4879 & 541.06 & 0.204 \\
+2 & $+$ \texttt{type} & 3 & 0.9512 & 0.9486 & 405.02 & 0.065 \\
+3 & $+$ \texttt{staff} & 4 & 0.9537 & 0.9503 & 403.94 & 0.102 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent In Model 3 the \texttt{staff} coefficient is $1.406$ with $p = 0.094$.
+
+\begin{parts}
+\item Model 1 to Model 2 raises $R^2$ from 0.497 to 0.951. What does that say about leaving
+\texttt{type} out?
+\answerspace{3em}
+
+\item Model 3 has the best $R^2_{\text{adj}}$ \emph{and} the best AIC, yet its \texttt{staff}
+coefficient has $p = 0.094$ and the standard error of \texttt{hours} rose from 0.065 to 0.102.
+Explain both facts, and say which model you would report and why.
+\answerspace{5.5em}
+
+\item Using Model 2, someone predicts visits for a branch open $120$ hours per week and gets
+$182.5$ thousand. Give two separate reasons to distrust that number.
+\answerspace{4.5em}
+
+\item Would the collinearity between \texttt{hours} and \texttt{staff} damage Model 3's
+\emph{predictions}? Answer in one sentence.
+\answerspace{3em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{A binary outcome.} \lo{M1.L06} Now model \texttt{met} on \texttt{visits} by logistic
+regression:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lccc}
+\toprule
+ & \textbf{Estimate} & \textbf{Std. Error} & \textbf{$p$-value} \\
+\midrule
+(Intercept) & $-6.990$ & 1.727 & $<0.001$ \\
+\texttt{visits} & $0.0745$ & 0.0197 & $<0.001$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent You may use: $e^{0.0745} = 1.077$, \; $e^{0.745} = 2.107$, \;
+$e^{-2.518} = 0.081$, \; $e^{0.464} = 1.590$, \; $e^{0.36} = 1.433$, \; $e^{1.13} = 3.096$.
+
+\begin{parts}
+\item Give the odds ratio for a one-unit (one thousand visits) increase, and for a ten-unit (ten
+thousand visits) increase. Interpret the second one in a sentence a library director would
+understand.
+\answerspace{4.5em}
+
+\item The 95\% interval for the \texttt{visits} coefficient is $[0.036,\; 0.113]$. Give the
+interval for the ten-thousand-visit odds ratio, and say what it means that the interval excludes 1.
+\answerspace{4em}
+
+\item Complete the table. \texttt{visits} is in thousands.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.6}
+\begin{tabular}{cccc}
+\toprule
+\texttt{visits} & \textbf{Log odds $\eta$} & \textbf{Odds} & \textbf{Probability} \\
+\midrule
+60 & $-2.518$ & \blankline{1in} & \blankline{1in} \\
+100 & $0.464$ & \blankline{1in} & \blankline{1in} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\item At a threshold of $0.5$ this model classifies $78.3\%$ of branches correctly. Before calling
+that good, what number must you put beside it, and what is that number here?
+\answerspace{3.5em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Referee the report.} \lo{all of Module 1} A classmate submits the conclusions below.
+Each numbered sentence is either defensible or not. Mark each, and rewrite the ones that are not.
+
+\begin{enumerate}[label=\textbf{S\arabic*.}, leftmargin=2.2em, itemsep=.3em, topsep=.4em]
+\item ``Our model explains 95.1\% of the variability in visits, so it is the correct model for
+library visits.''
+\item ``Each extra weekly open hour causes about 1.5 thousand more annual visits.''
+\item ``Central branches receive 40.8 thousand visits per year.''
+\item ``Because \texttt{staff} has $p = 0.094$, staffing does not affect visits.''
+\item ``A branch open 120 hours per week would receive about 183 thousand visits.''
+\item ``Our logistic model classifies 78\% of branches correctly, so it reliably predicts which
+branches will meet their target.''
+\end{enumerate}
+
+\begin{center}
+\renewcommand{\arraystretch}{2.1}
+\begin{tabularx}{\linewidth}{ccL}
+\toprule
+\textbf{Sentence} & \textbf{Defensible?} & \textbf{If not, what is wrong and what should it say} \\
+\midrule
+S1 & & \\
+S2 & & \\
+S3 & & \\
+S4 & & \\
+S5 & & \\
+S6 & & \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\end{questions}
+
+\end{document}

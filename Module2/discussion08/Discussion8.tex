@@ -1,0 +1,325 @@
+% MA 214 Discussion 8 -- covers Lectures 11 and 12, and doubles as Quiz 2 review.
+%
+% Student handout. Page 1 is the Module 2 concept review; the question set runs from page 2.
+% One categorical variable, two responses: chi-square and ANOVA on the same branch types.
+%
+% Compile from inside this folder:  pdflatex Discussion8.tex
+
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{tabularx}
+\usepackage{listings}
+
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\rhead{Discussion 8}
+\lhead{MA 214: Applied Statistics}
+\renewcommand{\headrulewidth}{.4mm}
+
+\newcommand{\blankline}[1]{\underline{\hspace{#1}}}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  frame=single,
+  framerule=0.4pt,
+  breaklines=true,
+  showstringspaces=false,
+  aboveskip=8pt,
+  belowskip=8pt
+}
+
+% Section header: bold title over a hairline rule.
+\newcommand{\parttitle}[1]{%
+  \par\medskip\noindent
+  {\large\bfseries #1}\par
+  \vspace{-.5em}\noindent\rule{\linewidth}{0.4pt}\par\smallskip}
+
+% Writing space.
+\newcommand{\answerspace}[1]{\vspace{#1}}
+
+% Scope tag printed after a question title.
+\newcommand{\lo}[1]{{\normalfont\small (#1)}}
+
+% Flush-left question list: the label runs in at the margin and the body wraps
+% back to the margin, so nothing is pushed far to the right.
+\newlist{questions}{enumerate}{1}
+\setlist[questions]{label=\textbf{Question \arabic*.}, wide=0pt, itemsep=1.4em, topsep=.8em}
+
+\newlist{parts}{enumerate}{1}
+\setlist[parts]{label=\textbf{(\Alph*)}, leftmargin=1.6em, labelsep=.45em,
+  itemsep=.7em, topsep=.5em}
+
+\begin{document}
+
+\noindent\textbf{Name:}\blankline{2.3in}\hfill\textbf{BUID:}\blankline{1.6in}
+
+\begin{center}
+  {\Large\bfseries Discussion 8: One Number for a Whole Comparison}
+\end{center}
+
+\noindent\textbf{Goals:} \textbf{(1)} build expected counts and $X^2$ and get its df right,
+\textbf{(2)} decide which road survives when a condition fails, \textbf{(3)} read standardized
+residuals rather than only a $p$-value, \textbf{(4)} complete an ANOVA table and check its
+conditions, \textbf{(5)} choose the right method for any Module 2 question.
+
+\parttitle{Part 1: Module 2 Concept Review}
+
+{\small
+
+\noindent The whole module on one page. Everything in Part 2 can be answered from it.
+
+\begin{enumerate}[label=\textbf{\arabic*.}, wide=0pt, itemsep=.4em, topsep=.5em]
+
+\item \textbf{Two roads, whatever the statistic.} \textbf{Road A} builds the null distribution by
+simulation: shuffle or resample so that $H_0$ is true by construction, recompute the statistic,
+repeat. \textbf{Road B} uses a formula for that null distribution. Road A needs only that your
+shuffle encode $H_0$; Road B carries conditions. When they disagree, trust Road A.
+
+\item \textbf{Module 2's four questions.}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{llll}
+\toprule
+\textbf{Question} & \textbf{Statistic} & \textbf{Road A shuffles} & \textbf{Road B model} \\
+\midrule
+One mean or proportion & $\bar{x}$ or $\hat{p}$ & nothing; simulate from $H_0$ & $t$, normal, binomial \\
+Two groups & difference in means & the group labels & $t$ \\
+Two-way table & $X^2$ & one variable's labels & $\chi^2_{(r-1)(c-1)}$ \\
+$k$ group means & $F$ & the group labels & $F_{k-1,\,n-k}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\item \textbf{Testing a two-way table.} Independence predicts
+\[
+E_{ij} = \frac{(\text{row } i \text{ total})(\text{column } j \text{ total})}{n},
+\qquad
+X^2 = \sum_{ij} \frac{(O_{ij}-E_{ij})^2}{E_{ij}},
+\qquad \text{df} = (r-1)(c-1).
+\]
+The df counts the cells you are free to fill once the margins are fixed, which is why a
+$2\times3$ table has $2$ df and not $6$. \textbf{Condition for Road B:} every expected count at
+least about $5$.
+
+\item \textbf{Where the evidence sits.} A $p$-value says \emph{whether}; the
+\textbf{standardized residuals} $(O-E)/\sqrt{E}$ say \emph{where}. A residual beyond about
+$\pm 2$ marks a cell pulling the result; its sign says whether that cell is over- or
+under-represented. Each cell's contribution to $X^2$ is $(O-E)^2/E$.
+
+\item \textbf{ANOVA.} With $k$ groups and $n$ observations,
+$\text{SST} = \text{SSG} + \text{SSE}$, each mean square is $\text{SS}/\text{df}$, and
+\[
+F = \frac{\text{MSG}}{\text{MSE}}
+= \frac{\text{SSG}/(k-1)}{\text{SSE}/(n-k)} ,
+\qquad \text{df} = (k-1,\; n-k).
+\]
+Large $F$ means between-group variability is large \emph{relative to} within-group variability.
+The $p$-value is always the right-hand tail. \textbf{Conditions for Road B:} independence, roughly
+normal residuals, and comparable group spreads (a largest-to-smallest SD ratio under about 2 is
+usually fine).
+
+\item \textbf{After a significant $F$.} $F$ says the means are not all equal, not which pair
+differs. Running all $m = \binom{k}{2}$ pairwise tests at $\alpha$ inflates the family-wise error
+rate to $1-(1-\alpha)^m$: for $k=3$ that is $0.143$, not $0.05$.
+
+\item \textbf{Four traps.} Using $rc$ or $n$ for the df of a table. Reading a large $X^2$ or $F$ as
+a direction; both are one-tailed magnitudes with no sign. Reporting a formula $p$-value without
+checking the condition that licenses it. Concluding from a significant $F$ that every group differs
+from every other.
+
+\end{enumerate}
+
+}
+
+\newpage
+
+\parttitle{Part 2: Question Set}
+
+\noindent\textbf{Scenario.} The $60$ library branches are of three types. For each branch you know
+whether it met its annual program target, and its annual visits in thousands. The same
+three-level variable is about to be tested two different ways.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lcccc}
+\toprule
+ & \textbf{Branch} & \textbf{Central} & \textbf{Kiosk} & \textbf{Total} \\
+\midrule
+Met target & 6 & 9 & 3 & 18 \\
+Did not & 22 & 5 & 15 & 42 \\
+\midrule
+Total & 28 & 14 & 18 & 60 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{questions}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{What independence predicts.}
+
+\begin{parts}
+\item Compute the expected count for \textbf{Met / Central} and for \textbf{Did not / Branch},
+showing the arithmetic.
+\answerspace{4em}
+
+\item The full table of expected counts is below. Compute the contribution
+$(O-E)^2/E$ for the Met / Central cell.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Expected} & \textbf{Branch} & \textbf{Central} & \textbf{Kiosk} \\
+\midrule
+Met target & 8.4 & 4.2 & 5.4 \\
+Did not & 19.6 & 9.8 & 12.6 \\
+\bottomrule
+\end{tabular}
+\end{center}
+\answerspace{3.5em}
+
+\item The whole statistic is $X^2 = 10.34$. State the degrees of freedom and justify the number
+without quoting the formula: say what you are free to choose once the margins are fixed.
+\answerspace{4em}
+
+\item A classmate says a large $X^2$ shows that Central branches do \emph{better}. What is wrong
+with reading a direction off $X^2$?
+\answerspace{3.5em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Which road survives.} Road B gives $p = 0.0057$ from the $\chi^2$ distribution.
+Road A, shuffling the branch-type labels $1000$ times, put $8$ of the shuffles at or above the
+observed $X^2$.
+
+\begin{parts}
+\item Give Road A's $p$-value.
+\answerspace{2.5em}
+
+\item Look at the expected counts in Question 1(B). Which condition for Road B fails, and in which
+cell?
+\answerspace{3.5em}
+
+\item Given that failure, which $p$-value do you report, and why is Road A unaffected by the
+problem?
+\answerspace{4em}
+
+\item The two $p$-values came out close anyway. Does that mean the condition did not matter?
+Answer carefully.
+\answerspace{4em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Where the evidence sits.} The standardized residuals $(O-E)/\sqrt{E}$ and the
+contributions to $X^2$:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lcccccc}
+\toprule
+ & \multicolumn{3}{c}{\textbf{Standardized residual}} & \multicolumn{3}{c}{\textbf{Contribution to $X^2$}} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+ & Branch & Central & Kiosk & Branch & Central & Kiosk \\
+\midrule
+Met target & $-0.83$ & $2.34$ & $-1.03$ & 0.69 & 5.49 & 1.07 \\
+Did not & $0.54$ & $-1.53$ & $0.68$ & 0.29 & 2.35 & 0.46 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{parts}
+\item Which single cell contributes most to $X^2$, and what share of the total $10.34$ is it?
+\answerspace{3em}
+
+\item Interpret that cell's standardized residual, including its sign, in a sentence about
+Central branches.
+\answerspace{3.5em}
+
+\item Only one residual exceeds $\pm 2$. Write the conclusion you would report to the director,
+naming \emph{where} the dependence is rather than only that it exists.
+\answerspace{4em}
+
+\item The Kiosk column has residuals $-1.03$ and $0.68$. Would you claim anything about kiosks?
+\answerspace{3em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{The same variable, a numeric response.} Now compare mean annual visits across the
+three types. Group sizes are $28$, $14$, $18$; group means are $66.99$, $111.90$, $59.44$; the
+grand mean is $75.20$. The sums of squares are $\text{SSG} = 25217$ and $\text{SSE} = 26857$. The
+three group standard deviations are $22.95$, $21.79$, and $19.49$.
+
+\begin{parts}
+\item Complete the ANOVA table.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.7}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Source} & \textbf{df} & \textbf{Sum of squares} & \textbf{Mean square} & \textbf{$F$} \\
+\midrule
+Type (between) & \blankline{.6in} & 25217 & \blankline{1in} & \blankline{.9in} \\
+Residual (within) & \blankline{.6in} & 26857 & \blankline{1in} & \\
+\midrule
+Total & \blankline{.6in} & \blankline{1in} & & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\item The $p$-value is about $6 \times 10^{-9}$. State the conclusion, and say why the $p$-value
+uses only the right-hand tail of the $F$ distribution.
+\answerspace{4em}
+
+\item Check the comparable-spread condition using the three standard deviations. Does Road B's
+formula look licensed here? Contrast this with what you found in Question 2.
+\answerspace{4em}
+
+\item The director now wants to know which types differ. You run all three pairwise comparisons at
+$\alpha = 0.05$. Compute the family-wise error rate, and say what it means.
+\answerspace{4em}
+\end{parts}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item \textbf{Pick the method.} \lo{Module 2 sweep} For each question, name the statistic you would
+use and say whether a formula is available or you would have to simulate.
+
+\begin{center}
+\renewcommand{\arraystretch}{2}
+\begin{tabularx}{\linewidth}{LLL}
+\toprule
+\textbf{Question} & \textbf{Statistic} & \textbf{Formula or simulate?} \\
+\midrule
+Do the three branch types have equal mean visits? & & \\
+Is meeting the target related to branch type? & & \\
+A plausible range for the median visits across all branches & & \\
+Did the Saturday program change mean visits, program vs control? & & \\
+Is the share of branches meeting target really $0.40$? & & \\
+A plausible range for the difference the program made & & \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{parts}
+\item Two rows in your table ask for an \emph{interval} rather than a test. Which two, and what
+does that change about the method?
+\answerspace{3.5em}
+
+\item $X^2$ and $F$ are built very differently, yet the review calls both ``one number for a whole
+comparison.'' Name two structural features they share.
+\answerspace{4em}
+\end{parts}
+
+\end{questions}
+
+\end{document}
