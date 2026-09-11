@@ -5,23 +5,24 @@
 ### Lab 1: Working with R and Data
 
 - **Week:** 1
-- **Materials:** `flights.csv`, `lab-starter.R`
+- **Materials:** `nycflights13::flights`, `lab-activity.pdf`, `lab-starter.R` (TA reference: `lab-ta-solutions.R`, `lab-ta-guide.md`)
 - **Lecture Anchor:** Lecture 1
 - **Purpose:** Establish the R workflow used throughout the course and review basic data exploration with flights data.
 - **Primary Objectives:**
   - Carry out a complete, reproducible statistical workflow in R
-  - Import, inspect, summarize, visualize, and interpret a data set
+  - Load packaged data; inspect, summarize, visualize, and interpret a data set
 - **Pre-Lab Activity:**
-  - Introduce yourself to a partner and identify what one row represents in a familiar data set.
+  - Introduce yourself to a partner and discuss a recent trip and time spent at the airport, if applicable.
 - **In-Lab Activity:**
-  - Open `lab-starter.R` and import `flights.csv` without using `setwd()`.
-  - Inspect dimensions, names, structure, and the meaning of `origin`, `dest`, and `air_time`.
-  - Predict which NYC airport has the most flights, then verify with grouped counts.
-  - Summarize destinations and mean air time by month.
-  - Interpret the strongest comparison in context and identify a limitation.
-  - Optionally plot air time across months or origin airports and save it with `ggsave()`.
+  - Install/load `nycflights13`, load `flights`, and use `?flights`; explain basic R functions and pipelines.
+  - Inspect dimensions, variable types, units, scheduled times, and missing values.
+  - Predict and compare the busiest scheduled departure hours at two airports; make a labeled bar plot.
+  - Report each airport's mean arrival delay and identify the greatest, excluding missing values.
+  - Calculate the count and percentage of departures more than 30 minutes late that arrive on time or early, using only observed arrival delays.
+  - Make a scatterplot of departure delay and arrival delay and describe the pattern in 1-2 sentences.
+  - Propose one further question and name the variables needed to investigate it.
 - **Post-Lab Activity:**
-  - Write a final claim about the flights data, cite evidence, and explain the context.
+  - Review the worksheet responses and the question proposed for further investigation.
 - **Deliverables:**
   - Tutorial 1 hash.
   - Completed in-lab activity response sheet.

@@ -1,0 +1,366 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% MA214 Lab 0 -- Welcome to the MA214 Labs
+%
+% Presented in the first lab meeting. Introduces the lab schedule, what
+% students are required to do, and then hands off to Tutorial 0, whose
+% hash they submit to Blackboard before leaving.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Slide options
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Option 1: Slides with solutions
+
+\documentclass[slidestop,compress,mathserif]{beamer}
+\newcommand{\soln}[1]{\textit{#1}}
+\newcommand{\solnGr}[1]{#1}
+\usepackage{booktabs}
+
+% Option 2: Handouts without solutions
+
+%\documentclass[11pt,containsverbatim,handout]{beamer}
+%\usepackage{pgfpages}
+%\pgfpagesuselayout{4 on 1}[letterpaper,landscape,border shrink=5mm]
+%\newcommand{\soln}[1]{ }
+%\newcommand{\solnGr}[1]{ }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Style
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{../../common/lec_style.tex}
+\graphicspath{ {../../common/} }
+
+% This is a lab deck, not a lecture deck: credit the lab instructor.
+\renewcommand{\coursetag}{MA214: Applied Statistics --- Lab}
+\renewcommand{\courseattribution}{%
+  MA214 lab materials by Yongho Lim. Released under the
+  \webLink{http://creativecommons.org/licenses/by-sa/3.0/us/}{CC BY-SA license}.}
+
+% EDIT ME each semester: the Docker Hub account hosting the tutorial image
+% is written literally in the "Getting the tutorials running" frame below
+% (the code block is verbatim, so a macro would not expand there).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Preamble
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title[Lab 0]{Lab 0: Welcome to the labs}
+\subtitle{Module 1: Modeling and Linear Regression}
+\date{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Begin document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Title page
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\maketitleframe
+
+\include{Lab0_agenda}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{How the labs run}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Who is in the room}
+
+\begin{itemize}
+  \item \hl{Lab instructor:} Dr.~Yongho Lim --- \mail{ylim2@bu.edu} \\
+        Office hours: Monday 1:00--2:00pm, Thursday 12:00--1:00pm, CDS 408
+  \item \hl{Teaching fellows:} Sidharth Soundararajan (\mail{sidsound@bu.edu})
+  \item \hl{Learning assistants:} Cynthia Huang (\mail{chuang12@bu.edu})
+
+\end{itemize}
+
+\vspace{0.5em}
+Teaching fellow and learning assistant office hours: TBA, posted on the
+course page.
+
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{What the labs are for}
+
+Lecture is where the statistics is developed. Lab is where you
+\hl{do} it: on real data, in R, with other people.
+
+\vspace{0.5em}
+\begin{itemize}
+  \item You work in \hl{groups}. Statistics is argued about, not
+        recited.
+  \item You use \hl{R} and RStudio. The code is a means, not the point.
+  \item You produce something every session --- a worksheet, a
+        deliverable.
+\end{itemize}
+
+\keyidea{The lab grade is not about getting clean output. It is about
+whether you can interpret what the output says and say why it is
+reasonable.}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Two kinds of lab}
+
+\begin{columns}[T]
+\column{0.48\textwidth}
+\textbf{\color{ccBlue} Skills labs (5)}
+
+\vspace{0.3em}
+Short, self-contained, hands-on.
+
+\begin{itemize}\footnotesize
+\item Prepare with an online tutorial
+\item Work an in-lab worksheet
+\item Graded \emph{completed} / \emph{not completed}
+\end{itemize}
+
+\column{0.48\textwidth}
+\textbf{\color{ccTerra} Project labs (2 projects)}
+
+\vspace{0.3em}
+Several weeks each, one group product.
+
+\begin{itemize}\footnotesize
+\item Project 1: video presentation
+\item Project 2: written report
+\item Graded E / S / R / N
+\end{itemize}
+\end{columns}
+
+\vspace{0.8em}
+Roughly half the semester is skills labs, half is project work. Both
+count toward your final grade, and they count in different ways --- see
+the syllabus grading table.
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The lab schedule}
+
+\vspace{-0.8em}
+{\scriptsize
+\renewcommand{\arraystretch}{0.9}
+\begin{center}
+\begin{tabular}{cll}
+\toprule
+\bf Week & \bf Session & \bf Focus \\
+\midrule
+1 & \color{ccBlue}Lab 0  & Welcome to the labs \\
+2  & \color{ccBlue}Lab 1  & Working with R and data \\
+3  & \color{ccBlue}Lab 2  & Regression models \\
+4  & \color{ccTerra}P1--1 & Project 1 launch and outline \\
+5  & \color{ccTerra}P1--2 & Project 1 data cleaning and EDA \\
+6  & \color{ccTerra}P1--3 & Project 1 modeling and diagnostics \\
+7  & \color{ccTerra}P1--4 & Project 1 presentation work session \\
+8  & \color{ccTerra}P2--1 & Project 2 launch: bootstrapping \\
+9  & \color{ccTerra}P2--2 & Project 2 simulation design \\
+10  & \color{ccTerra}P2--3 & Project 2 real data analysis \\
+11 & \color{ccTerra}P2--4 & Project 2 final work session \\
+12 & \color{ccBlue}Lab 3  & Bayes' rule \\
+13 & \color{ccBlue}Lab 4  & Conjugate families: beta-binomial \\
+14 & \color{ccGray}---    & \color{ccGray}No lab \\
+15 & \color{ccBlue}Lab 5  & Bayesian linear regression \\
+\bottomrule
+\end{tabular}
+\end{center}}
+
+\vspace{-0.6em}
+\Note{Calendar dates follow your own section's meeting day --- check
+your schedule and the course page.}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{What counts as a completed lab}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The shape of a skills lab}
+
+Every one of the five runs the same way.
+
+\begin{enumerate}
+  \item \hl{Before lab.} Work the online \hl{tutorial} for that lab.
+        It practises the R on a different scenario, so that syntax is not
+        what slows you down in the room.
+  \item \hl{In lab.} Work the \hl{worksheet} with your group, with the
+        lab team circulating.
+  \item \hl{Submit.} The tutorial's \hl{hash} to Blackboard, and the
+        worksheet as instructed for that lab.
+\end{enumerate}
+
+\keyidea{A skills lab counts as completed only when \emph{both} arrive:
+the tutorial hash \hl{and} the worksheet. One without the other is not.}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{What is required of you}
+
+\begin{itemize}
+  \item \hl{Show up.} Lab attendance is graded. For an A you may miss
+        at most one lab.
+  \item \hl{Come prepared.} Do the tutorial \emph{before} the lab it
+        belongs to, not after.
+  \item \hl{Submit both pieces} for each skills lab: hash and worksheet.
+  \item \hl{Carry your weight on projects.} Every deliverable is
+        followed by a peer assessment form.
+\end{itemize}
+
+\caution[--- absences]{An absence is excused only if you email the lab
+instructor \emph{in advance} with your reason. Excused absences are not
+counted as missed. After the fact is too late.}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{The lab projects, in one slide}
+
+You will work in the same group on two projects.
+
+\vspace{0.5em}
+\begin{itemize}
+  \item \hl{Project 1} --- a video presentation. Weeks 4--7.
+  \item \hl{Project 2} --- a written report. Weeks 8--11.
+\end{itemize}
+
+\vspace{0.5em}
+Each is graded on the ESRN rubric: \hl{E}xcellent, \hl{S}atisfactory,
+\hl{R}evisions needed, \hl{N}ot assessable. An S earns full credit. An R
+or N must be revised and resubmitted \emph{once}.
+
+\vspace{0.5em}
+Both projects must reach S or E by the end of the course.
+
+\Note{More detail in the Week 4 lab, when Project 1 launches. Nothing to
+do about it today.}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The tutorial system}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{Getting the tutorials running}
+
+The tutorials run in \hl{Docker}, so you install no R packages and set no
+working directory. Install Docker Desktop once, then for every tutorial:
+
+Run the tutorial launcher that is available on the blackboard. 
+
+Then open \webURL{http://localhost:3838} in a browser (your launcher will open it for you). 
+You will see a list of tutorials. Click the one you want to run.
+
+\vspace{0.4em}
+\begin{itemize}\footnotesize
+  \item \hl{Back to Main Tutorial Page} at the top of a tutorial returns
+        to the picker.
+  \item Nothing is downloaded and nothing is installed into R --- the
+        data lives inside the tutorial.
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Inside a tutorial}
+
+\begin{itemize}
+  \item \hl{Exercise box} --- an editable code editor with a
+        \emph{Run Code} button. Run it as often as you like; you cannot
+        break anything.
+  \item \hl{Blanks} --- \texttt{\_\_\_} marks something for you to
+        replace.
+  \item \hl{Hint} --- available from the start. Use it.
+  \item \hl{Solution} --- released on a timer, normally \emph{after}
+        that tutorial's deadline. Do not wait for it.
+  \item \hl{Quiz} --- multiple choice, with retries.
+\end{itemize}
+
+\caution[--- one box, one world]{Each exercise box starts fresh. An
+object you create in one box does not exist in the next one.}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Submitting a hash}
+
+At the bottom of every tutorial is a \hl{Submit your work} section.
+
+\vspace{0.6em}
+\begin{enumerate}
+  \item Check that you have attempted every exercise and quiz.
+  \item Type your \hl{name} and \hl{student ID}.
+  \item Click \hl{Generate}.
+  \item Select the \hl{whole} hash and copy it.
+  \item Paste it into that tutorial's submission form on
+        \hl{Blackboard}.
+\end{enumerate}
+
+\vspace{0.4em}
+\begin{itemize}\footnotesize
+  \item No hash appears? Answer at least one question first, and check
+        that neither name box is blank.
+  \item Changed an answer afterwards? Generate a new hash and submit the
+        newer one.
+  \item The hash encodes your answers and your ID. Do not post it
+        anywhere public.
+\end{itemize}
+
+\end{frame}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{When you are stuck}
+
+In this order:
+
+\begin{enumerate}
+  \item Read the error message, then read the question again.
+  \item Check spelling, capitalisation, brackets, quotation marks.
+  \item Compare your code with the worked example above it.
+  \item Open the hint.
+  \item Ask your group, then an LA, a TF, or the lab instructor.
+\end{enumerate}
+
+Say what you already tried, and do not delete the broken attempt --- it
+is the most useful thing you can show us.
+
+\keyidea{An error message is not a verdict on you. It is R telling you
+what it needs next.}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Wrap-up}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Key takeaways}
+
+\begin{itemize}
+\item Five \hl{skills labs} and two \hl{projects}, roughly half the semester each.
+\item A skills lab is completed only when \emph{both} the tutorial hash and the
+  worksheet arrive --- one without the other is not.
+\item The tutorial for a lab is done \emph{before} that lab, not after.
+\item Attendance is graded, and an absence is excused only if you email
+  \hl{in advance}.
+\item Tutorials run in \hl{Docker}. Download \hl{Docker Desktop} and open it. 
+\item \hl{Today:} finish Tutorial 0 and submit its hash to Blackboard before
+  you leave.
+\item Go over the R onboarding website for R and RStudio if you are new to R.
+\item https://bu-intro-stats.github.io/MA213-214-R-onboarding-website/
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% End document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}

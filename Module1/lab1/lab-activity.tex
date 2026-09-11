@@ -1,188 +1,195 @@
-\documentclass{article}
-
-\usepackage[margin=1in]{geometry}
-\usepackage{xcolor}
-\usepackage{parskip}
-\usepackage{array}
-\usepackage{enumitem}
-\usepackage{listings}
-
+\documentclass[11pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{xcolor,parskip,array,enumitem,listings}
+\usepackage[hidelinks]{hyperref}
 \definecolor{codegray}{gray}{0.97}
 \definecolor{huddleblue}{RGB}{214,234,255}
 \definecolor{predictionyellow}{RGB}{255,242,200}
-\definecolor{debatepink}{RGB}{255,225,225}
-
-\lstset{
-  basicstyle=\ttfamily\small,
-  columns=fullflexible,
-  frame=single,
-  framerule=0.4pt,
-  backgroundcolor=\color{codegray},
-  breaklines=true,
-  showstringspaces=false,
-  keepspaces=true
-}
-
-\newcommand{\coursenumber}{MA 214}
-\newcommand{\nameblank}{\rule{1.75in}{0.4pt}}
-\newcommand{\idblank}{\rule{1.55in}{0.4pt}}
-\newcommand{\shortblank}{\rule{1.6in}{0.4pt}}
-\newcommand{\longblank}{\rule{0.93\linewidth}{0.4pt}}
-\newcommand{\responsebox}[2]{\noindent\fbox{\begin{minipage}{0.95\linewidth}\textbf{#1} #2\vspace{0.55in}\end{minipage}}}
-\newcommand{\linedbox}[1]{\noindent\fbox{\begin{minipage}{0.95\linewidth}#1\vspace{0.18in}\par\longblank\par\vspace{0.18in}\longblank\par\vspace{0.18in}\longblank\end{minipage}}}
-\newcommand{\callout}[3]{\noindent\colorbox{#1}{\makebox[\dimexpr0.95\linewidth-2\fboxsep\relax][l]{\textbf{#2}}}\par\noindent\fbox{\begin{minipage}{0.93\linewidth}#3\end{minipage}}}
-
+\lstset{basicstyle=\ttfamily\small,columns=fullflexible,frame=single,
+  framerule=0.4pt,backgroundcolor=\color{codegray},breaklines=true,
+  showstringspaces=false,keepspaces=true,aboveskip=6pt,belowskip=6pt}
+\setlist[enumerate]{leftmargin=*,itemsep=4pt,topsep=4pt}
+\newcommand{\response}[2]{\par\noindent\fbox{\begin{minipage}{0.96\linewidth}\textbf{#1}\par\vspace{#2}\end{minipage}}\par}
+\newcommand{\callout}[2]{\noindent\colorbox{#1}{\begin{minipage}{0.96\linewidth}#2\end{minipage}}\par}
 \begin{document}
-
 \begin{center}
-  {\LARGE \coursenumber{} Week 1: Lab 1}\\
-  {\large Working with R and Data}
+{\LARGE MA 214: Lab 1}\\[3pt]
+{\large Working with R and Data: NYC Flights}
 \end{center}
+\textbf{Name:} \hrulefill\quad  \textbf{BU ID:} \hrulefill\par
+\textbf{Partner's name:} \hrulefill \quad \textbf{BU ID:} \hrulefill
 
-\begin{enumerate}[label=\arabic*.,leftmargin=*,itemsep=.7em]
-  \item \textbf{Your name:} \nameblank \hfill \textbf{BU ID:} \idblank
-  \item \textbf{Partner's name:} \nameblank \hfill \textbf{BU ID:} \idblank
-\end{enumerate}
+\textbf{Mission:} Use flight records to ask a question, choose a summary, make a plot, and support a claim. Work with a partner and explain your code to each other.
+\textbf{Do not use GenAI tools for this lab.} Practice your own coding and statistical reasoning.
 
-\textbf{Big idea:} Data analysis starts with understanding what each row and column represents before calculating summaries or making plots.
-\textbf{Do not use GenAI tools for this lab.} The point is to practice your own analysis work, coding skills, and statistical reasoning.
+\section*{Getting Started: Packages, Data, and Help}
+Open \texttt{lab-starter.R}. We will use the full \texttt{flights} data set in \texttt{nycflights13}.
 
-\textbf{Files used:} \texttt{flights.csv} and \texttt{lab-starter.R}
-
-\textbf{Skills practiced:} \texttt{read.csv()}, \texttt{glimpse()}, \texttt{count()}, \texttt{summarize()}, and basic \texttt{ggplot()} graphics.
-
-\textbf{Your mission:} Use the flights data to practice importing, inspecting, summarizing, and visualizing data in a reproducible R script.
-
-\section*{Icebreaker}
-
-Before opening R: introduce yourself to your partner and answer the warm-up question below.
-
-\responsebox{Warm-up response:}{What is one everyday data set you have seen recently, and what would one row represent in that data set?}
-
-\section*{Getting Started}
-
-Open \texttt{lab-starter.R}. Make sure \texttt{flights.csv} is in the same folder as your script. Do not use \texttt{setwd()} in the file you submit.
-
+Run the installation commands in the \textbf{Console once}, if needed:
 \begin{lstlisting}
+install.packages("nycflights13")
+install.packages(c("dplyr", "ggplot2"))
+\end{lstlisting}
+Then run these lines at the start of each new R session:
+\begin{lstlisting}
+library(nycflights13)
 library(dplyr)
 library(ggplot2)
-library(readr)
-
-flights <- read.csv("flights.csv")
-
-head(flights)
-str(flights)
+data(flights)
+?flights
 \end{lstlisting}
-
-\callout{huddleblue}{HUDDLE UP}{Before calculating anything, what do you think one row represents? Which variables seem useful for describing where flights went and how long they took?}
+\textbf{What do these commands do?}
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{p{0.35\linewidth}p{0.57\linewidth}}
+\textbf{Command} & \textbf{Purpose} \\
+\texttt{install.packages("name")} & Downloads and installs a package on your computer. \\
+\texttt{library(name)} & Attaches an installed package for this session. \\
+\texttt{data(flights)} & Loads the packaged data set for use in R. \\
+\texttt{?flights} & Opens documentation: context, variables, and units. \\
+\texttt{head(flights)} & Shows the first six rows. \\
+\texttt{dim(flights)} & Returns the number of rows and columns. \\
+\texttt{names(flights)} & Lists the column names. \\
+\texttt{glimpse(flights)} & Shows column types and example values. \\
+\end{tabular}
+\end{center}
+\callout{huddleblue}{\textbf{Huddle:} Why do we install a package once but load it again in a new session? What information can the help page give you that the first six rows cannot?}
+\response{Warm-up: Introduce yourself. Which city did you visit recently? If you flew, how much time did you spend at the airport?}{0.35in}
 
 \newpage
-
-\section*{Question 1. Explore the Flights Data}
-
-Start by getting oriented. Record what you learn about the size, columns, and variable types in the data.
-
-\begin{lstlisting}
-dim(flights)
-names(flights)
-str(flights)
-\end{lstlisting}
-
+\section*{1. Meet the Data and Read a Pipeline}
+Run \texttt{head()}, \texttt{dim()}, \texttt{names()}, and \texttt{glimpse()} on \texttt{flights}. Use \texttt{?flights} to interpret the output.
+\begin{enumerate}
+\item How many rows and columns are there? What does one row represent? Which year and origin airports are covered?
+\item For each variable below, identify whether it is categorical or quantitative and explain its meaning (including units). Is every column stored as a number a quantitative measurement?
+\end{enumerate}
 \begin{center}
-\renewcommand{\arraystretch}{2.3}
-\begin{tabular}{|p{0.24\linewidth}|p{0.27\linewidth}|p{0.36\linewidth}|}
+\renewcommand{\arraystretch}{1.65}
+\begin{tabular}{|p{0.20\linewidth}|p{0.28\linewidth}|p{0.41\linewidth}|}
 \hline
-\textbf{Variable or data set} & \textbf{Type or role} & \textbf{What it means} \\
+\textbf{Variable} & \textbf{Type} & \textbf{Meaning / units} \\
 \hline
-\texttt{origin} & & \\
+\texttt{origin}, \texttt{dest} & & \\
 \hline
-\texttt{dest} & & \\
+\texttt{carrier}, \texttt{flight} & & \\
 \hline
-\texttt{air\_time} & & \\
+\texttt{hour} & & \\
+\hline
+\texttt{arr\_delay} & & \\
+\hline
+\texttt{air\_time}, \texttt{distance} & & \\
 \hline
 \end{tabular}
 \end{center}
-
-\linedbox{\textbf{Write 2-3 sentences describing what you learned from the first look at the data.}}
-
-\section*{Question 2. Make a Prediction}
-
-Before summarizing, predict which NYC airport had the most flights in this data set: JFK, LGA, or EWR.
-
-\callout{predictionyellow}{PREDICTION TIME}{Before running the code, predict the busiest origin airport. Be specific enough that the data can support or challenge your answer.}
-
+\textbf{Reading R:} \texttt{<-} saves a result with a name; \texttt{==} tests equality; \texttt{\%>\%} passes a result into the next function. Read a pipeline as ``take this, then do that.''
 \begin{lstlisting}
 airport_counts <- flights %>%
-  count(origin)
-
+  count(origin, sort = TRUE)
 airport_counts
 \end{lstlisting}
-
-\newpage
-
-\linedbox{\textbf{What did your team predict? What evidence did you check first?}}
-
-\section*{Question 3. Compute Summaries}
-
-Use counts and grouped summaries to answer concrete questions about destinations and air time.
-
-\begin{lstlisting}
-state_counts <- flights %>%
-  count(dest)
-
-air_time_by_month <- flights %>%
-  group_by(month) %>%
-  summarize(
-    mean_air_time = mean(air_time, na.rm = TRUE),
-    n_flights = n()
-  )
-\end{lstlisting}
-
-\callout{huddleblue}{HUDDLE UP}{Does each summary answer the question directly, or do you need another comparison, plot, or table?}
-
-\callout{huddleblue}{CLAIM, EVIDENCE, CONTEXT}{%
-The main pattern is \shortblank.\\[.6em]
-My evidence is \shortblank.\\[.6em]
-This matters because \shortblank.
-}
-
-\section*{Question 4. Interpret in Context}
-
-Connect your R output to a plain-language statement about the flights data.
-
 \begin{center}
-\renewcommand{\arraystretch}{2.25}
-\begin{tabular}{|p{0.42\linewidth}|p{0.50\linewidth}|}
-\hline
-\textbf{Question} & \textbf{Your answer} \\
-\hline
-What comparison did you make? & \\
-\hline
-What result is strongest? & \\
-\hline
-What limitation or caution should readers know? & \\
-\hline
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{p{0.38\linewidth}p{0.54\linewidth}}
+\textbf{Function} & \textbf{Purpose} \\
+\texttt{filter(origin == "JFK")} & Keeps rows matching a condition. \\
+\texttt{select(origin, hour)} & Keeps selected columns. \\
+\texttt{count(origin)} & Counts rows in each origin group. \\
+\texttt{arrange(desc(n))} & Orders rows from largest to smallest \texttt{n}. \\
+\texttt{group\_by(origin)} & Sets the groups for the next summary. \\
+\texttt{summarize(...)} & Calculates summaries within each group. \\
+\texttt{n()}, \texttt{mean()}, \texttt{median()} & Group size, average, and middle value. \\
 \end{tabular}
 \end{center}
+\response{Which airport has the most records? Then select three variables and filter to one airport in your script.}{0.4in}
+\textbf{Watch the units:} \texttt{hour} is the \emph{scheduled} departure hour (local time). \texttt{dep\_time} uses HHMM, so 830 means 8:30, not 830 minutes. Negative delay means early; \texttt{NA} means missing, not zero.
 
 \newpage
+\section*{2. When Is an Airport Busiest?}
+\callout{predictionyellow}{\textbf{Predict first:} Choose JFK, LGA, or EWR. Which scheduled departure hour do you expect to have the most flights, and why?}
+\response{Chosen airport, predicted busiest hour, and reason:}{0.3in}
+Here, \textbf{busiest hour} means the hour of day with the most scheduled departures in the data across all of 2013. We are counting records, not passengers or simultaneous aircraft.
+\begin{lstlisting}
+chosen_airport <- "JFK"  # Change this to your airport.
+hour_counts <- flights %>%
+  filter(origin == chosen_airport) %>%
+  count(hour, name = "n_flights") %>%
+  arrange(desc(n_flights))
+hour_counts
+\end{lstlisting}
+\begin{enumerate}
+\item Report the busiest hour as a clock interval (for example, 9 means 9:00--9:59) and its flight count. Check for ties. Did the result support your prediction?
+\item Repeat for another airport. Do the peak hours match? What information is lost when we combine all days of the year?
+\end{enumerate}
+\response{Evidence: Compare your two airports using hours and counts.}{0.5in}
+\textbf{Make a plot.} \texttt{ggplot()} starts a plot; \texttt{aes()} maps columns to axes; \texttt{geom\_col()} draws bars using the counts we already calculated.
+\begin{lstlisting}
+hour_plot <- ggplot(hour_counts,
+                    aes(x = hour, y = n_flights)) +
+  geom_col() +
+  scale_x_continuous(breaks = seq(0, 23, by = 3)) +
+  labs(title = paste("Scheduled departures from", chosen_airport),
+       x = "Scheduled departure hour (local time)",
+       y = "Flight count in 2013")
+hour_plot
+# Optional: save to your current working directory.
+# ggsave("lab1-hour-counts.png", hour_plot, width = 7, height = 4)
+\end{lstlisting}
+\callout{huddleblue}{\textbf{Huddle:} Why does a histogram of \texttt{dep\_time} answer a different question? Why does a larger flight count not tell us the number of passengers?}
 
-\callout{debatepink}{DEBATE CORNER}{If you and your partner disagree about the interpretation, write both arguments first. Then decide what claim the evidence actually supports.}
+\newpage
+\begingroup\setlength{\parskip}{4pt}
+\section*{3. How Long Is the Delay?}
+Which origin airport has the greatest mean arrival delay? Report the mean for EWR, JFK, and LGA.
 
-\section*{Question 5. Close the Lab}
-
-Submit your completed \texttt{lab-starter.R}. Your script should run from top to bottom and include the requested objects and plots.
-
-\linedbox{\textbf{Final response:} state one claim about the flights data, cite one piece of evidence, and explain the context.}
-
-\section*{Optional Challenge}
-
-Make one plot that compares \texttt{air\_time} across months or origin airports. Save it using \texttt{ggsave()}.
+\textit{Delays are in minutes; negative values mean early arrivals. Enter and run this code in your script. Missing values are excluded.}
 
 \begin{lstlisting}
-# Optional challenge starter code.
-ggplot(flights, aes(x = factor(month), y = air_time)) +
-  geom_boxplot()
+airport_delays <- flights %>%
+  group_by(origin) %>%
+  summarize(
+    n_observed = sum(!is.na(arr_delay)),
+    mean_delay = mean(arr_delay, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  arrange(desc(mean_delay))
+airport_delays
 \end{lstlisting}
 
+\response{Your answer:}{0.75in}
+
+\section*{4. Can a Late Departure Still Arrive on Time?}
+Of flights departing more than 30 minutes late, what percentage arrive on time or early?
+
+\textit{Use \texttt{dep\_delay > 30} and \texttt{arr\_delay <= 0}. Exclude missing arrival delays; report the count and percentage.}
+
+\begin{lstlisting}
+recovery <- flights %>%
+  filter(dep_delay > 30, !is.na(arr_delay)) %>%
+  summarize(
+    n_observed = n(),
+    n_recovered = sum(arr_delay <= 0),
+    pct_recovered = 100 * n_recovered / n_observed
+  )
+recovery
+\end{lstlisting}
+
+\response{Your answer:}{0.7in}
+
+\newpage
+\section*{5. Late Leaving, Late Arriving?}
+Make a scatterplot of departure delay and arrival delay. What relationship do you see?
+
+\textit{Use \texttt{dep\_delay} on the x-axis and \texttt{arr\_delay} on the y-axis (both in minutes). Each point is a flight. Describe the pattern in 1--2 sentences.}
+
+\response{Sketch your plot and describe the relationship:}{1.5in}
+
+\section*{6. What Else Would You Like to Find Out?}
+Write one question you could investigate with these data and name the variables you would use.
+
+\response{Your answer:}{0.7in}
+
+\textbf{Before you leave:} Submit the completed activity worksheet.
+
+{\footnotesize Data documentation: \url{https://nycflights13.tidyverse.org/reference/flights.html}.}
+\par\endgroup
 \end{document}

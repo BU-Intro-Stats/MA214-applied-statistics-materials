@@ -1,0 +1,2 @@
+docker run --rm -p 3838:3838 -p 3839:3839 \
+  DOCKERHUB-USERNAME/ma214tutorial:latest
